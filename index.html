@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver304</title>
+<title>DUNGEON WALKER DWCver312</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -26,7 +26,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     flex-shrink:0;
   }
   /* fixed要素をappの幅に収める（#app内側の要素） */
-  .overlay:not(#ov-over):not(#ov-clear):not(#ov-admin):not(#ov-monster-viewer):not(#ov-save-delete-confirm):not(#ov-gamedata):not(#ov-achievements):not(#ov-main-menu):not(#ov-soul-setup):not(#ov-deck-edit):not(#ov-area-select):not(#ov-charge-select):not(#ov-shop){position:absolute !important;}
+  .overlay:not(#ov-over):not(#ov-clear):not(#ov-admin):not(#ov-monster-viewer):not(#ov-save-delete-confirm):not(#ov-gamedata):not(#ov-achievements):not(#ov-main-menu):not(#ov-soul-setup):not(#ov-deck-edit):not(#ov-area-select):not(#ov-charge-select):not(#ov-shop):not(#ov-shop-confirm):not(#ov-rules):not(#ov-gacha-select):not(#ov-gacha-common):not(#ov-gacha-confirm):not(#ov-gacha-result){position:absolute !important;}
   /* ov-over/ov-clear は動的生成に変更したため position指定不要 */
   #ov-curtain,#confirm-box{position:absolute !important;width:100% !important;}
   #turn-slide{position:absolute !important;}
@@ -39,7 +39,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
      position:fixedのまま画面中央に420px幅で表示する */
   #start-screen,#tap-to-start-screen,#op-screen,
   #company-logo-screen,#logo-screen,
-  #ov-admin,#ov-monster-viewer,#ov-save-delete-confirm,#ov-gamedata,#ov-achievements,#ov-main-menu,#ov-soul-setup,#ov-deck-edit,#ov-area-select,#ov-charge-select,#ov-shop{
+  #ov-admin,#ov-monster-viewer,#ov-save-delete-confirm,#ov-gamedata,#ov-achievements,#ov-main-menu,#ov-soul-setup,#ov-deck-edit,#ov-area-select,#ov-charge-select,#ov-shop,#ov-shop-confirm,#ov-rules,#ov-gacha-select,#ov-gacha-common,#ov-gacha-confirm,#ov-gacha-result{
     position:fixed !important;
     left:50% !important;
     right:auto !important;
@@ -759,7 +759,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver304</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver312</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -883,6 +883,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span class="menu-btn-fallback"><span style="font-size:20px;">🛒</span><span>ショップ</span></span>
       <span id="menu-shop-new-badge" style="display:none;position:absolute;top:6px;right:8px;background:#e74c3c;color:#fff;font-size:9px;font-weight:bold;padding:2px 6px;border-radius:10px;letter-spacing:1px;box-shadow:0 0 6px rgba(231,76,60,.8);z-index:2;">NEW</span>
     </div>
+    <div id="menu-btn-gacha" class="ov-btn menu-img-btn" data-bg="menu_gacha.png" style="height:70px;overflow:hidden;">
+      <span class="menu-btn-fallback"><span style="font-size:20px;">🎰</span><span>ガチャ</span></span>
+    </div>
     <div id="menu-btn-gamedata" class="ov-btn menu-img-btn" data-bg="menu_data.png" style="height:70px;overflow:hidden;">
       <span class="menu-btn-fallback">📊 ゲームデータ</span>
     </div>
@@ -915,6 +918,84 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
   <div id="shop-content" style="width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:6px;"></div>
   <div class="ov-btn" id="btn-shop-close" style="margin-top:4px;">閉じる</div>
+</div>
+
+<!-- ショップ購入確認ポップアップ（#appの外側に配置） -->
+<div class="overlay" id="ov-shop-confirm" style="gap:8px;padding:14px 12px;position:fixed;z-index:2050;justify-content:center;">
+  <div style="background:linear-gradient(160deg,#1a1408,#0a0a1a);border:2px solid rgba(201,168,76,.7);border-radius:14px;padding:18px 20px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:10px;align-items:center;">
+    <div id="sc-icon" style="font-size:32px;"></div>
+    <div id="sc-name" style="font-family:'Cinzel',serif;font-size:15px;color:#f0d47a;font-weight:bold;text-align:center;"></div>
+    <div id="sc-desc" style="font-size:11px;color:#ccc;text-align:center;line-height:1.6;"></div>
+    <div id="sc-price" style="font-size:13px;color:#c9a84c;font-weight:bold;text-align:center;margin-top:2px;"></div>
+    <div style="width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;">
+      <span id="sc-before" style="color:#e8dcc8;"></span>
+      <span style="color:#888;">→</span>
+      <span id="sc-after" style="color:#7ed6a0;font-weight:bold;"></span>
+    </div>
+    <div id="sc-warn" style="font-size:10px;color:#e07070;text-align:center;display:none;"></div>
+    <div style="display:flex;gap:12px;width:100%;margin-top:4px;">
+      <button id="sc-ok" style="flex:1;background:#1a4020;border:2px solid #4a8;border-radius:6px;padding:10px;color:#4e4;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">決定</button>
+      <button id="sc-cancel" style="flex:1;background:#1a1a1a;border:2px solid #666;border-radius:6px;padding:10px;color:#ccc;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ガチャ種類選択画面（#appの外側に配置） -->
+<div class="overlay" id="ov-gacha-select" style="gap:10px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(munyu_haikei.png);background-size:cover;background-position:center;">
+  <div class="ov-title" style="font-size:16px;margin-top:0;">🎰 ガチャ</div>
+  <div style="font-size:10px;color:#999;line-height:1.5;padding:2px 4px;">ゴールドやクリスタルを使って、ランダムな能力を持つカードを生成できます。</div>
+  <div id="gacha-select-list" style="width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+  <div class="ov-btn" id="btn-gacha-select-close" style="margin-top:4px;">閉じる</div>
+</div>
+
+<!-- コモンガチャ画面（#appの外側に配置） -->
+<div class="overlay" id="ov-gacha-common" style="gap:10px;padding:14px 12px;position:fixed;z-index:2010;background-image:url(munyu_haikei.png);background-size:cover;background-position:center;">
+  <div class="ov-title" style="font-size:16px;margin-top:0;">🃏 コモンガチャ</div>
+  <div style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:space-around;">
+    <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💰ゴールド</span><br><span id="gacha-gold-val" style="font-size:15px;color:#f0d020;font-weight:bold;">0</span></div>
+    <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💎クリスタル</span><br><span id="gacha-crystal-val" style="font-size:15px;color:#c9a8ff;font-weight:bold;">0</span></div>
+  </div>
+  <div style="font-size:10px;color:#999;line-height:1.6;padding:2px 4px;">
+    コモン80%・アンコモン20%の確率でレアリティが決まり、カードコスト（1〜3）に応じた「生成ポイント」を使ってランダムに能力が付与されます。
+  </div>
+  <div style="width:100%;background:rgba(120,30,30,.25);border:1px solid rgba(220,120,120,.5);border-radius:8px;padding:8px 10px;font-size:9.5px;color:#f0b8b8;line-height:1.6;">
+    ⚠️ ガチャで生成したカードは「使い捨てカード」です。デッキ編集でいずれか1つのチャージデッキにのみ登録でき、他のデッキには同時登録できません。また、そのデッキでエリアに入った場合、クリア・敗北・中断など理由を問わずエリアを出たタイミングで消滅します。
+  </div>
+  <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+    <div id="gacha-buy-gold" class="ov-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">💰 20ゴールドで1回引く</div>
+    <div id="gacha-buy-crystal" class="ov-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">💎 10クリスタルで1回引く</div>
+  </div>
+  <div style="flex:1;"></div>
+  <div class="ov-btn" id="gacha-back-to-select" style="margin-top:4px;background:rgba(80,60,20,.3);border-color:rgba(200,160,80,.4);color:#e0b878;">← ガチャ選択に戻る</div>
+  <div class="ov-btn" id="btn-gacha-common-close">閉じる</div>
+</div>
+
+<!-- ガチャ購入確認ポップアップ（#appの外側に配置） -->
+<div class="overlay" id="ov-gacha-confirm" style="gap:8px;padding:14px 12px;position:fixed;z-index:2060;justify-content:center;">
+  <div style="background:linear-gradient(160deg,#1a1408,#0a0a1a);border:2px solid rgba(201,168,76,.7);border-radius:14px;padding:18px 20px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:10px;align-items:center;">
+    <div style="font-size:28px;">🎰</div>
+    <div id="gc-name" style="font-family:'Cinzel',serif;font-size:15px;color:#f0d47a;font-weight:bold;text-align:center;"></div>
+    <div id="gc-price" style="font-size:13px;color:#c9a84c;font-weight:bold;text-align:center;margin-top:2px;"></div>
+    <div style="width:100%;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;">
+      <span id="gc-before" style="color:#e8dcc8;"></span>
+      <span style="color:#888;">→</span>
+      <span id="gc-after" style="color:#7ed6a0;font-weight:bold;"></span>
+    </div>
+    <div id="gc-warn" style="font-size:10px;color:#e07070;text-align:center;display:none;"></div>
+    <div style="display:flex;gap:12px;width:100%;margin-top:4px;">
+      <button id="gc-ok" style="flex:1;background:#1a4020;border:2px solid #4a8;border-radius:6px;padding:10px;color:#4e4;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">決定</button>
+      <button id="gc-cancel" style="flex:1;background:#1a1a1a;border:2px solid #666;border-radius:6px;padding:10px;color:#ccc;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ガチャ結果画面（#appの外側に配置） -->
+<div class="overlay" id="ov-gacha-result" style="gap:10px;padding:14px 12px;position:fixed;z-index:2070;justify-content:flex-start;background:rgba(5,3,10,.96);">
+  <div class="ov-title" style="font-size:16px;margin-top:0;">✨ カード生成完了！</div>
+  <div id="gacha-result-card" style="width:140px;margin:6px auto;"></div>
+  <div id="gacha-result-detail" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:10px 14px;font-size:11px;color:#e8dcc8;line-height:1.7;font-family:sans-serif;"></div>
+  <div style="flex:1;"></div>
+  <div class="ov-btn" id="btn-gacha-result-close" style="margin-top:4px;">ガチャ画面に戻る</div>
 </div>
 
 <!-- ソウル設定画面（#appの外側に配置） -->
@@ -1068,6 +1149,37 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div id="charge-scroll-hint" style="display:none;text-align:center;font-size:18px;color:rgba(201,168,76,.7);animation:scroll-hint-blink 1s ease-in-out infinite;margin-top:-6px;">▼</div>
   </div>
   
+<!-- ルール説明（タイトル画面から使うため#appの外側に配置） -->
+<div class="overlay" id="ov-rules" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;">
+  <div class="ov-title" style="font-size:16px;margin-top:0;">📜 ルール説明</div>
+  <div style="width:100%;overflow-y:auto;max-height:64vh;display:flex;flex-direction:column;gap:8px;font-family:sans-serif;">
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">⚔️ 基本ルール</div>
+      <div style="font-size:10px;color:#ccc;line-height:1.9;">・プレイヤーHP: 30（最大HP）<br>・マナはターン開始時に必ず3に固定（蓄積なし）。最大10<br>・毎ターン5枚ドロー（最初のターンは5枚）<br>・<span style="color:#aae;">手札は毎ターン決まった枚数補充され、ターン終了時には全て捨札になる。<br>　山札がなくなった場合、捨札のカードを全てシャッフルし新たな山札となる。</span><br>・シールドは自分のターン開始時に30%減少する（切り捨て）<br>・カードをタップすると<span style="color:#f0c040;font-weight:bold;">拡大表示</span>され、<span style="color:#2ecc71;font-weight:bold;">決定</span>ボタンで使用<br>・<span style="color:#f0c040;font-weight:bold;">ターン終了</span>ボタンで敵のターンへ</div>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">⚡ チャージシステム</div>
+      <div style="font-size:10px;color:#ccc;line-height:1.9;">ゲーム開始前に1つ選ぶ特殊能力。カウンターが満タンになったらチャージゲージをタップして手動発動。<br>装着した「<span style="color:#f0d47a;">チャージUPのソウル</span>」の数（0〜2個）に応じてチャージレベルが1〜3に上昇し、<span style="color:#f0d47a;">発動効果がさらに強化されていく</span>（初期はレベル1）。<br>・<span style="color:#e74c3c;">格闘家</span>: カード使用3回→このターン攻撃力+3<br>・<span style="color:#e67e22;">重戦士</span>: コスト2以上のカード使用2回→次の攻撃が2倍<br>・<span style="color:#27ae60;">僧侶</span>: 回復カード3回→HP+9回復<br>・<span style="color:#2980b9;">守護者</span>: 盾獲得ごと3回→次の敵からの被ダメを半減（切り捨て）<br>・<span style="color:#8e44ad;">錬金術師</span>: 毒カード3回→このターン次に毒を与えるカードの毒付与値を2倍（1回限り）<br>・<span style="color:#f0e060;">祈祷師</span>: ターン終了2回→マナ+3 + デッキから1枚選んでコストなしで使用<br>・<span style="color:#e07030;">狂戦士</span>: 盾0でターン終了2回→手札全コストを1にする</div>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(180,40,40,.5);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;color:#e74c3c;margin-bottom:6px;">⏳ 呪縛タイマー</div>
+      <div style="font-size:10px;color:#ccc;line-height:1.9;"><span style="color:#e74c3c;">6ターン目の終了時から</span>呪縛が発動し、ターン終了時にダメージを受ける。<br>ダメージ = <span style="color:#e74c3c;">(現在ターン - 5) × 5</span><br>例：6ターン目終了→5ダメ、7ターン目終了→10ダメ…<br>右下の⏳ボックスで現在ターンと状況を確認。長押しで詳細。</div>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;color:#7ab8ff;margin-bottom:6px;">⚔️ ダメージ計算</div>
+      <div style="font-size:10px;color:#ccc;line-height:1.9;">・攻撃力の加算（+）は<span style="color:#7ab8ff;">乗算（×）より先に計算</span>される。<br>　例：基本攻撃5、攻撃+5、攻撃×2の場合<br>　　　(5 + 5) × 2 = <span style="color:#fff;font-weight:bold;">20ダメージ</span><br>・<span style="color:#ffd060;">「次の攻撃が2倍」</span>の効果は、双撃・連撃など<br>　<span style="color:#ffd060;">1枚で複数回攻撃するカードでも1撃目にのみ適用</span>される。<br>　2撃目以降は通常ダメージになる。</div>
+    </div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">🔴 レアリティ</div>
+      <div style="font-size:10px;color:#ccc;line-height:1.9;"><span style="color:#8a9aaa;">◆ COMMON</span> → <span style="color:#60cc60;">◆ UNCOMMON</span> → <span style="color:#4a8aff;">◆ RARE</span> → <span style="color:#d040ff;">◈ EPIC</span> → <span style="color:#ff9500;">★ LEGEND</span> → <span style="color:#c9a84c;">⚡ GAUGE</span><br>ステージが進むほど高レアリティが出やすくなる。GAUGEはチャージ選択時の初期デッキ専用。</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px;">
+    <div class="ov-btn" id="btn-rules-to-tutorial" style="background:rgba(100,160,255,.1);border-color:rgba(100,160,255,.6);color:#7dd4f8;" onclick="hideOv('ov-rules');startTutorial(true);" ontouchend="event.preventDefault();hideOv('ov-rules');startTutorial(true);">📖 説明書を見る</div>
+    <div class="ov-btn" id="btn-close-rules" onclick="document.getElementById('ov-rules').classList.remove('show')" ontouchend="event.preventDefault();document.getElementById('ov-rules').classList.remove('show')">閉じる</div>
+  </div>
+</div>
+
 <div id="app" style="display:none;flex-direction:column;height:100%;">
 
 
@@ -1359,55 +1471,125 @@ const RL={common:'COMMON',uncommon:'UNCOMMON',rare:'◆ RARE',epic:'◈ EPIC',le
 // =============================================
 // チャージシステム定義
 // =============================================
+// ===== チャージレベルシステム =====
+// チャージUPのソウルを装着した数（0〜2）に応じて、チャージ能力全体のレベルが1〜3に変化する。
+function getChargeLevel(){
+  const s=getEquippedSouls();
+  let lv=1;
+  if(s.includes('chargeup1')) lv++;
+  if(s.includes('chargeup2')) lv++;
+  return Math.min(3,lv);
+}
+// 指定のチャージ種別・レベルにおける実効データ（基本データ＋レベル別上書き）を取得
+function getChargeTypeAtLevel(id, level){
+  const base=CHARGE_TYPES[id];
+  if(!base) return null;
+  const lv=Math.max(1,Math.min(3,level||1));
+  const ov=(base.levels&&base.levels[lv])||{};
+  return Object.assign({}, base, ov, {level:lv});
+}
+// 現在のG.chargeType・G.chargeLevelに応じた実効チャージデータを取得（レベル反映済み）
+function curCT(){
+  return G.chargeType?getChargeTypeAtLevel(G.chargeType, G.chargeLevel||1):null;
+}
 const CHARGE_TYPES = {
   renGeki: {
     id:'renGeki', name:'格闘家', icon:'⚡',
-    desc:'カード使用で1溜まる。3溜まったらゲージをタップして手動発動：このターン攻撃力+4 + ドロー1',
-    maxCount:3, triggerType:'cardUse',
-    effectType:'nextTurnAtkBuff', effectVal:4, effectTiming:'turnStart',
+    playstyle:'手数で攻める',
+    triggerType:'cardUse',
     color:'#e74c3c',
+    levels:{
+      1:{maxCount:3, desc:'カード使用で1溜まる。3溜まったらゲージをタップして手動発動：このターン攻撃力+3',
+         effectType:'nextTurnAtkBuff', effectVal:3, draw:0},
+      2:{maxCount:3, desc:'カード使用で1溜まる。3溜まったらゲージをタップして手動発動：このターン攻撃力+4',
+         effectType:'nextTurnAtkBuff', effectVal:4, draw:0},
+      3:{maxCount:3, desc:'カード使用で1溜まる。3溜まったらゲージをタップして手動発動：このターン攻撃力+4 + ドロー1',
+         effectType:'nextTurnAtkBuff', effectVal:4, draw:1},
+    },
   },
   tameAtk: {
     id:'tameAtk', name:'重戦士', icon:'🔥',
-    desc:'コスト2以上のカード使用で1溜まる。2溜まったらゲージをタップして手動発動：次の攻撃が2倍 + マナ+2',
-    maxCount:2, triggerType:'highCostCard',
-    effectType:'doubleNext', effectTiming:'turnStart',
+    playstyle:'高コストで一撃',
+    triggerType:'highCostCard',
     color:'#e67e22',
+    levels:{
+      1:{maxCount:2, desc:'コスト2以上のカード使用で1溜まる。2溜まったらゲージをタップして手動発動：次の攻撃が2倍',
+         effectType:'doubleNext', manaBonus:0},
+      2:{maxCount:2, desc:'コスト2以上のカード使用で1溜まる。2溜まったらゲージをタップして手動発動：次の攻撃が2倍 + マナ+1',
+         effectType:'doubleNext', manaBonus:1},
+      3:{maxCount:2, desc:'コスト2以上のカード使用で1溜まる。2溜まったらゲージをタップして手動発動：次の攻撃が2倍 + マナ+2',
+         effectType:'doubleNext', manaBonus:2},
+    },
   },
   jikoSaisei: {
     id:'jikoSaisei', name:'僧侶', icon:'💚',
-    desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+12回復 + ドロー1',
-    maxCount:3, triggerType:'healCard',
-    effectType:'nextTurnHeal', effectVal:12, effectTiming:'turnStart',
+    playstyle:'回復して立て直す',
+    triggerType:'healCard',
     color:'#27ae60',
+    levels:{
+      1:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+9回復',
+         effectType:'nextTurnHeal', effectVal:9, draw:0},
+      2:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+12回復',
+         effectType:'nextTurnHeal', effectVal:12, draw:0},
+      3:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+12回復 + ドロー1',
+         effectType:'nextTurnHeal', effectVal:12, draw:1},
+    },
   },
   teppeki: {
     id:'teppeki', name:'守護者', icon:'🛡️',
-    desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを無効 + マナ+1',
-    maxCount:3, triggerType:'shieldGain',
-    effectType:'nextDmgNull', effectTiming:'manual',
+    playstyle:'盾で耐えて反撃',
+    triggerType:'shieldGain',
     color:'#2980b9',
+    levels:{
+      1:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを半減（切り捨て）',
+         effectType:'nextDmgHalf', manaBonus:0},
+      2:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを半減（切り捨て） + マナ+1',
+         effectType:'nextDmgHalf', manaBonus:1},
+      3:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを無効 + マナ+1',
+         effectType:'nextDmgNull', manaBonus:1},
+    },
   },
   dokushi: {
     id:'dokushi', name:'錬金術師', icon:'☠️',
-    desc:'毒カード使用で1溜まる。2溜まったらゲージをタップして手動発動：このターン、次に毒を与えるカード1枚の毒付与値を2倍にする（1回限り）',
-    maxCount:2, triggerType:'poisonCard',
-    effectType:'dokushiPoisonDouble', effectTiming:'manual',
+    playstyle:'毒を育てる',
+    triggerType:'poisonCard',
     color:'#8e44ad',
+    levels:{
+      1:{maxCount:3, desc:'毒カード使用で1溜まる。3溜まったらゲージをタップして手動発動：このターン、次に毒を与えるカード1枚の毒付与値を2倍にする（1回限り）',
+         effectType:'dokushiPoisonDouble', manaBonus:0},
+      2:{maxCount:2, desc:'毒カード使用で1溜まる。2溜まったらゲージをタップして手動発動：このターン、次に毒を与えるカード1枚の毒付与値を2倍にする（1回限り）',
+         effectType:'dokushiPoisonDouble', manaBonus:0},
+      3:{maxCount:2, desc:'毒カード使用で1溜まる。2溜まったらゲージをタップして手動発動：このターン、次に毒を与えるカード1枚の毒付与値を2倍にする（1回限り） + マナ+1',
+         effectType:'dokushiPoisonDouble', manaBonus:1},
+    },
   },
   inori: {
     id:'inori', name:'祈祷師', icon:'🙏',
-    desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用し、さらに山札から手札にも加える',
-    maxCount:2, triggerType:'turnEndWithMana',
-    effectType:'inoriDeckCopy', effectTiming:'manual',
+    playstyle:'マナを残して逆転',
+    triggerType:'turnEndWithMana',
     color:'#f0e060',
+    levels:{
+      1:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + デッキから1枚選んでコストなしで使用する',
+         effectType:'inoriDeckCopy', drawExtra:0, addToHandAfterUse:false},
+      2:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用できる',
+         effectType:'inoriDeckCopy', drawExtra:2, addToHandAfterUse:false},
+      3:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用し、さらに山札から手札にも加える',
+         effectType:'inoriDeckCopy', drawExtra:2, addToHandAfterUse:true},
+    },
   },
   haki: {
     id:'haki', name:'狂戦士', icon:'💪',
-    desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て0にする + このステージ中ターン開始マナ+1（累積）',
-    maxCount:2, triggerType:'turnEndNoShield',
-    effectType:'hakiZeroCost', effectTiming:'manual',
+    playstyle:'守りを捨てて爆発',
+    triggerType:'turnEndNoShield',
     color:'#e07030',
+    levels:{
+      1:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て1にする',
+         effectType:'hakiZeroCost', costTarget:1, manaBonusPerActivation:0},
+      2:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て0にする',
+         effectType:'hakiZeroCost', costTarget:0, manaBonusPerActivation:0},
+      3:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て0にする + このステージ中ターン開始マナ+1（累積）',
+         effectType:'hakiZeroCost', costTarget:0, manaBonusPerActivation:1},
+    },
   },
 };
 // エリアごとに選択可能なチャージを制限（未指定のエリアは制限なし＝全7種選択可）
@@ -1501,7 +1683,7 @@ const DB={
   superHeal2:  {id:'superHeal2',  name:'大回復',   icon:'✨', type:'heal',    rarity:'rare',      cost:2, desc:'HP +12',                                      shortDesc:"HP +12",             effect:{heal:12}},
   healReserve: {id:'healReserve', name:'回復予約', icon:'💊', type:'heal',    rarity:'gauge',     cost:1, desc:'次のターン開始時 HP+4',                       shortDesc:"次T HP+4",           effect:{nextTurnHealBonus:4}},
   comboHeal:   {id:'comboHeal',   name:'連撃回復', icon:'💗', type:'heal',    rarity:'gauge',     cost:0, desc:'このターン攻撃カードを使用するたびHP+3',       shortDesc:"攻カード使用毎HP+3", effect:{comboHealOn:true}},
-  cleanse:     {id:'cleanse',     name:'解呪',     icon:'🌿', type:'heal',    rarity:'uncommon',  cost:2, desc:'全てのマイナス効果（毒・ATKデバフ）を解除',    shortDesc:"状態異常解除",       effect:{cleanse:true}},
+  cleanse:     {id:'cleanse',     name:'解呪',     icon:'🌿', type:'heal',    rarity:'uncommon',  cost:3, desc:'7種の状態異常（毒・炎上・重傷・衰弱・地響き・封印・マナ回復ペナルティ）を解除', shortDesc:"状態異常を7種解除",       effect:{cleanse:true}},
   afterForce:  {id:'afterForce',  name:'力の余韻', icon:'⚡', type:'heal',    rarity:'common',    cost:0, desc:'HP+5 / このターンコスト3以上のカードを使用した場合のみ使用可', shortDesc:"コスト3以上使用後HP+5", effect:{heal:5,requireHighCost:true}},
   // 新スキルカード
   discard1:    {id:'discard1',    name:'断捨離',   icon:'♻️', type:'skill',   rarity:'uncommon',  cost:0, desc:'手札1枚を選んで捨て、1枚ドロー',                            shortDesc:"選んで捨て+ドロー1",        effect:{discardChoiceAndDraw:1}},
@@ -1714,13 +1896,14 @@ const SWAMP_ENEMIES=[
   {name:'ダークフェアリー',icon:'🧚',hp:220,atk:20, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
 ];
 // 鉄壁の砦 敵データ（areaId:5）※1〜4は既存モンスター（名前に「（防御型）」を付与）、5〜7は追加モンスター(enemy_tuika)を使用
+// ステージ1〜6：石造りモンスターとして半角英字名に変更し、グレー寄りの石調フィルターを適用（ステージ7のボスは対象外）
 const IRON_ENEMIES=[
-  {name:'ゴブリン（防御型）',      icon:'👹',hp:50,  atk:8,  shield:5,  rank:1, pattern:['def','atk','def','big'],                boss:false, img:'enemy1.png'},
-  {name:'コボルト（防御型）',      icon:'🐲',hp:65,  atk:9,  shield:8,  rank:1, pattern:['atk','def','def','big'],                boss:false, img:'enemy2.png'},
-  {name:'オーク（防御型）',        icon:'🧌',hp:80,  atk:10, shield:10, rank:2, pattern:['def','big','atk','def'],                boss:false, img:'enemy3.png'},
-  {name:'ゴーレム（防御型）',      icon:'🗿',hp:95,  atk:12, shield:14, rank:3, pattern:['def','def','big','atk'],                boss:false, img:'enemy6.png'},
-  {name:'スケルトンナイト（防御型）',icon:'💀',hp:115, atk:13, shield:18, rank:2, pattern:['bigdef','atk','big','bigdef'],          boss:false, img:'enemy_tuika6.png'},
-  {name:'デーモン兵（防御型）',    icon:'😈',hp:135, atk:15, shield:22, rank:3, pattern:['bigdef','big','def','big'],             boss:false, img:'enemy_tuika14.png'},
+  {name:'Stone Goblin',   icon:'👹',hp:50,  atk:8,  shield:5,  rank:1, pattern:['def','atk','def','big'],                boss:false, img:'enemy1.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'Stone Kobold',   icon:'🐲',hp:65,  atk:9,  shield:8,  rank:1, pattern:['atk','def','def','big'],                boss:false, img:'enemy2.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'Stone Orc',      icon:'🧌',hp:80,  atk:10, shield:10, rank:2, pattern:['def','big','atk','def'],                boss:false, img:'enemy3.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'Stone Golem',    icon:'🗿',hp:95,  atk:12, shield:14, rank:3, pattern:['def','def','big','atk'],                boss:false, img:'enemy6.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'Stone Skeleton', icon:'💀',hp:115, atk:13, shield:18, rank:2, pattern:['bigdef','atk','big','bigdef'],          boss:false, img:'enemy_tuika6.png',  filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'Stone Demon',    icon:'😈',hp:135, atk:15, shield:22, rank:3, pattern:['bigdef','big','def','big'],             boss:false, img:'enemy_tuika14.png', filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
   {name:'鉄球兵（防御型）',        icon:'⚙️',hp:240, atk:18, shield:30, rank:3, pattern:['superbigdef','big','bigdef','big','superbigdef'], boss:true, img:'enemy_tuika47.png'},
 ];
 // 氷壁の迷宮 敵データ（areaId:6）※既存モンスターの水属性カラー流用＋改名。先制行動は全個体が氷雪弾で統一。
@@ -1869,9 +2052,9 @@ function getRewards(stage){
 
 // ===== セーブ機能（第一段階：エリアクリアフラグ・最高到達ステージ・ミュート設定） =====
 // 将来的にデッキ内容・最高到達ステージ等を追加する場合もこのSAVE_KEYの1エントリにまとめて追記していく想定。
-const SAVE_KEY='dw_save_v1';
+const SAVE_KEY='dw_save_v2';
 function _defaultSaveData(){
-  return { clearedAreas:[false,false,false], bestStage:[0,0,0], muted:false, noContinueCleared:[], chargeCleared:{}, soulsOwned:{}, soulCapacity:{1:1,2:1,3:1,4:1}, soulEquipped:[], gold:0, crystal:0, shopNewBadge:false, customDecks:{}, deckSwapLimit:1, deckPointLimit:5, unlockedCards:{}, areasUnlocked:{}, shopPurchased:{} };
+  return { clearedAreas:[false,false,false], bestStage:[0,0,0], muted:false, noContinueCleared:[], chargeCleared:{}, soulsOwned:{}, soulCapacity:{1:1,2:1,3:1,4:1}, soulEquipped:[], gold:0, crystal:0, shopNewBadge:false, customDecks:{}, deckSwapLimit:1, deckPointLimit:5, unlockedCards:{}, areasUnlocked:{}, shopPurchased:{}, pendingDisposal:null };
 }
 function loadSaveData(){
   try{
@@ -1896,6 +2079,9 @@ function loadSaveData(){
     if(typeof d.crystal!=='number') d.crystal=0;
     if(!d.areasUnlocked||typeof d.areasUnlocked!=='object') d.areasUnlocked={};
     if(!d.shopPurchased||typeof d.shopPurchased!=='object') d.shopPurchased={};
+    // 使い捨て(ガチャ)カードの「持ち込み中フラグ」。エリア攻略中に強制終了された場合、
+    // 次回起動時にこのフラグを検知して消滅処理を行うための永続化フラグ。
+    if(d.pendingDisposal===undefined) d.pendingDisposal=null;
     return d;
   }catch(e){
     console.warn('[DW] セーブデータの読み込みに失敗しました。初期状態で続行します。',e);
@@ -1926,25 +2112,33 @@ const AREA_REWARDS={
 const GLOBAL_AREA_COUNT_REWARDS={2:null, 4:null, 6:null};
 function grantGold(amount){ if(amount>0){ SAVE.gold=(SAVE.gold||0)+amount; } }
 function grantCrystal(amount){ if(amount>0){ SAVE.crystal=(SAVE.crystal||0)+amount; } }
-// エリアクリア報酬（毎回付与）。戻り値：{gold,soul}
+// 小銭稼ぎのソウル：クリア報酬獲得時にゴールド+5・クリスタル+2を追加
+function _kozeniBonus(){
+  return getEquippedSouls().includes('kozeni')?{gold:5,crystal:2}:{gold:0,crystal:0};
+}
+// エリアクリア報酬（毎回付与）。戻り値：{gold,crystal,baseGold,baseCrystal,bonusGold,bonusCrystal}
 function grantAreaClearReward(areaId){
   const r=AREA_REWARDS[areaId];
-  if(!r) return {gold:0,crystal:0};
-  grantGold(r.clearGold||0);
-  grantCrystal(r.clearCrystal||0);
+  const bonus=_kozeniBonus();
+  if(!r) return {gold:0,crystal:0,baseGold:0,baseCrystal:0,bonusGold:0,bonusCrystal:0};
+  const baseGold=r.clearGold||0, baseCrystal=r.clearCrystal||0;
+  grantGold(baseGold+bonus.gold);
+  grantCrystal(baseCrystal+bonus.crystal);
   writeSaveData();
-  return {gold:r.clearGold||0, crystal:r.clearCrystal||0};
+  return {gold:baseGold+bonus.gold, crystal:baseCrystal+bonus.crystal, baseGold, baseCrystal, bonusGold:bonus.gold, bonusCrystal:bonus.crystal};
 }
-// ノーコンティニュークリア報酬（エリアにつき1回だけ）。戻り値：{gold,soul}
+// ノーコンティニュークリア報酬（エリアにつき1回だけ）。戻り値：{gold,crystal,baseGold,baseCrystal,bonusGold,bonusCrystal}
 function grantNoContinueReward(areaId){
   const r=AREA_REWARDS[areaId];
-  if(!r) return {gold:0,crystal:0};
-  grantGold(r.noContinueGold||0);
-  grantCrystal(r.noContinueCrystal||0);
+  const bonus=_kozeniBonus();
+  if(!r) return {gold:0,crystal:0,baseGold:0,baseCrystal:0,bonusGold:0,bonusCrystal:0};
+  const baseGold=r.noContinueGold||0, baseCrystal=r.noContinueCrystal||0;
+  grantGold(baseGold+bonus.gold);
+  grantCrystal(baseCrystal+bonus.crystal);
   writeSaveData();
-  return {gold:r.noContinueGold||0, crystal:r.noContinueCrystal||0};
+  return {gold:baseGold+bonus.gold, crystal:baseCrystal+bonus.crystal, baseGold, baseCrystal, bonusGold:bonus.gold, bonusCrystal:bonus.crystal};
 }
-// 全チャージクリア報酬（エリアにつき1回だけ）。戻り値：新規付与なら{gold,soul}、そうでなければnull
+// 全チャージクリア報酬（エリアにつき1回だけ）。戻り値：新規付与なら{gold,crystal,baseGold,baseCrystal,bonusGold,bonusCrystal}、そうでなければnull
 function grantAllChargeRewardIfNew(areaId){
   if(!isAllChargeCleared(areaId)) return null;
   SAVE.allChargeRewarded=SAVE.allChargeRewarded||[];
@@ -1952,11 +2146,13 @@ function grantAllChargeRewardIfNew(areaId){
   if(SAVE.allChargeRewarded[areaId]) return null;
   SAVE.allChargeRewarded[areaId]=true;
   const r=AREA_REWARDS[areaId];
+  const bonus=_kozeniBonus();
   if(!r){ writeSaveData(); return null; }
-  grantGold(r.allChargeGold||0);
-  grantCrystal(r.allChargeCrystal||0);
+  const baseGold=r.allChargeGold||0, baseCrystal=r.allChargeCrystal||0;
+  grantGold(baseGold+bonus.gold);
+  grantCrystal(baseCrystal+bonus.crystal);
   writeSaveData();
-  return {gold:r.allChargeGold||0, crystal:r.allChargeCrystal||0};
+  return {gold:baseGold+bonus.gold, crystal:baseCrystal+bonus.crystal, baseGold, baseCrystal, bonusGold:bonus.gold, bonusCrystal:bonus.crystal};
 }
 function markAreaCleared(areaId){
   if(areaId==null || areaId<0) return false;
@@ -2041,6 +2237,8 @@ const SOULS={
   seimei2: {id:'seimei2', name:'生命のソウルⅡ', category:1, cost:2, icon:'❤️', desc:'最大HP+20'},
   teppeki: {id:'teppeki', name:'鉄壁のソウル', category:1, cost:1, icon:'🛡️', desc:'ステージ開始時シールド+5'},
   teppeki2:{id:'teppeki2', name:'鉄壁Ⅱ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
+  kekkai:  {id:'kekkai',  name:'障壁のソウルⅠ', category:1, cost:3, icon:'🔷', desc:'シールドの最低値が0ではなく5になり、5以下に減少しなくなる'},
+  kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+10する'},
   taidoku: {id:'taidoku', name:'耐毒のソウル', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-3（0未満にはならない）'},
   taidoku2:{id:'taidoku2', name:'耐毒Ⅱ', category:2, cost:2, icon:'☠️', desc:'敵から受ける毒付与量-6（0未満にはならない）'},
   fukutsu: {id:'fukutsu', name:'不屈のソウル', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-3（0未満にはならない）'},
@@ -2049,6 +2247,10 @@ const SOULS={
   gogeki:  {id:'gogeki',  name:'強撃のソウル', category:3, cost:1, icon:'🪓', desc:'「強撃」カードの攻撃力（計算後）+2', cardBonus:{cardId:'bash', atkAdd:2}},
   kaifuku: {id:'kaifuku', name:'回復カードのソウル', category:3, cost:1, icon:'💗', desc:'「回復」カードの回復力（計算後）+1', healBonus:{cardId:'heal', healAdd:1}},
   bougyo:  {id:'bougyo',  name:'防御カードのソウル', category:3, cost:1, icon:'🛡️', desc:'「防御」カードの防御力（計算後）+1', shieldBonus:{cardId:'guard', shieldAdd:1}},
+  saiseiBougyo: {id:'saiseiBougyo', name:'再生防御のソウルⅠ', category:4, cost:1, icon:'💗', desc:'防御カードを使用するたび、HP+2回復する'},
+  kozeni:  {id:'kozeni',  name:'小銭稼ぎのソウル', category:4, cost:1, icon:'🪙', desc:'クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する'},
+  chargeup1: {id:'chargeup1', name:'チャージUPのソウル', category:4, cost:1, icon:'⚡', desc:'チャージのレベルを1つ上げる（現在の上限：レベル3）'},
+  chargeup2: {id:'chargeup2', name:'チャージUPのソウルⅡ', category:4, cost:1, icon:'⚡', desc:'チャージのレベルをさらに1つ上げる（現在の上限：レベル3）'},
 };
 const SOUL_CATEGORY_NAMES={1:'①ステータスアップ系',2:'②状態異常軽減系',3:'③カード強化系',4:'④特殊効果付与系'};
 // エリアクリア実績：対応するソウルを入手（エリアにつき1回だけ、AREA_DATA[areaId].soulRewardが設定されている場合のみ）
@@ -2124,6 +2326,10 @@ function getSoulCardShieldBonus(cardBaseId){
   });
   return total;
 }
+// 障壁のソウルⅠ：シールドの最低値（このソウルを装着していない場合は0）
+function getShieldFloor(){
+  return getEquippedSouls().includes('kekkai')?5:0;
+}
 let SAVE=loadSaveData();
 
 let G={};
@@ -2134,7 +2340,7 @@ function initGame(){
   const _soulShieldBonus=(_equippedSouls.includes('teppeki')?5:0)+(_equippedSouls.includes('teppeki2')?10:0);
   const _soulPoisonReduce=(_equippedSouls.includes('taidoku')?3:0)+(_equippedSouls.includes('taidoku2')?6:0);
   const _soulCurseReduce=(_equippedSouls.includes('fukutsu')?3:0)+(_equippedSouls.includes('fukutsu2')?6:0);
-  G={stage:0,areaId:1,playerHp:20+_soulHpBonus,playerMaxHp:20+_soulHpBonus,shield:0,mana:3,manaMax:10,manaRegen:3,atkBuff:0,nextManaBonus:0,weakenTurns:0,weakenHalf:false,weakenHalfTurns:0,invincibleTurns:0,mirrorActive:false,exileOnBattle:[],tempExiled:[],cardGauge:0,chargeType:null,chargeCount:0,chargeActive:false,nextDmgNull:false,nextTurnHealPending:false,regenTurns:0,regenVal:0,doubleNext:false,doubleMultiplier:1,halfShieldLossTurns:0,
+  G={stage:0,areaId:1,playerHp:20+_soulHpBonus,playerMaxHp:20+_soulHpBonus,shield:0,mana:3,manaMax:10,manaRegen:3,atkBuff:0,nextManaBonus:0,weakenTurns:0,weakenHalf:false,weakenHalfTurns:0,invincibleTurns:0,mirrorActive:false,exileOnBattle:[],tempExiled:[],cardGauge:0,chargeType:null,chargeCount:0,chargeLevel:getChargeLevel(),chargeActive:false,nextDmgNull:false,nextTurnHealPending:false,regenTurns:0,regenVal:0,doubleNext:false,doubleMultiplier:1,halfShieldLossTurns:0,
      deck:[...STARTER],drawPile:[],discard:[],hand:[],enemy:null,
      enemyShield:0,enemyPoison:0,enemyAtkDebuff:0,playerPoison:0,playerBurn:0,heatCount:0,igniteCostPenalties:[],ignitedCards:{},turnCount:1,phase:'block',
      permAtkBonus:0, initShieldBonus:_soulShieldBonus, turnStartHealPct:0, firstTurnManaBonus:0,
@@ -2235,7 +2441,7 @@ function _startStageBattle(){
   G.nextTurnAtkBuff=0; G.nextTurnHealDraw=0; G.nextTurnAtkCostDown=false; G.nextDmgHalf=false;
   G.furyDanceBonus=0; G.furyDanceUsedThisTurn=false; G.soulEaterActive=false; G.soulEaterDmgThisTurn=0; G.turnLastUsedCardId=null;
   G.freeNextCard=false; G.freePassUsedThisTurn=false; G.swiftBladeActive=false; G.freePassManaAtUse=0;
-  G.hakiZeroCostCards=null; G.hakiZeroCostCardIds=null;
+  G.hakiZeroCostCards=null; G.hakiZeroCostCardIds=null; G.hakiZeroCostTarget=null;
   G.nextTurnDrawBonusPending=0;
   G.swiftUsedThisTurn=false; G.chainNoSkill=false;
   G.nextTurnHealBonus=0; G.comboHealActive=false; G.usedHighCostThisTurn=false;
@@ -2306,12 +2512,12 @@ function _startStageBattle(){
   G._skipDrawAnim=true; drawCards(5+(G.initHandBonus||0)+(G.drawBonusPerTurn||0)); G._skipDrawAnim=false; updateUI();
   // チャージヘルパー
   if(G.chargeHelperBonus&&G.chargeType){
-    const _hct=CHARGE_TYPES[G.chargeType];
+    const _hct=curCT();
     if(_hct){addCharge(G.chargeHelperBonus);addLog('⚡ チャージヘルパー: +'+G.chargeHelperBonus,'sys');}
   }
   // フルチャージ開始
   if(G.fullChargeStart&&G.chargeType){
-    const _fct=CHARGE_TYPES[G.chargeType];
+    const _fct=curCT();
     if(_fct){G.chargeCount=_fct.maxCount;updateGaugeLamps();addLog('⚡ フルチャージ状態で開始！','sys');}
   }
   if(G.initShieldBonus>0) addLog('🛡️ 初期シールド+'+G.initShieldBonus,'sys');
@@ -2553,7 +2759,7 @@ function playCard(idx, _isChain){
     const datsuryo=G.hand.some(id=>id==='bougai_datsuryo');
     // 炎上コストペナルティ
     const _ignitePenalty=(G.ignitedCards&&G.ignitedCards[idx])||0;
-    const _reducedCost=(isHakiZeroPlay||isFreePass)?0:applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)));
+    const _reducedCost=isFreePass?0:(isHakiZeroPlay?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0))));
     if(G.mana<_reducedCost){addLog('💎 マナ不足！','sys');return;}
     const actualCost=_reducedCost;
     G.mana-=actualCost; G.stageManaSpent=(G.stageManaSpent||0)+actualCost;
@@ -2613,13 +2819,13 @@ function playCard(idx, _isChain){
       if(G.comboHealActive){const chHeal=healPlayer((G.comboHealVal||3)+(G.healBuff||0));if(chHeal>0){queueEffect(()=>{sfxHeal();spawnDmgNum('+'+chHeal,'heal');flashHealEffect(chHeal);}, 800);}}
     }
     if(actualCost>=3) G.usedHighCostThisTurn=true;
-    const _ct_now_inner=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+    const _ct_now_inner=G.chargeType?curCT():null;
     if(_ct_now_inner&&_ct_now_inner.triggerType==='cardUse'&&c.id!=='chargeKeep') addCharge(1);
     if(_ct_now_inner&&_ct_now_inner.triggerType==='highCostCard'&&actualCost>=2&&c.id!=='chargeKeep') addCharge(1);
     // 脱力Dが手札にある場合、攻撃力を半減（次のatk計算に適用）
     if(datsuryo && c.type==='attack') G._datsuryo_this_card=true; else G._datsuryo_this_card=false;
   }
-  const ct_now=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+  const ct_now=G.chargeType?curCT():null;
   // prevCardId: このターン中に直前に使ったカード（echoLast用）
   const prevCardId=G.turnLastUsedCardId||null;
   if(cid!=='echo') G.turnLastUsedCardId=cid; // 残影は直前カードを上書きしない
@@ -2925,6 +3131,14 @@ function playCard(idx, _isChain){
     G.shield+=shieldAmt; msgs.push('シールド+'+shieldAmt+(G.shieldBuff>0?' (+'+G.shieldBuff+'強化)':''));
     queueEffect(()=>{flashShield();flashShieldAdd('player',shieldAmt);sfxShield();}, 800);
     if(G.chargeType==='teppeki') addCharge(1);
+    // 再生防御のソウルⅠ：防御カード使用のたびHP+2回復
+    if(getEquippedSouls().includes('saiseiBougyo')){
+      const _srHeal=healPlayer(2);
+      if(_srHeal>0){
+        msgs.push('再生防御: HP+'+_srHeal);
+        queueEffect(()=>{spawnDmgNum('+'+_srHeal,'heal');sfxHeal();flashHealEffect(_srHeal);}, 900);
+      }
+    }
   }
   if(ef.draw){msgs.push(ef.draw+'枚ドロー');queueEffect(()=>{flashDrawCard(ef.draw);setTimeout(()=>{drawCards(ef.draw);renderHand();},500);}, 800);}
   if(ef.mana){G.mana=Math.min(G.manaMax,G.mana+ef.mana);msgs.push('マナ+'+ef.mana);}
@@ -3028,13 +3242,19 @@ function playCard(idx, _isChain){
   }
   // 加速する刃：このターン7以上ダメを与えるたびドロー1
   if(ef.swiftBladeOn){G.swiftBladeActive=true;msgs.push('7以上ダメージごとにドロー1！');queueEffect(()=>showEffectPopup('Ehiku.png','加速する刃','#a8d8ea','player'),800);}
-  // 解呪：全マイナス状態異常を解除
+  // 解呪：全マイナス状態異常を解除（毒・炎上・重傷・衰弱・地響き・封印・マナ回復ペナルティ）
   if(ef.cleanse){
     let cleaned=[];
     if(G.playerPoison>0){cleaned.push('毒');G.playerPoison=0;}
     if(G.playerBurn>0){cleaned.push('炎上');G.playerBurn=0;}
+    if(G.heavyWoundTurns>0){cleaned.push('重傷');G.heavyWoundTurns=0;}
+    if(G.shieldWeakenTurns>0){cleaned.push('衰弱');G.shieldWeakenTurns=0;}
+    if(G.quakeTurns>0){cleaned.push('地響き');G.quakeTurns=0;}
+    if(G.sealThisTurn||G.sealNextTurn){cleaned.push('封印');G.sealThisTurn=false;G.sealNextTurn=false;G.sealedCardId=null;}
+    if(G.manaRegenPenaltyNext>0){cleaned.push('マナ回復ペナルティ');G.manaRegenPenaltyNext=0;}
     if(cleaned.length>0) msgs.push('解呪: '+cleaned.join('・')+'を解除');
     else msgs.push('解呪: 解除する状態異常なし');
+    updateIntent();
   }
   // 力の余韻：コスト3以上使用後のみ（renderHandで制御済み・念のため）
   if(ef.requireHighCost && !G.usedHighCostThisTurn){
@@ -3149,23 +3369,25 @@ function playCard(idx, _isChain){
   }
   // 反転：盾の半分で攻撃、シールド減少
   if(ef.shieldAttack){
-    const sv=Math.floor(G.shield/2);
-    G.shield=Math.max(0,G.shield-sv);
-    if(sv>0){
-      let d=sv;
+    const _svAvail=Math.max(0,G.shield-getShieldFloor());
+    const _svActual=Math.min(Math.floor(G.shield/2),_svAvail);
+    G.shield=Math.max(getShieldFloor(),G.shield-_svActual);
+    if(_svActual>0){
+      let d=_svActual;
       if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
       G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
       if(G.soulEaterActive && d>0){const _seH=Math.floor(d/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');queueEffect(()=>{spawnDmgNum('+'+_seH,'heal');sfxHeal();flashHealEffect(_seH);}, 1200);}}
       G.totalDmgDealt=(G.totalDmgDealt||0)+d;
-      msgs.push('反転(旧): 盾'+sv+'→'+d+'ダメ');
+      msgs.push('反転(旧): 盾'+_svActual+'→'+d+'ダメ');
       queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
     } else msgs.push('反転: 盾なし');
   }
   // 反転：盾の半分の値で攻撃しその値分盾を減らす
   if(ef.shieldAttackHalf){
-    const sv=Math.floor(G.shield/2);
+    const _svAvail2=Math.max(0,G.shield-getShieldFloor());
+    const sv=Math.min(Math.floor(G.shield/2),_svAvail2);
     if(sv>0){
-      G.shield=Math.max(0,G.shield-sv);
+      G.shield=Math.max(getShieldFloor(),G.shield-sv);
       let d=(sv+G.atkBuff)*(G.doubleNext?2:1);
       if(G.doubleNext) G.doubleNext=false;
       if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
@@ -3364,7 +3586,7 @@ function playCard(idx, _isChain){
   // チャージ満タンチェック：満タンになってもカウンターを維持するだけ（発動しない）
   // 各チャージは決まったタイミング（ターン開始時/終了時）に処理される
   if(G.chargeType){
-    const _ct2=CHARGE_TYPES[G.chargeType];
+    const _ct2=curCT();
     if(_ct2) updateGaugeLamps(); // 満タン表示の更新のみ
   }
   updateUI();
@@ -3425,7 +3647,7 @@ function endTurn(){
 
   // 狂戦士コストダウンフラグをリセット
   G.swiftBladeActive=false;
-  G.hakiZeroCostCards=null; G.hakiZeroCostCardIds=null;
+  G.hakiZeroCostCards=null; G.hakiZeroCostCardIds=null; G.hakiZeroCostTarget=null;
 
   // 魂食らいリセット
   G.soulEaterActive=false; G.soulEaterDmgThisTurn=0;
@@ -3534,8 +3756,21 @@ function processPlayerTurnEnd(onDone){
     });
   }
 
+  // 緊急防壁のソウルⅠ：シールド無しでターンを終了した場合、シールド+10
+  if(getEquippedSouls().includes('kinkyu')){
+    addStep((next)=>{
+      if(G.shield===0){
+        G.shield+=10;
+        queueEffect(()=>{flashShield();flashShieldAdd('player',10);sfxShield();}, 800);
+        addLog('🛡️ 緊急防壁: シールド0でターン終了→シールド+10','sys');
+        updateUI();
+      }
+      setTimeout(next,300);
+    });
+  }
+
   // チャージターン終了トリガー（重戦士・祈祷師・狂戦士）
-  const _ct=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+  const _ct=G.chargeType?curCT():null;
   if(_ct&&_ct.triggerType==='turnEnd'){
     addStep((next)=>{ addCharge(1); setTimeout(next,200); });
   }
@@ -3554,7 +3789,7 @@ function enemyTurn(){
   G._hpBeforeEnemyTurn=G.playerHp;
   showTurnSlide('👿 敵のターン','#e07878');
   const steps=[];
-  const _ct=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+  const _ct=G.chargeType?curCT():null;
 
   // ① プレイヤーターン終了チェック（チャージトリガー・再生等はendTurn内のprocessPlayerTurnEndで処理済み）
 
@@ -3988,9 +4223,9 @@ function enemyTurn(){
       const decayRate=G.halfShieldLossTurns>0?0.15:0.3;
       // 衰弱中：シールド減少量2倍
       const weakenMult=G.shieldWeakenTurns>0?2:1;
-      const shieldDecay=Math.min(G.shield,Math.floor(G.shield*decayRate*weakenMult));
+      const shieldDecay=Math.min(Math.max(0,G.shield-getShieldFloor()),Math.floor(G.shield*decayRate*weakenMult));
       if(shieldDecay>0){
-        G.shield=Math.max(0,G.shield-shieldDecay);
+        G.shield=Math.max(getShieldFloor(),G.shield-shieldDecay);
         addLog('🛡️ シールド-'+shieldDecay+'（ターン開始'+(G.halfShieldLossTurns>0?'15':'30')+'%減）','sys');
         updateUI();
       }
@@ -4135,14 +4370,16 @@ function dealToPlayer(dmg,lbl){
   const kyojakuCount=(G.hand||[]).filter(id=>id==='bougai_kyojaku').length;
   if(kyojakuCount>0) d+=kyojakuCount*20;
   if(G.shield>0){
+    const _shFloor=getShieldFloor();
+    const _shAvail=Math.max(0,G.shield-_shFloor);
     if(G.halfShieldLossTurns>0){
       // 剛体：シールド減少を半分（切り上げ）
-      const fullAbsorb=Math.min(G.shield,d);
+      const fullAbsorb=Math.min(_shAvail,d);
       const halfLoss=Math.ceil(fullAbsorb/2);
       G.shield-=halfLoss; d=Math.max(0,d-fullAbsorb);
       addLog('🪨 剛体: シールド'+halfLoss+'減少（半減）','sys');
     } else {
-      const a=Math.min(G.shield,d);G.shield-=a;d-=a;
+      const a=Math.min(_shAvail,d);G.shield-=a;d-=a;
       if(a){addLog('🛡️ GUARD！ シールド'+a+'吸収（ダメージ0）','sys');sfxShield();flashShieldBlock('player');}
     }
   }
@@ -4541,24 +4778,36 @@ function _showGrandEnding(){
       _delayCursor+=1100;
     }
     if(G._clearReward && (G._clearReward.gold>0||G._clearReward.crystal>0)){
-      lines.push({text:'💰 クリア報酬：ゴールド+'+G._clearReward.gold+' ／ クリスタル+'+G._clearReward.crystal, size:'12px', color:'#f0d020', delay:_delayCursor, glow:'rgba(240,208,32,0.6)'});
+      const _cr=G._clearReward;
+      const _crTxt=(_cr.bonusGold>0||_cr.bonusCrystal>0)
+        ? '💰 クリア報酬：ゴールド'+_cr.baseGold+(_cr.bonusGold>0?'（+'+_cr.bonusGold+'）':'')+' ／ クリスタル'+_cr.baseCrystal+(_cr.bonusCrystal>0?'（+'+_cr.bonusCrystal+'）':'')
+        : '💰 クリア報酬：ゴールド+'+_cr.gold+' ／ クリスタル+'+_cr.crystal;
+      lines.push({text:_crTxt, size:'12px', color:'#f0d020', delay:_delayCursor, glow:'rgba(240,208,32,0.6)'});
       _delayCursor+=1100;
     }
     if(G._newNoContinueUnlocked){
       lines.push({text:'🏆 ノーコンティニュークリア達成！', size:'12px', color:'#ffd700', delay:_delayCursor, glow:'rgba(255,215,0,0.6)'});
       _delayCursor+=1100;
       if(G._noContinueReward && (G._noContinueReward.gold>0||G._noContinueReward.crystal>0)){
-        lines.push({text:'💰 ゴールド+'+G._noContinueReward.gold+(G._noContinueReward.crystal>0?' ／ クリスタル+'+G._noContinueReward.crystal:''), size:'12px', color:'#f0d020', delay:_delayCursor, glow:'rgba(240,208,32,0.6)'});
+        const _ncr=G._noContinueReward;
+        const _ncrTxt=(_ncr.bonusGold>0||_ncr.bonusCrystal>0)
+          ? '💰 ゴールド'+_ncr.baseGold+(_ncr.bonusGold>0?'（+'+_ncr.bonusGold+'）':'')+(_ncr.baseCrystal>0||_ncr.bonusCrystal>0?' ／ クリスタル'+_ncr.baseCrystal+(_ncr.bonusCrystal>0?'（+'+_ncr.bonusCrystal+'）':''):'')
+          : '💰 ゴールド+'+_ncr.gold+(_ncr.crystal>0?' ／ クリスタル+'+_ncr.crystal:'');
+        lines.push({text:_ncrTxt, size:'12px', color:'#f0d020', delay:_delayCursor, glow:'rgba(240,208,32,0.6)'});
         _delayCursor+=1100;
       }
     }
     if(G._newChargeUnlocked){
-      const _chargeName=(CHARGE_TYPES[G.chargeType]&&CHARGE_TYPES[G.chargeType].name)||G.chargeType;
+      const _chargeName=(curCT()&&curCT().name)||G.chargeType;
       lines.push({text:'🏆 '+_chargeName+'でのクリア達成！（記録されました）', size:'12px', color:'#8ab8d8', delay:_delayCursor, glow:'rgba(138,184,216,0.6)'});
       _delayCursor+=1100;
     }
     if(G._allChargeReward && (G._allChargeReward.gold>0||G._allChargeReward.crystal>0)){
-      lines.push({text:'🏆 全チャージクリア達成！ ゴールド+'+G._allChargeReward.gold+(G._allChargeReward.crystal>0?' ／ クリスタル+'+G._allChargeReward.crystal:''), size:'12px', color:'#ff9a4a', delay:_delayCursor, glow:'rgba(255,154,74,0.6)'});
+      const _acr=G._allChargeReward;
+      const _acrTxt=(_acr.bonusGold>0||_acr.bonusCrystal>0)
+        ? '🏆 全チャージクリア達成！ ゴールド'+_acr.baseGold+(_acr.bonusGold>0?'（+'+_acr.bonusGold+'）':'')+(_acr.baseCrystal>0||_acr.bonusCrystal>0?' ／ クリスタル'+_acr.baseCrystal+(_acr.bonusCrystal>0?'（+'+_acr.bonusCrystal+'）':''):'')
+        : '🏆 全チャージクリア達成！ ゴールド+'+_acr.gold+(_acr.crystal>0?' ／ クリスタル+'+_acr.crystal:'');
+      lines.push({text:_acrTxt, size:'12px', color:'#ff9a4a', delay:_delayCursor, glow:'rgba(255,154,74,0.6)'});
       _delayCursor+=1100;
     }
     lines.forEach(({text,size,color,delay,glow})=>{
@@ -5405,9 +5654,10 @@ function showChargeSelect(){
   list.innerHTML='';
   // エリアによって選択可能チャージを制限
   const _allowed=AREA_CHARGE_ALLOWED[G.areaId];
-  const chargeList=_allowed
+  const _csLevel=getChargeLevel();
+  const chargeList=(_allowed
     ? Object.values(CHARGE_TYPES).filter(ct=>_allowed.includes(ct.id))
-    : Object.values(CHARGE_TYPES);
+    : Object.values(CHARGE_TYPES)).map(base=>getChargeTypeAtLevel(base.id,_csLevel));
   chargeList.forEach(ct=>{
     const d=document.createElement('div');
     d.style.cssText='background:rgba(0,0,0,.85);border:2px solid '+ct.color+';border-radius:10px;padding:10px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;min-height:88px;box-sizing:border-box;';
@@ -5427,16 +5677,31 @@ function showChargeSelect(){
         <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
           <span style="font-family:'Cinzel',serif;font-size:14px;color:${ct.color};font-weight:bold;letter-spacing:1px;">${ct.name}</span>
           <span style="font-size:9px;color:#ccc;font-family:sans-serif;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:1px 6px;letter-spacing:.5px;">${trait}</span>
+          <span style="font-size:9px;color:#f0d47a;font-family:sans-serif;background:rgba(240,212,122,.12);border:1px solid rgba(240,212,122,.4);border-radius:4px;padding:1px 6px;letter-spacing:.5px;">Lv.${ct.level}</span>
         </div>
         <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">${lamps}<span style="font-size:8px;color:#888;font-family:Cinzel,serif;margin-left:4px;">×${ct.maxCount}</span></div>
         <div style="font-size:10px;color:#aaa;font-family:sans-serif;line-height:1.4;margin-top:4px;">${ct.desc}</div>
       </div>`;
     const pick=(ev)=>{
       if(ev&&ev.type==='touchend') ev.preventDefault();
-      showSimpleConfirm('「<span style="color:'+ct.color+';font-size:18px;letter-spacing:2px;">'+ct.name+'</span>」<br>を選びますか？', '', ()=>{
+      // デッキが12枚未満の場合はステージを開始できない（使い捨てカードの消滅・カード削除等でも同様にチェック）
+      const _deckCheck=getEffectiveDeck(ct.id);
+      if(_deckCheck.length<12){
+        sfxCancel();
+        _showCenterWarning('カードが12枚そろっていません。デッキを編集してください。');
+        return;
+      }
+      showSimpleConfirm('「<span style="color:'+ct.color+';font-size:18px;letter-spacing:2px;">'+ct.name+'</span>」<br>を選びますか？', '<br><span style="font-size:12px;color:#ccc;">'+(ct.playstyle||'')+'</span>', ()=>{
         G.chargeType=ct.id;
         G.chargeCount=0;
         G.deck=getEffectiveDeck(ct.id);
+        // このエリアに使い捨て(ガチャ生成)カードを持ち込んだかどうかを記録。
+        // メモリ上のフラグだけだとアプリ強制終了時に消えてしまうため、SAVEにも即座に永続化しておく。
+        // エリアを出る際（クリア／敗北／タイトルへ戻る、いずれも showLogoThenTitle 経由）に消滅処理を行う。
+        // 万一そのまま強制終了された場合も、次回起動時にこのフラグを検知して消滅処理を行う。
+        G._inAreaRun = G.deck.some(id=>DB[id] && DB[id]._gachaGenerated);
+        SAVE.pendingDisposal = G._inAreaRun ? {chargeId:ct.id} : null;
+        writeSaveData();
         hideOv('ov-charge-select');
         hideOv('ov-area-select');
         hideOv('ov-main-menu'); // メニュー画面が戦闘画面の手前に残らないよう非表示にする
@@ -6149,7 +6414,7 @@ function updateUI(){
   if(G.nextDmgHalf) pParts.push('<span style="color:#2980b9;">🛡️半減待機</span>');
   // チャージ満タン待機中（発動タイミングを待っている状態）
   if(G.chargeType&&G.chargeCount>0){
-    const _ctDisp=CHARGE_TYPES[G.chargeType];
+    const _ctDisp=curCT();
     if(_ctDisp&&G.chargeCount>=_ctDisp.maxCount){
       pParts.push('<span style="color:'+_ctDisp.color+';">⚡'+_ctDisp.name+'待機</span>');
     }
@@ -6662,7 +6927,7 @@ function renderHand(){
     const costAdd=c.type!=='bougai'?soulcrushCount:0;
     // 炎上コストペナルティ
     const ignitePenalty=(G.ignitedCards&&G.ignitedCards[i])||0;
-    const reducedCost=isHakiZero?0:applyRaimeiCostMod(Math.max(0,c.cost+costAdd+ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)));
+    const reducedCost=isHakiZero?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)));
     // 踏み倒し発動中はコスト0扱い（ただし対象カードのコストが閾値超えの場合のみ）
     const isFreePassTarget = G.freeNextCard && c.id!=='freePass' && c.cost>(G.freePassManaAtUse||0);
     const effectiveCost = isFreePassTarget ? 0 : reducedCost;
@@ -6984,7 +7249,7 @@ function renderHand(){
       '<div class="card-band" style="'+(frameImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
-        '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">0</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
+        '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">'+reducedCost+'</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
@@ -7364,7 +7629,7 @@ function checkHpBlink(){
 
 // デッキビルド表示（クリア・ゲームオーバー共通）
 function buildDeckBuildHTML(){
-  const ct=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+  const ct=G.chargeType?curCT():null;
   const rarityCol={common:'#8a9aaa',uncommon:'#60cc60',rare:'#4a8aff',epic:'#d040ff',legendary:'#ff9500'};
   let html='<div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:10px 12px;font-family:sans-serif;display:flex;flex-direction:column;gap:10px;">';
 
@@ -7524,7 +7789,7 @@ function _showResultClear(){
 
 function addCharge(n){
   if(!G.chargeType) return;
-  const ct=CHARGE_TYPES[G.chargeType];
+  const ct=curCT();
   if(!ct) return;
   // 守護者：効果発動中は蓄積停止
   if(ct.id==='teppeki' && (G.nextDmgNull||G.nextDmgHalf)) return;
@@ -7551,7 +7816,7 @@ function addCharge(n){
 // 実際の効果はenemyTurn（錬金術師）またはターン開始時（他全て）に処理
 function triggerCharge(){
   if(!G.chargeType) return;
-  const ct=CHARGE_TYPES[G.chargeType];
+  const ct=curCT();
   if(!ct || G.chargeCount<ct.maxCount) return;
   if(G.holdCharge){G.holdCharge=false;addLog('🔒 チャージ保存: 発動をスキップ（カウンター維持）','sys');return;}
 }
@@ -7591,7 +7856,7 @@ function updateGaugeLamps(){
       el.innerHTML='<span style="font-size:8px;color:#555;">未選択</span>';
     return;
   }
-  const ct=CHARGE_TYPES[G.chargeType];
+  const ct=curCT();
   const max=ct?ct.maxCount:3;
   const color=ct?ct.color:'#c9a84c';
   const chargeUsed=G.chargeUsedThisTurn===true;
@@ -7840,9 +8105,29 @@ function runEffectQueue(){
     if(eb) eb.style.pointerEvents='none';
   }
   const {fn,delay}=effectQueue.shift();
-  fn();
+  try{
+    fn();
+  }catch(err){
+    // 【バグ対策】演出処理中に例外が発生してもキュー処理を止めない（操作不能バグ防止）
+    console.error('[DWC] effectQueue内でエラーが発生しました。処理を継続します:', err);
+  }
   setTimeout(runEffectQueue, delay||800);
 }
+// 【バグ対策】演出ロックが異常に長時間（8秒）続いた場合、強制的にUIロックを解除する安全弁
+setInterval(()=>{
+  if(typeof G!=='undefined' && G && G._effectLocked){
+    G._effectLockWatchdog=(G._effectLockWatchdog||0)+1;
+    if(G._effectLockWatchdog>=4){ // 2秒間隔 × 4回 = 8秒
+      console.warn('[DWC] 演出ロックが長時間解除されないため、強制解除します。');
+      effectQueue=[]; effectRunning=false; G._effectLocked=false; G._effectLockWatchdog=0;
+      ['hand-area','end-turn-btn','btn-deck-view','charge-gauge-box','curse-timer-box'].forEach(function(id){
+        var el=document.getElementById(id);if(el)el.style.pointerEvents='';
+      });
+    }
+  } else {
+    if(typeof G!=='undefined' && G) G._effectLockWatchdog=0;
+  }
+}, 2000);
 
 
 // ドロー演出（カードを引いたときに表示）
@@ -8008,7 +8293,9 @@ function addLog(msg,type=''){
 // PC時はappに、スマホはbodyに追加するヘルパー
 function appendToApp(el){
   const app=document.getElementById('app');
-  if(app && window.innerWidth>=480){
+  // #appがまだ非表示（タイトル画面などゲーム開始前）の場合は、
+  // #appの中に追加しても表示されないため、必ずdocument.bodyに追加する
+  if(app && window.innerWidth>=480 && app.style.display!=='none'){
     if(el.style.position==='fixed') el.style.position='absolute';
     app.appendChild(el);
   } else {
@@ -8084,7 +8371,8 @@ function hideOv(id){
   // オーバーレイが全て消えたとき、ゲーム中なら暗幕を出したままにして
   // 次のshowOv/showStageIntro/showStartScreenで消す（チラ見え防止）
   const curtain=document.getElementById('ov-curtain');
-  if(curtain && !anyShown && G && G.phase && G.stage>0){
+  const _onTitleNow=(typeof logoScreen!=='undefined' && logoScreen && logoScreen.style.display==='flex');
+  if(curtain && !anyShown && G && G.phase && G.stage>0 && !_onTitleNow){
     curtain.style.display='block';
     // 安全弁：4秒以内に次の画面が来なければ自動で消す（ハングアップ防止）
     if(window._curtainSafeTimer) clearTimeout(window._curtainSafeTimer);
@@ -8129,9 +8417,60 @@ function addCardToDeck(id){
   recordCardAcquired(id);
 }
 
-function bind(id,fn){const el=document.getElementById(id);if(!el)return;if(el._dwBound){el._dwBoundFn=fn;return;}el._dwBound=true;el._dwBoundFn=fn;let _t=0;const guarded=(e)=>{if(e&&e.stopPropagation)e.stopPropagation();const now=Date.now();if(now-_t<300)return;_t=now;el._dwBoundFn();};el.addEventListener('click',guarded);el.addEventListener('touchend',e=>{e.preventDefault();guarded(e);});}
-// タップ/クリックの二重発火を防ぐ共通ラッパー（addEventListenerで click+touchend を両方登録する箇所向け）
-function bindSafe(el,fn){if(!el)return;let _handled=false;const guarded=(e)=>{if(e&&e.type==='touchend')e.preventDefault();if(_handled)return;_handled=true;fn(e);};el.addEventListener('click',guarded);el.addEventListener('touchend',guarded);return ()=>{_handled=false;};}
+// 汎用バインド関数：指が一定以上動いた（スワイプ／スクロール）場合はタップとして扱わない。
+// 静止タップの挙動（click/touchendの二重発火防止・300ms連打ガード）は従来どおり維持する。
+function bind(id,fn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el._dwBound){el._dwBoundFn=fn;return;}
+  el._dwBound=true;el._dwBoundFn=fn;
+  let _t=0;
+  const guarded=(e)=>{if(e&&e.stopPropagation)e.stopPropagation();const now=Date.now();if(now-_t<300)return;_t=now;el._dwBoundFn();};
+  const MOVE_LIMIT=10;
+  let sx=0, sy=0, moved=false;
+  el.addEventListener('touchstart',(e)=>{
+    if(!e.touches||!e.touches[0]){moved=false;return;}
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; moved=false;
+  },{passive:true});
+  el.addEventListener('touchmove',(e)=>{
+    if(!e.touches||!e.touches[0])return;
+    const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(Math.sqrt(dx*dx+dy*dy)>MOVE_LIMIT) moved=true;
+  },{passive:true});
+  el.addEventListener('click',guarded);
+  el.addEventListener('touchend',e=>{
+    if(moved){moved=false;return;} // スワイプ／スクロール中に指が離れた場合はタップ扱いしない（preventDefaultもしないのでスクロールを妨げない）
+    e.preventDefault();
+    guarded(e);
+  });
+}
+// タップの二重発火を防ぐ共通ラッパー（addEventListenerで click+touchend を両方登録する箇所向け）。
+// こちらもスワイプ／スクロールとタップを区別する。
+function bindSafe(el,fn){
+  if(!el)return;
+  let _handled=false;
+  const MOVE_LIMIT=10;
+  let sx=0, sy=0, moved=false;
+  el.addEventListener('touchstart',(e)=>{
+    if(!e.touches||!e.touches[0]){moved=false;return;}
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; moved=false;
+  },{passive:true});
+  el.addEventListener('touchmove',(e)=>{
+    if(!e.touches||!e.touches[0])return;
+    const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(Math.sqrt(dx*dx+dy*dy)>MOVE_LIMIT) moved=true;
+  },{passive:true});
+  const guarded=(e)=>{
+    if(e&&e.type==='touchend'){
+      if(moved){moved=false;return;} // スワイプ中に指が離れた場合はタップ扱いしない
+      e.preventDefault();
+    }
+    if(_handled)return;_handled=true;fn(e);
+  };
+  el.addEventListener('click',guarded);
+  el.addEventListener('touchend',guarded);
+  return ()=>{_handled=false;};
+}
 // スクロール可能なリスト内の項目用：指が一定以上動いた（スワイプ/スクロール）場合はタップとして扱わない
 function bindTapSwipe(el,fn){
   if(!el) return;
@@ -8670,7 +9009,7 @@ bind('btn-close-discard',()=>{sfxCancel();hideOv('ov-discard');});
 function openChargeInfo(){
   if(typeof G==='undefined') return; // 初期化前は無視
   // 使用済みでも詳細確認は可能（発動ボタンのみ無効）
-  const ct=G.chargeType?CHARGE_TYPES[G.chargeType]:null;
+  const ct=G.chargeType?curCT():null;
   const el=document.getElementById('charge-info-content');
   const activateBtn=document.getElementById('charge-activate-btn');
   const isFull=ct&&G.chargeCount>=ct.maxCount;
@@ -8681,7 +9020,7 @@ function openChargeInfo(){
   if(el&&ct){
     el.innerHTML='<div style="background:rgba(0,0,0,.6);border:2px solid '+ct.color+';border-radius:10px;padding:14px 16px;font-family:sans-serif;">'
       +'<div style="font-size:28px;margin-bottom:8px;">'+ct.icon+'</div>'
-      +'<div style="font-family:\'Cinzel\',serif;font-size:15px;color:'+ct.color+';font-weight:bold;margin-bottom:6px;">'+ct.name+'</div>'
+      +'<div style="font-family:\'Cinzel\',serif;font-size:15px;color:'+ct.color+';font-weight:bold;margin-bottom:6px;">'+ct.name+' <span style="font-size:10px;color:#f0d47a;">Lv.'+ct.level+'</span></div>'
       +'<div style="font-size:11px;color:#ccc;line-height:1.8;">'+ct.desc+'</div>'
       +'<div style="margin-top:10px;font-size:10px;color:#888;">カウント: '+G.chargeCount+' / '+ct.maxCount+(isFull?'　<span style="color:#e74c3c;font-weight:bold;">発動可能！</span>':'')+'</div>'
       +(G.chargeUsedThisTurn?'<div style="margin-top:6px;font-size:11px;color:#aaa;">このターンは使用済みです</div>':'')
@@ -8710,7 +9049,7 @@ window.openChargeInfo=openChargeInfo;
 // チャージ効果を手動実行する関数
 function executeChargeEffect(){
   if(!G.chargeType||(G.phase!=='player'&&G.phase!=='block')) return;
-  const ct=CHARGE_TYPES[G.chargeType];
+  const ct=curCT();
   if(!ct||G.chargeCount<ct.maxCount) return;
   if(G.chargeUsedThisTurn){addLog('⚡ チャージは1ターンに1度のみ使用できます','sys');return;}
   if(G.phase==='block') G.phase='player';
@@ -8723,34 +9062,51 @@ function executeChargeEffect(){
   addLog('⚡ チャージ「'+ct.name+'」発動！'+(G.chargeCount>0?' (カウント1残)':''),'sys');
   sfxChargeActivate();
   if(ct.effectType==='nextTurnAtkBuff'){
-    G.atkBuff=G.atkBuff+(ct.effectVal||4);
-    addLog('⚡ このターン攻撃力+'+ct.effectVal+' + ドロー1！','sys');
-    queueEffect(()=>showEffectPopup('Ekougeki.png','攻撃力+'+(ct.effectVal||4),'#ff6b35'), 800);
-    queueEffect(()=>{flashDrawCard(1);setTimeout(()=>{drawCards(1);renderHand();},500);}, 800);
+    G.atkBuff=G.atkBuff+(ct.effectVal||3);
+    const _drawTxt=ct.draw>0?(' + ドロー'+ct.draw):'';
+    addLog('⚡ このターン攻撃力+'+ct.effectVal+_drawTxt+'！','sys');
+    queueEffect(()=>showEffectPopup('Ekougeki.png','攻撃力+'+(ct.effectVal||3),'#ff6b35'), 800);
+    if(ct.draw>0) queueEffect(()=>{flashDrawCard(ct.draw);setTimeout(()=>{drawCards(ct.draw);renderHand();},500);}, 800);
     updateUI();
   } else if(ct.effectType==='doubleNext'){
     G.doubleNext=true;
     G.doubleMultiplier=(G.doubleMultiplier||1)*2;
-    G.mana=Math.min(G.manaMax,G.mana+2);
-    addLog('🔥 このターン次の攻撃が'+G.doubleMultiplier+'倍！ + マナ+2','sys'); updateUI();
+    const _mb=ct.manaBonus||0;
+    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
+    addLog('🔥 このターン次の攻撃が'+G.doubleMultiplier+'倍！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
   } else if(ct.effectType==='nextTurnHeal'){
-    const hv=ct.effectVal||12;
+    const hv=ct.effectVal||9;
     const _mha=healPlayer(hv);
-    addLog('💚 HP+'+_mha+'！ + ドロー1','sys');
+    const _drawTxt=ct.draw>0?(' + ドロー'+ct.draw):'';
+    addLog('💚 HP+'+_mha+_drawTxt+'！','sys');
     queueEffect(()=>{sfxHeal();spawnDmgNum('+'+_mha,'heal');flashHealEffect(_mha);}, 800);
-    queueEffect(()=>{flashDrawCard(1);setTimeout(()=>{drawCards(1);renderHand();},500);}, 800);
+    if(ct.draw>0) queueEffect(()=>{flashDrawCard(ct.draw);setTimeout(()=>{drawCards(ct.draw);renderHand();},500);}, 800);
     G.chargeEffectActive=false;
     updateUI();
   } else if(ct.effectType==='nextDmgNull'){
     G.nextDmgNull=true;
-    G.mana=Math.min(G.manaMax,G.mana+1);
-    addLog('🛡️ 守護者: 次の被ダメを無効！ + マナ+1','sys'); updateUI();
+    const _mb=ct.manaBonus||0;
+    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
+    addLog('🛡️ 守護者: 次の被ダメを無効！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
+  } else if(ct.effectType==='nextDmgHalf'){
+    G.nextDmgHalf=true;
+    const _mb=ct.manaBonus||0;
+    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
+    addLog('🛡️ 守護者: 次の被ダメを半減（切り捨て）！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
   } else if(ct.effectType==='dokushiPoisonDouble'){
     G.dokushiPoisonDouble=true;
-    addLog('☠️ 錬金術師: このターン次に毒を与えるカードの毒付与値が2倍！','sys');
+    const _mb=ct.manaBonus||0;
+    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
+    addLog('☠️ 錬金術師: このターン次に毒を与えるカードの毒付与値が2倍！'+(_mb>0?' + マナ+'+_mb:''),'sys');
     G.chargeEffectActive=false;
     updateUI(); renderHand();
   } else if(ct.effectType==='inoriDeckCopy'){
+    // マナ+3は共通効果として先に付与
+    G.mana=Math.min(G.manaMax,G.mana+3);
+    const _drawExtra=ct.drawExtra||0;
+    if(_drawExtra>0){ flashDrawCard(_drawExtra); drawCards(_drawExtra); }
+    addLog('🙏 祈祷師: マナ+3'+(_drawExtra>0?(' + ドロー'+_drawExtra):'')+'！','sys');
+    updateUI(); renderHand();
     // デッキからカード1枚を選んでコストなしで使用
     const deckUniq=[...new Set(G.deck)].filter(id=>DB[id]&&DB[id].type!=='bougai');
     if(deckUniq.length===0){addLog('🙏 祈祷師: デッキにカードがありません','sys');G.chargeEffectActive=false;updateUI();return;}
@@ -8762,7 +9118,7 @@ function executeChargeEffect(){
     ttl.textContent='🙏 祈祷師：カードを選択';
     const sub=document.createElement('div');
     sub.style.cssText='font-size:10px;color:#aaa;font-family:sans-serif;';
-    sub.textContent='コストなしで即時使用し、さらに山札から手札にも加える';
+    sub.textContent=ct.addToHandAfterUse?'コストなしで即時使用し、さらに山札から手札にも加える':'コストなしで即時使用する';
     const grid=document.createElement('div');
     grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-height:60vh;overflow-y:auto;width:100%;-webkit-overflow-scrolling:touch;';
     deckUniq.forEach(cid=>{
@@ -8783,7 +9139,7 @@ function executeChargeEffect(){
         '</div>'+
         '<div class="card-corner tl">'+corner+'</div>'+
         '<div class="card-corner br">'+corner+'</div>';
-      // タップ：コストなしで使用 + 山札から手札にも加える
+      // タップ：コストなしで使用（レベル3のみさらに山札から手札にも加える）
       const doUse=(e)=>{
         if(e.type==='touchend') e.preventDefault();
         (function(){var _el=ov;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();
@@ -8796,8 +9152,8 @@ function executeChargeEffect(){
         playCard(c, true);
         c.effect.battleExile=_savedBattleExile;
         c.effect.tempExile=_savedTempExile;
-        // さらに山札から手札にも加える
-        if(G.hand.length<CARDS_PER_PAGE){
+        // レベル3のみ：さらに山札から手札にも加える
+        if(ct.addToHandAfterUse && G.hand.length<CARDS_PER_PAGE){
           G.hand.push(cid);
           addLog('🙏 祈祷師: 「'+c.name+'」を手札にも加えた！','sys');
         }
@@ -8821,9 +9177,15 @@ function executeChargeEffect(){
   } else if(ct.effectType==='hakiZeroCost'){
     G.hakiZeroCostCards=new Set(G.hand.map((_,i)=>i));
     G.hakiZeroCostCardIds=G.hand.map(id=>id);
-    // ステージ中累積マナボーナス（毎ターン開始時マナ+1）
-    G.berserkManaBonus=(G.berserkManaBonus||0)+1;
-    addLog('💪 狂戦士: 手札全コスト0！ + ターン開始マナ+1（累計+'+(G.berserkManaBonus)+'）','sys');
+    G.hakiZeroCostTarget=(ct.costTarget!=null?ct.costTarget:0);
+    const _mbpa=ct.manaBonusPerActivation||0;
+    let _logMsg='💪 狂戦士: 手札全コスト'+G.hakiZeroCostTarget+'！';
+    if(_mbpa>0){
+      // ステージ中累積マナボーナス（毎ターン開始時マナ+1）
+      G.berserkManaBonus=(G.berserkManaBonus||0)+_mbpa;
+      _logMsg+=' + ターン開始マナ+'+_mbpa+'（累計+'+(G.berserkManaBonus)+'）';
+    }
+    addLog(_logMsg,'sys');
     G.chargeEffectActive=false;
     updateUI(); renderHand();
   }
@@ -9142,7 +9504,15 @@ function openAdminMode(){
   setTab(adminAreaId);
   showOv('ov-admin');
 }
-bind('btn-admin-close',()=>hideOv('ov-admin'));
+bind('btn-admin-close',()=>{
+  hideOv('ov-admin');
+  // 【修正】管理者モードを閉じてタイトル画面に戻った際、タイトルタップが反応しなくなる不具合の対策。
+  // タイトル画面（logo-screen）が表示中であれば、タップ受付フラグとイベントリスナーを強制的に再設定する。
+  if(typeof logoScreen!=='undefined' && logoScreen && logoScreen.style.display==='flex'){
+    _logoScreenTapReady=true;
+    _registerStartListeners();
+  }
+});
 bind('btn-admin-cardtest',()=>{ enterCardTestMode(); });
 bind('btn-cardtest-exit',()=>{ exitCardTestMode(); });
 
@@ -9352,7 +9722,7 @@ bind('btn-deck-view',()=>{
 
   // 選択中チャージ（専用枠）
   if(ca && G.chargeType){
-    const ct=CHARGE_TYPES[G.chargeType];
+    const ct=curCT();
     if(ct){
       ca.style.cssText='width:100%;background:rgba(0,0,0,.6);border:1px solid '+ct.color+'55;border-radius:10px;padding:8px 10px;margin-top:4px;';
       ca.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;letter-spacing:1px;">⚡ チャージ</div>'+
@@ -9471,10 +9841,11 @@ window.addEventListener('load',()=>{
 });
 
 function showLogoThenTitle(){
+  _consumeDisposableCardsOnAreaExit();
   _gameStarting=false;
   _inBattle=false; // タイトルに戻る際は必ず戦闘中フラグを解除（保険）
   // メニュー関連のオーバーレイが残っていれば念のため非表示にする
-  ['ov-main-menu','ov-area-select','ov-charge-select','ov-soul-setup','ov-deck-edit','ov-achievements','ov-gamedata','ov-shop'].forEach(id=>{
+  ['ov-main-menu','ov-area-select','ov-charge-select','ov-soul-setup','ov-deck-edit','ov-achievements','ov-gamedata','ov-shop','ov-shop-confirm','ov-rules','ov-gacha-select','ov-gacha-common','ov-gacha-confirm','ov-gacha-result'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.classList.remove('show');
   });
   // ログエリアをクリア
@@ -9758,25 +10129,35 @@ setInterval(_stopThemeIfMenuHidden, 500);
 // 販売品リスト。unlockArea: nullなら常時販売、エリア名を指定すると該当エリアを初クリアした時点で追加販売される
 const SHOP_ITEMS=[
   // ===== ソウル =====
-  {id:'buy_seimei2',  cat:'soul', icon:'❤️', name:'生命のソウルⅡ', desc:'①ステータスアップ系 コスト2・HP+20', price:10, currency:'crystal', unlockArea:'始まりの洞窟', oneTime:true, soulId:'seimei2'},
-  {id:'buy_teppeki2', cat:'soul', icon:'🛡️', name:'鉄壁Ⅱ',        desc:'①ステータスアップ系 コスト2・ステージ開始時シールド+10', price:10, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, soulId:'teppeki2'},
-  {id:'buy_taidoku2', cat:'soul', icon:'☠️', name:'耐毒Ⅱ',        desc:'②状態異常軽減系 コスト2・毒付与-6', price:10, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taidoku2'},
-  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈Ⅱ',        desc:'②状態異常軽減系 コスト2・呪いダメージ-6', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu2'},
-  {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウル', desc:'③カード強化系 コスト1・「防御」カードの防御力（計算後）+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
+  {id:'buy_seimei2',  cat:'soul', icon:'❤️', name:'生命のソウルⅡ', desc:'①ステータスアップ系 コスト2・HP+20', price:40, currency:'crystal', unlockArea:'始まりの洞窟', oneTime:true, soulId:'seimei2'},
+  {id:'buy_teppeki2', cat:'soul', icon:'🛡️', name:'鉄壁Ⅱ',        desc:'①ステータスアップ系 コスト2・ステージ開始時シールド+10', price:40, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, soulId:'teppeki2'},
+  {id:'buy_kekkai',   cat:'soul', icon:'🔷', name:'障壁のソウルⅠ', desc:'①ステータスアップ系 コスト3・シールドの最低値が0ではなく5になり、5以下に減少しなくなる', price:80, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kekkai'},
+  {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+10する', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
+  {id:'buy_taidoku2', cat:'soul', icon:'☠️', name:'耐毒Ⅱ',        desc:'②状態異常軽減系 コスト2・毒付与-6', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taidoku2'},
+  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈Ⅱ',        desc:'②状態異常軽減系 コスト2・呪いダメージ-6', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu2'},
+  {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウル', desc:'③カード強化系 コスト1・「防御」カードの防御力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
+  {id:'buy_saiseiBougyo', cat:'soul', icon:'💗', name:'再生防御のソウルⅠ', desc:'④特殊効果付与系 コスト1・防御カードを使用するたび、HP+2回復する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'saiseiBougyo'},
+  {id:'buy_kozeni',   cat:'soul', icon:'🪙', name:'小銭稼ぎのソウル', desc:'④特殊効果付与系 コスト1・クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kozeni'},
+  {id:'buy_chargeup1', cat:'soul', icon:'⚡', name:'チャージUPのソウル',  desc:'④特殊効果付与系 コスト1・チャージのレベルを1つ上げる', costs:[{currency:'gold',amount:200},{currency:'crystal',amount:50}], unlockArea:'忘却の遺跡', oneTime:true, soulId:'chargeup1'},
+  {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'gold',amount:400},{currency:'crystal',amount:100}], unlockArea:'鉄壁の砦', oneTime:true, soulId:'chargeup2'},
   // ===== カード（1度のみ購入。購入するとデッキ編集の入れ替え候補に加わる） =====
   {id:'buy_teate',      cat:'card', icon:'🩹', name:'手当',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:40, currency:'gold', unlockArea:null, oneTime:true, cardId:'teate'},
   {id:'buy_smallShield',cat:'card', icon:'🪬', name:'小盾',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:40, currency:'gold', unlockArea:null, oneTime:true, cardId:'smallShield'},
-  {id:'buy_strike2',    cat:'card', icon:'⚔️', name:'追撃',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:30, currency:'gold', unlockArea:null, oneTime:true, cardId:'strike2'},
+  {id:'buy_strike2',    cat:'card', icon:'⚔️', name:'追撃',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:40, currency:'gold', unlockArea:null, oneTime:true, cardId:'strike2'},
+  // ===== カード（3エリアクリア後販売・1度のみ購入） =====
+  {id:'buy_allIn',      cat:'card', icon:'🎲', name:'大盤振る舞い', desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:50, currency:'gold', unlockArea:'炎の神殿', oneTime:true, cardId:'allIn'},
+  {id:'buy_afterForce', cat:'card', icon:'⚡', name:'力の余韻',     desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:50, currency:'gold', unlockArea:'炎の神殿', oneTime:true, cardId:'afterForce'},
+  {id:'buy_poisonCard', cat:'card', icon:'☠️', name:'毒',           desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:50, currency:'gold', unlockArea:'炎の神殿', oneTime:true, cardId:'poison'},
+  {id:'buy_swiftBlade', cat:'card', icon:'⚡', name:'加速する刃',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:50, currency:'gold', unlockArea:'炎の神殿', oneTime:true, cardId:'swiftBlade'},
   // ===== エリア解放（初期は選択画面に出ず、購入で追加される） =====
   {id:'buy_area_ruins', cat:'area', icon:'🗺️', name:'忘却の遺跡', desc:'エリア選択に「忘却の遺跡」が追加される', price:500, currency:'gold', unlockArea:null, oneTime:true, areaId:1},
-  // ===== キャパシティアップ（すべて1度のみ購入。忘却の遺跡クリア後販売） =====
-  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
-  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'swap', amount:1},
-  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:1},
-  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:2},
-  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:3},
-  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:100, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:4},
-  // ===== チャージ強化（今は商品なし） =====
+  // ===== キャパシティアップ（すべて1度のみ購入） =====
+  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
+  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'swap', amount:1},
+  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:200, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:200, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:2},
+  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:3},
+  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:200, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, capType:'soulcat', category:4},
 ];
 function _shopUnlockedItems(){
   // 常時販売品＋クリア済みエリアに紐づく追加販売品のみを対象にする
@@ -9798,6 +10179,18 @@ function showShopScreen(){
   _updateShopNewBadge();
   showOv('ov-shop');
 }
+// 商品の価格情報を統一形式（複数通貨対応）で取得する。
+// 従来の {price, currency} 形式のほか、複数通貨をまとめて必要とする {costs:[{currency,amount},...]} 形式にも対応。
+function _getItemCosts(it){
+  if(it.costs && Array.isArray(it.costs)) return it.costs;
+  return [{currency:it.currency, amount:it.price}];
+}
+function _getBalance(currency){ return currency==='crystal'?(SAVE.crystal||0):(SAVE.gold||0); }
+function _currencyIcon(currency){ return currency==='crystal'?'💎':'💰'; }
+function _currencyName(currency){ return currency==='crystal'?'クリスタル':'ゴールド'; }
+function _canAffordItem(it){ return _getItemCosts(it).every(c=>_getBalance(c.currency)>=c.amount); }
+function _formatItemPrice(it){ return _getItemCosts(it).map(c=>_currencyIcon(c.currency)+c.amount).join(' + '); }
+
 function renderShopContent(){
   const content=document.getElementById('shop-content');
   if(!content) return;
@@ -9809,7 +10202,9 @@ function renderShopContent(){
   if(soulEl) soulEl.textContent=SAVE.crystal;
 
   const CAT_LABEL={soul:'💠 ソウル',card:'🃏 カード（1度のみ）',area:'🗺️ エリア解放',cap:'📦 キャパシティアップ（1度のみ）',charge:'⚡ チャージ強化'};
-  const items=_shopUnlockedItems();
+  SAVE.shopPurchased=SAVE.shopPurchased||{};
+  // 購入済み（1度のみ）の商品はリストから消える
+  const items=_shopUnlockedItems().filter(it=>!(it.oneTime && SAVE.shopPurchased[it.id]));
   const byCat={};
   items.forEach(it=>{ (byCat[it.cat]=byCat[it.cat]||[]).push(it); });
 
@@ -9823,13 +10218,10 @@ function renderShopContent(){
     title.textContent=CAT_LABEL[cat];
     sec.appendChild(title);
     list.forEach(it=>{
-      SAVE.shopPurchased=SAVE.shopPurchased||{};
-      const bought=it.oneTime && !!SAVE.shopPurchased[it.id];
-      const currencyIcon=it.currency==='crystal'?'💎':'💰';
-      const balance=it.currency==='crystal'?SAVE.crystal:SAVE.gold;
-      const canAfford=balance>=it.price;
+      const priceLabel=_formatItemPrice(it);
+      const canAfford=_canAffordItem(it);
       const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 10px;margin-bottom:6px;'+(bought?'opacity:.5;':'');
+      row.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 10px;margin-bottom:6px;';
       row.innerHTML=
         '<span style="font-size:20px;">'+it.icon+'</span>'+
         '<div style="flex:1;min-width:0;">'+
@@ -9837,15 +10229,11 @@ function renderShopContent(){
           '<div style="font-size:9px;color:#aaa;line-height:1.4;">'+it.desc+'</div>'+
         '</div>'+
         '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'+
-          (bought
-            ? '<div style="font-size:10px;color:#7ed6a0;white-space:nowrap;">購入済み</div>'
-            : ('<div style="font-size:10px;color:'+(canAfford?'#c9a84c':'#e07070')+';white-space:nowrap;">'+currencyIcon+it.price+'</div>'+
-               '<div class="shop-buy-btn" style="font-size:10px;color:#c9a84c;border:1px solid rgba(201,168,76,.5);border-radius:6px;padding:3px 10px;white-space:nowrap;">購入</div>'))+
+          '<div style="font-size:10px;color:'+(canAfford?'#c9a84c':'#e07070')+';white-space:nowrap;">'+priceLabel+'</div>'+
+          '<div class="shop-buy-btn" style="font-size:10px;color:#c9a84c;border:1px solid rgba(201,168,76,.5);border-radius:6px;padding:3px 10px;white-space:nowrap;">購入</div>'+
         '</div>';
-      if(!bought){
-        const buyBtn=row.querySelector('.shop-buy-btn');
-        bindTapSwipe(buyBtn,()=>{ _buyShopItem(it); });
-      }
+      const buyBtn=row.querySelector('.shop-buy-btn');
+      bindTapSwipe(buyBtn,()=>{ _showShopBuyConfirm(it); });
       sec.appendChild(row);
     });
     content.appendChild(sec);
@@ -9854,19 +10242,64 @@ function renderShopContent(){
     content.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px 0;">現在販売中の品はありません</div>';
   }
 }
-// ショップ商品の購入処理
+// ショップ購入確認ポップアップを表示（詳細情報・所持金の増減を確認してから購入する）
+let _shopConfirmItem=null;
+function _showShopBuyConfirm(it){
+  sfxSelect();
+  SAVE.shopPurchased=SAVE.shopPurchased||{};
+  if(it.oneTime && SAVE.shopPurchased[it.id]){
+    _deckEditShowMsg('⚠️ この商品は既に購入済みです'); return;
+  }
+  _shopConfirmItem=it;
+  const costs=_getItemCosts(it);
+  const canAfford=_canAffordItem(it);
+  document.getElementById('sc-icon').textContent=it.icon;
+  document.getElementById('sc-name').textContent=it.name;
+  document.getElementById('sc-desc').textContent=it.desc;
+  document.getElementById('sc-price').textContent='価格：'+_formatItemPrice(it);
+  const beforeLines=costs.map(c=>_currencyIcon(c.currency)+_getBalance(c.currency)).join('　');
+  const afterLines=costs.map(c=>_currencyIcon(c.currency)+Math.max(_getBalance(c.currency)-c.amount,0)).join('　');
+  document.getElementById('sc-before').textContent='現在 '+beforeLines;
+  const afterEl=document.getElementById('sc-after');
+  const warnEl=document.getElementById('sc-warn');
+  const okBtn=document.getElementById('sc-ok');
+  if(canAfford){
+    afterEl.textContent='購入後 '+afterLines;
+    afterEl.style.color='#7ed6a0';
+    warnEl.style.display='none';
+    okBtn.disabled=false;
+    okBtn.style.opacity='1';
+  } else {
+    const shortages=costs.filter(c=>_getBalance(c.currency)<c.amount)
+      .map(c=>_currencyName(c.currency)+'が足りません（'+_getBalance(c.currency)+' / '+c.amount+'）').join('　');
+    afterEl.textContent='購入後 '+afterLines+'（不足あり）';
+    afterEl.style.color='#e07070';
+    warnEl.textContent='⚠️ '+shortages;
+    warnEl.style.display='block';
+    okBtn.disabled=true;
+    okBtn.style.opacity='0.4';
+  }
+  showOv('ov-shop-confirm');
+}
+// ショップ商品の購入処理（確認ポップアップの「決定」から呼ばれる）
 function _buyShopItem(it){
   sfxSelect();
   SAVE.shopPurchased=SAVE.shopPurchased||{};
   if(it.oneTime && SAVE.shopPurchased[it.id]){
     _deckEditShowMsg('⚠️ この商品は既に購入済みです'); return;
   }
-  const balance=it.currency==='crystal'?(SAVE.crystal||0):(SAVE.gold||0);
-  if(balance<it.price){
-    _deckEditShowMsg('⚠️ '+(it.currency==='crystal'?'クリスタル':'ゴールド')+'が足りません（'+balance+' / '+it.price+'）'); return;
+  const costs=_getItemCosts(it);
+  if(!_canAffordItem(it)){
+    const shortages=costs.filter(c=>_getBalance(c.currency)<c.amount)
+      .map(c=>_currencyName(c.currency)+'が足りません（'+_getBalance(c.currency)+' / '+c.amount+'）').join('　');
+    _deckEditShowMsg('⚠️ '+shortages); return;
   }
+  const beforeLabel=costs.map(c=>_currencyIcon(c.currency)+_getBalance(c.currency)).join('　');
   // 通貨を消費
-  if(it.currency==='crystal') SAVE.crystal-=it.price; else SAVE.gold-=it.price;
+  costs.forEach(c=>{
+    if(c.currency==='crystal') SAVE.crystal-=c.amount; else SAVE.gold-=c.amount;
+  });
+  const afterLabel=costs.map(c=>_currencyIcon(c.currency)+_getBalance(c.currency)).join('　');
   // 効果を適用
   if(it.cat==='soul'){
     SAVE.soulsOwned=SAVE.soulsOwned||{};
@@ -9884,7 +10317,7 @@ function _buyShopItem(it){
   }
   if(it.oneTime) SAVE.shopPurchased[it.id]=true;
   writeSaveData();
-  _deckEditShowMsg('🛒 「'+it.name+'」を購入しました！',true);
+  _deckEditShowMsg('🛒 「'+it.name+'」を購入しました！ '+beforeLabel+' → '+afterLabel,true);
   renderShopContent();
   if(it.cat==='area' && typeof showAreaSelect==='function'){
     // エリア選択画面が開いていれば解放状態を反映
@@ -9930,6 +10363,29 @@ function _bindTitleExtraButtons(){
   bind('menu-btn-gamedata',()=>{ sfxSelect(); showGameDataScreen(); });
   bind('menu-btn-shop',()=>{ sfxSelect(); showShopScreen(); });
   bind('btn-shop-close',()=>{ sfxBack(); hideOv('ov-shop'); });
+  bind('sc-ok',()=>{
+    if(!_shopConfirmItem) return;
+    const okBtnEl=document.getElementById('sc-ok');
+    if(okBtnEl && okBtnEl.disabled) return;
+    const it=_shopConfirmItem;
+    _shopConfirmItem=null;
+    hideOv('ov-shop-confirm');
+    _buyShopItem(it);
+  });
+  bind('sc-cancel',()=>{ sfxCancel(); _shopConfirmItem=null; hideOv('ov-shop-confirm'); });
+  bind('menu-btn-gacha',()=>{ sfxSelect(); showGachaSelectScreen(); });
+  bind('btn-gacha-select-close',()=>{ sfxBack(); hideOv('ov-gacha-select'); });
+  bind('gacha-back-to-select',()=>{ sfxBack(); hideOv('ov-gacha-common'); showGachaSelectScreen(); });
+  bind('btn-gacha-common-close',()=>{ sfxBack(); hideOv('ov-gacha-common'); });
+  bind('gacha-buy-gold',()=>{ _showGachaBuyConfirm('gold'); });
+  bind('gacha-buy-crystal',()=>{ _showGachaBuyConfirm('crystal'); });
+  bind('gc-ok',()=>{
+    const okBtnEl=document.getElementById('gc-ok');
+    if(okBtnEl && okBtnEl.disabled) return;
+    _executeGacha();
+  });
+  bind('gc-cancel',()=>{ sfxCancel(); _gachaConfirmCurrency=null; hideOv('ov-gacha-confirm'); });
+  bind('btn-gacha-result-close',()=>{ sfxSelect(); showGachaCommonScreen(); });
   bind('menu-btn-rules',()=>{ sfxSelect(); showOv('ov-rules'); });
   bind('menu-btn-achievements',()=>{ sfxSelect(); showAchievementsScreen(); });
   bind('menu-btn-savedelete',()=>{ sfxSelect(); showOv('ov-save-delete-confirm'); _startSaveDeleteCountdown(); });
@@ -10001,6 +10457,339 @@ function _deckEditShowMsg(text, positive){
   clearTimeout(el._hideTimer);
   el._hideTimer=setTimeout(()=>{ el.style.transition='opacity .35s'; el.style.opacity='0'; },1800);
 }
+// デッキ編集：ポイント不足／入れ替えポイント不足の注意表示専用（画面中央・通常の1.5倍サイズ・1.5倍表示時間）
+function _deckEditShowWarning(text){
+  let el=document.getElementById('deckedit-warning-toast');
+  if(!el){
+    el=document.createElement('div');
+    el.id='deckedit-warning-toast';
+    el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16.5px;padding:13.5px 24px;border-radius:20px;z-index:9750;pointer-events:none;max-width:86%;text-align:center;white-space:normal;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.7);font-weight:bold;';
+    document.body.appendChild(el);
+  }
+  el.style.background='rgba(20,10,10,.95)';el.style.color='#ffb3b3';el.style.border='2px solid rgba(255,120,120,.6)';
+  el.textContent=text;
+  el.style.opacity='1';
+  el.style.transition='none';
+  clearTimeout(el._hideTimer);
+  el._hideTimer=setTimeout(()=>{ el.style.transition='opacity .35s'; el.style.opacity='0'; },2700);
+}
+// ==================== カードガチャ ====================
+// ガチャ種類ごとの設定。今回は「コモンガチャ」のみ実装。
+// レアリティ・料金・排出内容などを個別設定できる構造にしてあるため、
+// 将来アンコモン以上のガチャを追加する場合はこの配列に定義を足すだけでよい。
+const GACHA_TYPES=[
+  { id:'common', name:'コモンガチャ', icon:'🃏',
+    costs:[{currency:'gold',amount:20},{currency:'crystal',amount:10}],
+    // レアリティ抽選テーブル：weight=排出率, mult=生成ポイント計算用のレアリティ倍率
+    rarityTable:[{rarity:'common',weight:80,mult:3},{rarity:'uncommon',weight:20,mult:4}],
+    implemented:true },
+  // ↓今後追加予定（未実装。ガチャ種類選択画面には「近日追加予定」として表示のみ行う）
+  { id:'uncommon',  name:'アンコモンガチャ', icon:'🃏', implemented:false },
+  { id:'rare',      name:'レアガチャ',       icon:'🃏', implemented:false },
+  { id:'epic',      name:'エピックガチャ',   icon:'🃏', implemented:false },
+  { id:'legendary', name:'レジェンドガチャ', icon:'🃏', implemented:false },
+];
+// カードコスト（1/2/3）の抽選確率。必要に応じて調整できるよう配列化してある。
+const GACHA_COST_WEIGHTS=[{cost:1,weight:40},{cost:2,weight:35},{cost:3,weight:25}];
+// カード構築要素（能力）。能力コストごとにプール分けし、それぞれの抽選確率(weight)を持つ。
+const GACHA_ABILITY_POOL={
+  1:{weight:50, items:[
+    {label:'攻撃2',              apply:e=>{e.atk=(e.atk||0)+2;}},
+    {label:'回復2',              apply:e=>{e.heal=(e.heal||0)+2;}},
+    {label:'防御2',              apply:e=>{e.shield=(e.shield||0)+2;}},
+    {label:'毒2',                apply:e=>{e.poison=(e.poison||0)+2;}},
+    {label:'敵シールド-3',        apply:e=>{e.shieldFirstBreak=(e.shieldFirstBreak||0)+3;}},
+    {label:'自分のHP-1 ＋ 攻撃3', apply:e=>{e.selfHp=(e.selfHp||0)-1;e.atk=(e.atk||0)+3;}},
+  ]},
+  2:{weight:30, items:[
+    {label:'攻撃5',              apply:e=>{e.atk=(e.atk||0)+5;}},
+    {label:'回復5',              apply:e=>{e.heal=(e.heal||0)+5;}},
+    {label:'防御5',              apply:e=>{e.shield=(e.shield||0)+5;}},
+    {label:'毒5',                apply:e=>{e.poison=(e.poison||0)+5;}},
+    {label:'ドロー1',            apply:e=>{e.draw=(e.draw||0)+1;}},
+    {label:'敵シールド-7',        apply:e=>{e.shieldFirstBreak=(e.shieldFirstBreak||0)+7;}},
+    {label:'自分のHP-2 ＋ 攻撃7', apply:e=>{e.selfHp=(e.selfHp||0)-2;e.atk=(e.atk||0)+7;}},
+  ]},
+  3:{weight:20, items:[
+    {label:'攻撃8',              apply:e=>{e.atk=(e.atk||0)+8;}},
+    {label:'回復8',              apply:e=>{e.heal=(e.heal||0)+8;}},
+    {label:'防御8',              apply:e=>{e.shield=(e.shield||0)+8;}},
+    {label:'毒8',                apply:e=>{e.poison=(e.poison||0)+8;}},
+    {label:'敵シールド-11',       apply:e=>{e.shieldFirstBreak=(e.shieldFirstBreak||0)+11;}},
+    {label:'自分のHP-3 ＋ 攻撃11',apply:e=>{e.selfHp=(e.selfHp||0)-3;e.atk=(e.atk||0)+11;}},
+  ]},
+};
+// weightKeyの値で重み付き抽選を行う汎用関数
+function _gachaWeightedPick(arr, weightKey){
+  const total=arr.reduce((s,x)=>s+x[weightKey],0);
+  let r=Math.random()*total;
+  for(const x of arr){ r-=x[weightKey]; if(r<0) return x; }
+  return arr[arr.length-1];
+}
+// レアリティ抽選
+function _gachaPickRarity(gtype){
+  return _gachaWeightedPick(gtype.rarityTable,'weight');
+}
+// カードコスト抽選
+function _gachaPickCardCost(){
+  return _gachaWeightedPick(GACHA_COST_WEIGHTS,'weight').cost;
+}
+// 生成ポイントが尽きるまで能力をランダムに付与していく。
+// 残り生成ポイントより能力コストが大きい能力は選択対象から除外し、
+// 選択可能な能力コストだけで確率を正規化して再抽選する。
+function _gachaBuildAbilities(genPoints){
+  const effect={};
+  const abilityLog=[];
+  let remain=genPoints;
+  while(remain>0){
+    const availableCosts=[1,2,3].filter(c=>c<=remain);
+    if(availableCosts.length===0) break;
+    const costPool=availableCosts.map(c=>({cost:c, weight:GACHA_ABILITY_POOL[c].weight}));
+    const pickedCost=_gachaWeightedPick(costPool,'weight').cost;
+    const items=GACHA_ABILITY_POOL[pickedCost].items;
+    const ability=items[Math.floor(Math.random()*items.length)];
+    ability.apply(effect);
+    abilityLog.push({label:ability.label, cost:pickedCost});
+    remain-=pickedCost;
+  }
+  return {effect, abilityLog, usedPoints:genPoints-remain};
+}
+// 生成された効果内容から、カードの種別（type）とアイコンを推定する
+function _gachaInferTypeIcon(effect){
+  const score={attack:0,shield:0,heal:0,curse:0};
+  if(effect.atk) score.attack+=effect.atk;
+  if(effect.shieldFirstBreak) score.attack+=effect.shieldFirstBreak*0.5;
+  if(effect.shield) score.shield+=effect.shield;
+  if(effect.heal) score.heal+=effect.heal;
+  if(effect.poison) score.curse+=effect.poison;
+  let best='skill', bestVal=0;
+  Object.keys(score).forEach(k=>{ if(score[k]>bestVal){bestVal=score[k];best=k;} });
+  const iconMap={attack:'⚔️',shield:'🛡️',heal:'💚',curse:'☠️',skill:'🎲'};
+  return {type:bestVal>0?best:'skill', icon:iconMap[best]||'🎲'};
+}
+// 生成された効果から説明文を自動生成する
+function _gachaBuildDesc(effect){
+  const parts=[];
+  if(effect.atk) parts.push('攻撃'+effect.atk);
+  if(effect.shieldFirstBreak) parts.push('敵シールド-'+effect.shieldFirstBreak);
+  if(effect.shield) parts.push('シールド'+effect.shield);
+  if(effect.heal) parts.push('HP+'+effect.heal);
+  if(effect.poison) parts.push('毒+'+effect.poison);
+  if(effect.draw) parts.push('カード'+effect.draw+'枚ドロー');
+  if(effect.selfHp&&effect.selfHp<0) parts.push('自分のHP'+effect.selfHp);
+  return parts.length?parts.join(' / '):'効果なし';
+}
+let _gachaCardSeq=0;
+// ガチャカード本体の生成処理（通貨消費は呼び出し側で行う）
+function generateGachaCard(gachaTypeId){
+  const gtype=GACHA_TYPES.find(g=>g.id===gachaTypeId);
+  if(!gtype||!gtype.implemented) return null;
+  const rarityPick=_gachaPickRarity(gtype);
+  const rarity=rarityPick.rarity, mult=rarityPick.mult;
+  const cardCost=_gachaPickCardCost();
+  const genPoints=mult*cardCost;
+  const {effect, abilityLog, usedPoints}=_gachaBuildAbilities(genPoints);
+  const {type, icon}=_gachaInferTypeIcon(effect);
+  const desc=_gachaBuildDesc(effect);
+  _gachaCardSeq++;
+  const newId='gacha_'+Date.now()+'_'+_gachaCardSeq;
+  const rarityNameMap={common:'コモン',uncommon:'アンコモン'};
+  const card={
+    id:newId, name:'生成'+(rarityNameMap[rarity]||rarity)+'カード', icon, type, rarity, cost:cardCost,
+    desc, shortDesc:(desc.length>16?desc.slice(0,16)+'…':desc), effect,
+    _gachaGenerated:true, _gachaSourceType:gachaTypeId,
+  };
+  return {card, detail:{rarity, cardCost, genPoints, usedPoints, abilityLog}};
+}
+// 生成したガチャカードをゲームデータへ登録する（DB追加＋SAVE永続化＋入れ替え候補として所持数+1）
+function _registerGachaCard(card){
+  DB[card.id]=card;
+  SAVE.gachaCards=SAVE.gachaCards||{};
+  SAVE.gachaCards[card.id]=card;
+  SAVE.unlockedCards=SAVE.unlockedCards||{};
+  SAVE.unlockedCards[card.id]=(SAVE.unlockedCards[card.id]||0)+1;
+  writeSaveData();
+}
+// セーブデータに保存されているガチャカードをDBへ復元する（起動時に一度だけ呼ぶ）
+function _restoreGachaCardsToDB(){
+  SAVE.gachaCards=SAVE.gachaCards||{};
+  Object.keys(SAVE.gachaCards).forEach(id=>{
+    const c=SAVE.gachaCards[id];
+    if(c && !DB[id]) DB[id]=c;
+  });
+}
+_restoreGachaCardsToDB();
+// アプリがエリア攻略中に強制終了された場合、SAVE.pendingDisposalに消し忘れフラグが残っている可能性があるため、
+// 起動直後（DB復元完了後）に検知して即座に消滅処理を行う。
+_consumeDisposableCardsOnAreaExit();
+
+// ----- ガチャ画面UI -----
+function showGachaSelectScreen(){
+  const list=document.getElementById('gacha-select-list');
+  if(list){
+    list.innerHTML='';
+    GACHA_TYPES.forEach(gt=>{
+      const locked=!gt.implemented;
+      const d=document.createElement('div');
+      d.style.cssText='background:rgba(0,0,0,.85);border:2px solid '+(locked?'rgba(120,120,120,.4)':'rgba(201,168,76,.6)')+';border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;'+(locked?'opacity:.45;':'cursor:pointer;touch-action:manipulation;');
+      d.innerHTML='<span style="font-size:24px;">'+gt.icon+'</span>'
+        +'<div style="flex:1;">'
+        +'<div style="font-family:\'Cinzel\',serif;font-size:14px;color:'+(locked?'#999':'#f0d47a')+';font-weight:bold;">'+gt.name+'</div>'
+        +'<div style="font-size:9px;color:#999;margin-top:2px;">'+(locked?'近日追加予定':'タップして選択')+'</div>'
+        +'</div>'
+        +(locked?'':'<span style="font-size:12px;color:#c9a84c;">＞</span>');
+      if(!locked) bindTapSwipe(d,()=>{ sfxSelect(); showGachaCommonScreen(); });
+      list.appendChild(d);
+    });
+  }
+  showOv('ov-gacha-select');
+}
+function showGachaCommonScreen(){
+  hideOv('ov-gacha-select');
+  hideOv('ov-gacha-result');
+  SAVE.gold=SAVE.gold||0; SAVE.crystal=SAVE.crystal||0;
+  const goldEl=document.getElementById('gacha-gold-val');
+  const crystalEl=document.getElementById('gacha-crystal-val');
+  if(goldEl) goldEl.textContent=SAVE.gold;
+  if(crystalEl) crystalEl.textContent=SAVE.crystal;
+  showOv('ov-gacha-common');
+}
+let _gachaConfirmCurrency=null;
+function _showGachaBuyConfirm(currency){
+  sfxSelect();
+  const gtype=GACHA_TYPES.find(g=>g.id==='common');
+  const costObj=gtype.costs.find(c=>c.currency===currency);
+  if(!costObj) return;
+  _gachaConfirmCurrency=currency;
+  const balance=_getBalance(currency);
+  const after=Math.max(0,balance-costObj.amount);
+  const canAfford=balance>=costObj.amount;
+  document.getElementById('gc-name').textContent=gtype.name;
+  document.getElementById('gc-price').textContent='使用料：'+_currencyIcon(currency)+costObj.amount+_currencyName(currency);
+  document.getElementById('gc-before').textContent='所持'+_currencyName(currency)+'：'+balance;
+  const afterEl=document.getElementById('gc-after');
+  const warnEl=document.getElementById('gc-warn');
+  const okBtn=document.getElementById('gc-ok');
+  if(canAfford){
+    afterEl.textContent='購入後：'+after;
+    afterEl.style.color='#7ed6a0';
+    warnEl.style.display='none';
+    okBtn.disabled=false; okBtn.style.opacity='1';
+  } else {
+    afterEl.textContent='購入後：'+after+'（不足あり）';
+    afterEl.style.color='#e07070';
+    warnEl.textContent='⚠️ '+_currencyName(currency)+'が足りません（'+balance+' / '+costObj.amount+'）';
+    warnEl.style.display='block';
+    okBtn.disabled=true; okBtn.style.opacity='0.4';
+  }
+  showOv('ov-gacha-confirm');
+}
+// 「決定」が押された場合のみ通貨を消費してガチャ処理を実行する（キャンセル時は何も起きない）
+function _executeGacha(){
+  if(!_gachaConfirmCurrency) return;
+  const currency=_gachaConfirmCurrency;
+  _gachaConfirmCurrency=null;
+  const gtype=GACHA_TYPES.find(g=>g.id==='common');
+  const costObj=gtype.costs.find(c=>c.currency===currency);
+  if(!costObj) return;
+  if(_getBalance(currency)<costObj.amount){
+    _deckEditShowMsg('⚠️ '+_currencyName(currency)+'が不足しています'); return;
+  }
+  sfxSelect();
+  if(currency==='crystal') SAVE.crystal-=costObj.amount; else SAVE.gold-=costObj.amount;
+  hideOv('ov-gacha-confirm');
+  const result=generateGachaCard('common');
+  if(!result){ writeSaveData(); return; }
+  _registerGachaCard(result.card);
+  showGachaResult(result.card, result.detail);
+}
+function showGachaResult(card, detail){
+  const box=document.getElementById('gacha-result-card');
+  if(box){
+    box.innerHTML='';
+    box.appendChild(_buildDeckEditCardEl(card,null,null,false));
+  }
+  const detailEl=document.getElementById('gacha-result-detail');
+  if(detailEl){
+    const rarityNameMap={common:'コモン',uncommon:'アンコモン'};
+    let html='';
+    html+='<div>レアリティ：'+(rarityNameMap[detail.rarity]||detail.rarity)+'</div>';
+    html+='<div>カードコスト：'+detail.cardCost+'</div>';
+    html+='<div>生成ポイント：'+detail.genPoints+'（消費'+detail.usedPoints+'）</div>';
+    html+='<div style="margin-top:6px;color:#c9a84c;">生成された能力：</div>';
+    html+='<ul style="margin:2px 0 0 16px;padding:0;">'+detail.abilityLog.map(a=>'<li>'+a.label+'【能力コスト'+a.cost+'】</li>').join('')+'</ul>';
+    detailEl.innerHTML=html;
+  }
+  showGoldCrystalRefresh();
+  showOv('ov-gacha-result');
+}
+// ガチャ結果画面表示時にメニュー等の所持通貨表示も最新化しておく（ショップ等を開いていた場合の見た目のズレ防止）
+function showGoldCrystalRefresh(){
+  const goldEl=document.getElementById('gacha-gold-val');
+  const crystalEl=document.getElementById('gacha-crystal-val');
+  if(goldEl) goldEl.textContent=SAVE.gold||0;
+  if(crystalEl) crystalEl.textContent=SAVE.crystal||0;
+}
+// 画面中央に警告メッセージを一定時間表示する汎用関数（デッキ12枚未満チェック等で使用）
+function _showCenterWarning(text, ms){
+  let el=document.getElementById('center-warning-toast');
+  if(!el){
+    el=document.createElement('div');
+    el.id='center-warning-toast';
+    el.style.cssText='position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:13px;padding:16px 22px;border-radius:12px;z-index:9800;pointer-events:none;max-width:78%;text-align:center;line-height:1.6;background:rgba(20,10,10,.95);color:#ffb3b3;border:2px solid rgba(255,120,120,.6);box-shadow:0 4px 20px rgba(0,0,0,.7);font-family:sans-serif;';
+    document.body.appendChild(el);
+  }
+  el.textContent=text;
+  el.style.display='block';
+  el.style.transition='none';
+  el.style.opacity='1';
+  clearTimeout(el._hideTimer);
+  el._hideTimer=setTimeout(()=>{
+    el.style.transition='opacity .4s';
+    el.style.opacity='0';
+    setTimeout(()=>{ el.style.display='none'; },400);
+  }, ms||3000);
+}
+
+// エリア（ステージ実行中）に持ち込んだ使い捨て(ガチャ生成)カードを、エリアを出るタイミングで永久に消滅させる。
+// 呼び出し元：
+//   1) showLogoThenTitle()（敗北→タイトル／全クリア→タイトル／中断→タイトルのいずれも経由する＝通常の退出経路）
+//   2) 起動直後（_restoreGachaCardsToDB の直後）。エリア攻略中にアプリを強制終了された場合、
+//      SAVE.pendingDisposal に持ち込みフラグが永続化されたまま残っているため、それを検知して同じ処理を行う。
+// 判定は必ずSAVE.pendingDisposal（永続化データ）を正として行う。G._inAreaRunはメモリ上の補助フラグに過ぎない。
+function _consumeDisposableCardsOnAreaExit(){
+  G._inAreaRun=false;
+  const pending=SAVE.pendingDisposal;
+  const chargeId=pending && pending.chargeId;
+  if(!chargeId){
+    if(SAVE.pendingDisposal){ SAVE.pendingDisposal=null; writeSaveData(); }
+    return;
+  }
+  // 処理の成否に関わらず、まずフラグを消してから処理する（万一エラーが起きても消し忘れフラグとして残らないように）
+  SAVE.pendingDisposal=null;
+  SAVE.customDecks=SAVE.customDecks||{};
+  const deck=SAVE.customDecks[chargeId];
+  if(!Array.isArray(deck)||deck.length===0){ writeSaveData(); return; }
+  const remaining=[];
+  const consumedIds=[];
+  deck.forEach(id=>{
+    const c=DB[id];
+    if(c && c._gachaGenerated) consumedIds.push(id);
+    else remaining.push(id);
+  });
+  if(consumedIds.length===0){ writeSaveData(); return; }
+  SAVE.customDecks[chargeId]=remaining;
+  SAVE.unlockedCards=SAVE.unlockedCards||{};
+  SAVE.gachaCards=SAVE.gachaCards||{};
+  consumedIds.forEach(id=>{
+    delete SAVE.unlockedCards[id];
+    delete SAVE.gachaCards[id];
+    delete DB[id];
+  });
+  writeSaveData();
+  _showCenterWarning('🕯️ 使い捨てカードが'+consumedIds.length+'枚 消滅しました', 3000);
+}
+
 // ==================== デッキ編集（基本土台） ====================
 let _deckEditChargeId=null;
 let _deckEditWorkingDeck=[]; // 編集中のデッキ：[{id,origin:'preset'|'pool'}, ...]（確定するまでSAVEには反映しない）
@@ -10008,11 +10797,13 @@ let _deckEditSideDeckArr=[]; // サイドデッキ：外したプリセット由
 // デッキポイント制：ショップで購入できるカードには、レアリティに応じたデッキポイントが設定されている
 const RARITY_DECK_POINTS={common:1, uncommon:2, rare:3, epic:4, legendary:5, gauge:3, bougai:2};
 // ショップで販売するカードなど、個別にカードポイントを設定したいものはここで上書きする
-const CARD_POINT_OVERRIDES={ teate:5, smallShield:5, strike2:5 };
+const CARD_POINT_OVERRIDES={ teate:5, smallShield:5, strike2:5, allIn:5, afterForce:5, poison:5, swiftBlade:5 };
 function getCardDeckPoint(cardId){
   if(CARD_POINT_OVERRIDES[cardId]!=null) return CARD_POINT_OVERRIDES[cardId];
   const c=DB[cardId];
   if(!c) return 1;
+  // ガチャで生成されたカードは、レアリティに関わらずデッキポイント5固定
+  if(c._gachaGenerated) return 5;
   return RARITY_DECK_POINTS[c.rarity]!=null?RARITY_DECK_POINTS[c.rarity]:1;
 }
 // 現在の編集中デッキで、入れ替え候補（購入カード）が消費しているデッキポイント合計
@@ -10110,6 +10901,9 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim){
   if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
   d.className='card '+c.rarity;
   if(dim) d.style.opacity='.45';
+  // ガチャ生成カード（使い捨てカード）は、他の入れ替え候補バッジより優先して「使い捨て」枠であることを明示する
+  const effBadge=c._gachaGenerated?'使い捨て':badgeText;
+  const badgeColor=c._gachaGenerated?'rgba(160,40,40,.85)':'rgba(0,0,0,.75)';
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
   d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
@@ -10122,17 +10916,19 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim){
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
     '<div class="card-corner br">'+corner+'</div>'+
-    (badgeText?('<div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.75);color:#fff;font-size:9px;font-weight:bold;padding:1px 5px;border-radius:8px;">'+badgeText+'</div>'):'');
+    (effBadge?('<div style="position:absolute;top:2px;right:2px;background:'+badgeColor+';color:#fff;font-size:9px;font-weight:bold;padding:1px 5px;border-radius:8px;">'+effBadge+'</div>'):'')+
+    (c._gachaGenerated?'<div style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(160,40,40,.55);border-radius:4px;font-size:6.5px;color:#ffe0e0;text-align:center;line-height:1.3;padding:1px 2px;">エリア退出で消滅</div>':'');
   if(tapFn) bindCardTouch(d,c,tapFn,true);
   return d;
 }
 function renderDeckEditPanel(){
-  const ct=CHARGE_TYPES[_deckEditChargeId];
+  const ct=getChargeTypeAtLevel(_deckEditChargeId, getChargeLevel());
   const preset=CHARGE_DECKS[_deckEditChargeId]||STARTER;
   const swapsUsed=_deckEditSideDeckArr.length;
   const swapLimit=SAVE.deckSwapLimit||0;
   const pointsUsed=_deckEditPointsUsed();
   const pointLimit=SAVE.deckPointLimit||0;
+  const disposableCount=_deckEditWorkingDeck.filter(entry=>{const c=DB[entry.id];return c&&c._gachaGenerated;}).length;
   const header=document.getElementById('deckedit-header');
   header.innerHTML=
     '<div><span style="font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.icon+' '+ct.name+'</span></div>'
@@ -10140,6 +10936,7 @@ function renderDeckEditPanel(){
     +'<div>枚数 <b style="color:'+(_deckEditWorkingDeck.length===preset.length?'#7ed6a0':'#ff8888')+';">'+_deckEditWorkingDeck.length+' / '+preset.length+'</b></div>'
     +'<div>入れ替え <b style="color:'+(swapsUsed>=swapLimit?'#ff8888':'#7ed6a0')+';">'+swapsUsed+' / '+swapLimit+'</b></div>'
     +'<div>デッキポイント <b style="color:'+(pointsUsed>=pointLimit?'#ff8888':'#7ed6a0')+';">'+pointsUsed+' / '+pointLimit+'</b></div>'
+    +(disposableCount>0?'<div style="color:#e08888;">🕯️ 使い捨て <b>'+disposableCount+'</b>枚（エリア退出で消滅）</div>':'')
     +'</div>';
 
   // 現在のデッキ表示（タップで詳細→決定で外す。プール由来なら入れ替え候補へ、プリセット由来ならサイドデッキへ）
@@ -10154,7 +10951,7 @@ function renderDeckEditPanel(){
       const canRemove=isPoolOrigin || (_deckEditSideDeckArr.length<swapLimit);
       const badge=isPoolOrigin?'入替':'';
       const el=_buildDeckEditCardEl(c, ()=>{
-        if(!canRemove){ _deckEditShowMsg('⚠️ 入れ替え上限に達しています（入れ替え '+_deckEditSideDeckArr.length+' / '+(SAVE.deckSwapLimit||0)+'）。これ以上プリセットのカードは外せません'); return; }
+        if(!canRemove){ _deckEditShowWarning('⚠️ 入れ替え上限に達しています（入れ替え '+_deckEditSideDeckArr.length+' / '+(SAVE.deckSwapLimit||0)+'）。これ以上プリセットのカードは外せません'); return; }
         const i=_deckEditWorkingDeck.indexOf(entry);
         if(i<0) return;
         _deckEditWorkingDeck.splice(i,1);
@@ -10205,7 +11002,7 @@ function renderDeckEditPanel(){
       const canAdd=hasRoom&&withinPoints;
       const el=_buildDeckEditCardEl(c, ()=>{
         if(!hasRoom){ _deckEditShowMsg('⚠️ デッキがすでに'+preset.length+'枚のため、これ以上入れられません。先に他のカードを外してください'); return; }
-        if(!withinPoints){ _deckEditShowMsg('⚠️ デッキポイントが不足しています（'+pointsUsed+'+'+cardPoint+' / 上限'+pointLimit+'）'); return; }
+        if(!withinPoints){ _deckEditShowWarning('⚠️ デッキポイントが不足しています（'+pointsUsed+'+'+cardPoint+' / 上限'+pointLimit+'）'); return; }
         _deckEditWorkingDeck.push({id, origin:'pool'});
         _deckEditShowMsg('📖 「'+c.name+'」を現在のデッキへ入れました（DP'+cardPoint+'消費）',true);
         renderDeckEditPanel();
@@ -10705,7 +11502,7 @@ function showStageIntro(stageNum, enemyData, onStart){
   div.addEventListener('click',go,{once:true});
   // PC時はappに追加（幅固定のため）、スマホはbody
   const appEl=document.getElementById('app');
-  if(appEl && window.innerWidth>=480){
+  if(appEl && window.innerWidth>=480 && appEl.style.display!=='none'){
     div.style.position='absolute';
     appEl.appendChild(div);
   } else {
@@ -10894,36 +11691,6 @@ document.addEventListener('visibilitychange', ()=>{
 
 </script>
 
-
-<div class="overlay" id="ov-rules" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">📜 ルール説明</div>
-  <div style="width:100%;overflow-y:auto;max-height:64vh;display:flex;flex-direction:column;gap:8px;font-family:sans-serif;">
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">⚔️ 基本ルール</div>
-      <div style="font-size:10px;color:#ccc;line-height:1.9;">・プレイヤーHP: 30（最大HP）<br>・マナはターン開始時に必ず3に固定（蓄積なし）。最大10<br>・毎ターン5枚ドロー（最初のターンは5枚）<br>・<span style="color:#aae;">手札は毎ターン決まった枚数補充され、ターン終了時には全て捨札になる。<br>　山札がなくなった場合、捨札のカードを全てシャッフルし新たな山札となる。</span><br>・シールドは自分のターン開始時に30%減少する（切り捨て）<br>・カードをタップすると<span style="color:#f0c040;font-weight:bold;">拡大表示</span>され、<span style="color:#2ecc71;font-weight:bold;">決定</span>ボタンで使用<br>・<span style="color:#f0c040;font-weight:bold;">ターン終了</span>ボタンで敵のターンへ</div>
-    </div>
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">⚡ チャージシステム</div>
-      <div style="font-size:10px;color:#ccc;line-height:1.9;">ゲーム開始前に1つ選ぶ特殊能力。カウンターが満タンになったらチャージゲージをタップして手動発動。<br>・<span style="color:#e74c3c;">格闘家</span>: カード使用3回→このターン攻撃力+4 + ドロー1<br>・<span style="color:#e67e22;">重戦士</span>: コスト2以上のカード使用2回→次の攻撃が2倍 + マナ+2<br>・<span style="color:#27ae60;">僧侶</span>: 回復カード2回→HP+12回復 + ドロー1<br>・<span style="color:#2980b9;">守護者</span>: 盾獲得ごと3回→次の敵からの被ダメを無効 + マナ+1<br>・<span style="color:#8e44ad;">錬金術師</span>: 毒カード2回→このターン次に毒を与えるカードの毒付与値を2倍（1回限り）<br>・<span style="color:#f0e060;">祈祷師</span>: ターン終了2回→マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用し手札にも加える<br>・<span style="color:#e07030;">狂戦士</span>: 盾0でターン終了2回→手札全コスト0 + このステージ中ターン開始マナ+1（累積）</div>
-    </div>
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(180,40,40,.5);border-radius:8px;padding:10px 12px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;color:#e74c3c;margin-bottom:6px;">⏳ 呪縛タイマー</div>
-      <div style="font-size:10px;color:#ccc;line-height:1.9;"><span style="color:#e74c3c;">6ターン目の終了時から</span>呪縛が発動し、ターン終了時にダメージを受ける。<br>ダメージ = <span style="color:#e74c3c;">(現在ターン - 5) × 5</span><br>例：6ターン目終了→5ダメ、7ターン目終了→10ダメ…<br>右下の⏳ボックスで現在ターンと状況を確認。長押しで詳細。</div>
-    </div>
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;color:#7ab8ff;margin-bottom:6px;">⚔️ ダメージ計算</div>
-      <div style="font-size:10px;color:#ccc;line-height:1.9;">・攻撃力の加算（+）は<span style="color:#7ab8ff;">乗算（×）より先に計算</span>される。<br>　例：基本攻撃5、攻撃+5、攻撃×2の場合<br>　　　(5 + 5) × 2 = <span style="color:#fff;font-weight:bold;">20ダメージ</span><br>・<span style="color:#ffd060;">「次の攻撃が2倍」</span>の効果は、双撃・連撃など<br>　<span style="color:#ffd060;">1枚で複数回攻撃するカードでも1撃目にのみ適用</span>される。<br>　2撃目以降は通常ダメージになる。</div>
-    </div>
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 12px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;color:#c9a84c;margin-bottom:6px;">🔴 レアリティ</div>
-      <div style="font-size:10px;color:#ccc;line-height:1.9;"><span style="color:#8a9aaa;">◆ COMMON</span> → <span style="color:#60cc60;">◆ UNCOMMON</span> → <span style="color:#4a8aff;">◆ RARE</span> → <span style="color:#d040ff;">◈ EPIC</span> → <span style="color:#ff9500;">★ LEGEND</span> → <span style="color:#c9a84c;">⚡ GAUGE</span><br>ステージが進むほど高レアリティが出やすくなる。GAUGEはチャージ選択時の初期デッキ専用。</div>
-    </div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px;">
-    <div class="ov-btn" id="btn-rules-to-tutorial" style="background:rgba(100,160,255,.1);border-color:rgba(100,160,255,.6);color:#7dd4f8;" onclick="hideOv('ov-rules');startTutorial(true);" ontouchend="event.preventDefault();hideOv('ov-rules');startTutorial(true);">📖 説明書を見る</div>
-    <div class="ov-btn" id="btn-close-rules" onclick="document.getElementById('ov-rules').classList.remove('show')" ontouchend="event.preventDefault();document.getElementById('ov-rules').classList.remove('show')">閉じる</div>
-  </div>
-</div>
 
 <!-- ターン開始スライドイン -->
 <div id="turn-slide" style="display:none;position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) translateX(-120vw);z-index:9100;pointer-events:none;transition:transform 0.35s cubic-bezier(.2,.8,.3,1);">
