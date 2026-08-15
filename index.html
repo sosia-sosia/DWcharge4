@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver312</title>
+<title>DUNGEON WALKER DWCver313</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -759,7 +759,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver312</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver313</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2420,6 +2420,7 @@ function _startStageBattle(){
   }
   const e=getAreaEnemies()[G.stage];
   G.enemy={...e,curHp:e.hp,patIdx:0};
+  G._enemyHpShown=e.hp; // 表示中HPの追跡値をリセット（新しい敵の最大HPから開始）
   G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={};
   // エリア効果：灼熱の刻印（炎の神殿）ステージ開始時にもカウント加算
   if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
@@ -2661,18 +2662,13 @@ function showReconsiderUI(){
 // 敵HP0チェック共通関数：どこから呼ばれても確実にvictoryを起動
 function checkEnemyDeath(){
   if(G.enemy.curHp>0) return false;
-  if(G._cardTestMode){ G.enemy.curHp=G.enemy.hp; updateUI(); return false; } // テストモード：サンドバッグは倒れない
+  if(G._cardTestMode){ G.enemy.curHp=G.enemy.hp; G._enemyHpShown=G.enemy.hp; updateUI(); return false; } // テストモード：サンドバッグは倒れない
   G.enemy.curHp=0;
   G.phase='block';
   updateUI();
   // 撃破確定時：多段ヒット演出中(effectRunning)でupdateUIのHPバー更新がスキップされていても、
   // 撃破した以上は確実にHP0表示にする（表示だけ古いままステージクリアになる不具合の対策）
-  {
-    const _hpBar=document.getElementById('enemy-hp-bar');
-    const _hpNum=document.getElementById('enemy-hp-num');
-    if(_hpBar) _hpBar.style.width='0%';
-    if(_hpNum) _hpNum.textContent='0/'+G.enemy.hp;
-  }
+  _renderEnemyHpDisplay(0);
   recordMonsterDefeated(G.areaId, G.stage, G.enemy);
   if(!G._victoryPending){
     G._victoryPending=true;
@@ -2902,22 +2898,19 @@ function playCard(idx, _isChain){
     }
     // 先頭のqueueEffectでHP表示を_hpBeforeに一時戻し、1撃ごとに段階表示
     // ※G.enemy.curHpは書き換えない（次カードのダメージ計算に影響するため）
+    // 【バグ対策】_renderEnemyHpDisplay経由にすることで、他の効果（追撃・毒など）が
+    // 先に実際の低いHPを表示していた場合に、この巻き戻し演出で高い値へ逆戻り＝回復して見える
+    // 不具合を防ぐ（表示は常に単調減少、実際の回復時のみ allowIncrease で上昇を許可）。
     if(t>1){
       queueEffect(()=>{
-        const hpBar=document.getElementById('enemy-hp-bar');
-        const hpNum=document.getElementById('enemy-hp-num');
-        if(hpBar) hpBar.style.width=Math.max(0,_hpBefore/G.enemy.hp*100)+'%';
-        if(hpNum) hpNum.textContent=_hpBefore+'/'+G.enemy.hp;
+        _renderEnemyHpDisplay(_hpBefore);
       }, 0);
     }
     _hpPerHit.forEach(function(hit, hitIdx){
       (function(dmg, snapHp, seHeal){
         queueEffect(()=>{
           // 表示のみ更新、G.enemy.curHpは書き換えない
-          const hpBar=document.getElementById('enemy-hp-bar');
-          const hpNum=document.getElementById('enemy-hp-num');
-          if(hpBar) hpBar.style.width=Math.max(0,snapHp/G.enemy.hp*100)+'%';
-          if(hpNum) hpNum.textContent=snapHp+'/'+G.enemy.hp;
+          _renderEnemyHpDisplay(snapHp);
           spawnDmgNum('-'+dmg,'enemy-dmg');
           shakeEnemyArea();
           flashScreen('flash-gold');
@@ -6273,8 +6266,8 @@ function updateUI(){
   const e=G.enemy;
   // 多段ヒットアニメ中は敵HPバーをqueueEffectに任せる（updateUIによる上書きを防ぐ）
   if(!effectRunning){
-    document.getElementById('enemy-hp-bar').style.width=Math.max(0,e.curHp/e.hp*100)+'%';
-    document.getElementById('enemy-hp-num').textContent=e.curHp+'/'+e.hp;
+    // ここでの値(e.curHp)は常に「実際の最新HP」なので、回復（敵の自己回復等）による増加も正しく反映してよい
+    _renderEnemyHpDisplay(e.curHp, true);
   }
   // エリア効果バッジ表示
   const _aef=AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect;
@@ -7765,11 +7758,12 @@ function _showResultClear(){
 
   const doRestart = ()=>{
     if(_locked) return;
-    showSimpleConfirm('タイトルに戻りますか？','これまでの進行状況は失われます',()=>{
-      const clr=document.getElementById('_result-clear');
-      if(clr&&clr.parentNode) clr.parentNode.removeChild(clr);
-      resetSmithKai(); showLogoThenTitle();
-    });
+    // 【修正】このALL CLEAR画面に到達した時点でクリア報酬・実績は既に保存済みのため、
+    // 「進行状況が失われます」という警告は事実と異なり紛らわしい。誤タップ防止の2秒ロックは
+    // 既にあるので、確認ポップアップなしでそのままタイトルへ戻る。
+    const clr=document.getElementById('_result-clear');
+    if(clr&&clr.parentNode) clr.parentNode.removeChild(clr);
+    resetSmithKai(); showLogoThenTitle();
   };
   let _restTouched = false;
   restartBtn.addEventListener('touchend',(e)=>{e.preventDefault();if(_restTouched)return;_restTouched=true;setTimeout(()=>_restTouched=false,600);doRestart();});
@@ -8062,14 +8056,28 @@ function showCardEffect(type,target){
 // エフェクトキュー（複数効果を順番に表示）
 let effectQueue=[];
 let effectRunning=false;
+// 敵HP表示の一元管理ヘルパー。
+// 【バグ対策】多段ヒット演出の「スナップショット表示」と、追撃・毒などの「即時同期表示」が
+// 互いのタイミングを追い越すと、古い（高い）HP値が後から表示されてしまい「回復したように見える」
+// 不具合が起きていた。これを防ぐため、実際のHP増加（敵の自己回復）以外では
+// 表示値が既存の表示値より増えることを許可しない（＝表示は基本的に単調減少）。
+// allowIncrease:true を渡した場合のみ増加を許可する（敵の自己回復・新しい敵の登場時など）。
+function _renderEnemyHpDisplay(val, allowIncrease){
+  const e=G.enemy;
+  if(!e) return;
+  let v=val;
+  if(!allowIncrease && G._enemyHpShown!=null && v>G._enemyHpShown) v=G._enemyHpShown;
+  G._enemyHpShown=v;
+  const b=document.getElementById('enemy-hp-bar');
+  const n=document.getElementById('enemy-hp-num');
+  if(b) b.style.width=Math.max(0,v/e.hp*100)+'%';
+  if(n) n.textContent=v+'/'+e.hp;
+}
 // 単発ダメージ効果（追撃・爆毒など）用：演出中でも敵HPバー/数値を即座に実際の値へ同期する
 // ※多段ヒット演出（ヒットごとに段階表示するもの）は独自にスナップショット値でバーを制御しているため対象外
 function _updEnemyHpBar(){
-  const b=document.getElementById('enemy-hp-bar');
-  const n=document.getElementById('enemy-hp-num');
   if(!G||!G.enemy) return;
-  if(b) b.style.width=Math.max(0,G.enemy.curHp/G.enemy.hp*100)+'%';
-  if(n) n.textContent=G.enemy.curHp+'/'+G.enemy.hp;
+  _renderEnemyHpDisplay(G.enemy.curHp);
 }
 function clearEffectQueue(){
   effectQueue=[];effectRunning=false;
@@ -9241,7 +9249,7 @@ function populateCardTestJumpSelect(){
 }
 function resetCardTestState(){
   // 敵HP・盾・毒等の蓄積状態とプレイヤー状態のみリセット（手札はrenderHand内で常に復元される）
-  if(G.enemy){ G.enemy.curHp=G.enemy.hp; }
+  if(G.enemy){ G.enemy.curHp=G.enemy.hp; G._enemyHpShown=G.enemy.hp; }
   G.enemyShield=0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.enemyFrozen=false;
   G.playerPoison=0; G.playerBurn=0; G.shield=0; G.atkBuff=0;
   G.regenTurns=0; G.regenVal=0; G.weakenHalf=false; G.weakenHalfTurns=0;
