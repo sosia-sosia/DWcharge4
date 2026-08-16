@@ -1782,16 +1782,16 @@ function getBgImg(stage){
 const ENEMY_IMGS=['enemy1.png','enemy2.png','enemy3.png','enemy4.png','enemy5.png','enemy6.png','enemy7.png','enemy8.png','enemy9.png','enemy10.png','enemy11.png','enemy12.png','enemy13.png','enemy14.png','enemy15.png'];
 const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png'};
 const ENEMIES=[
-  {name:'ゴブリン',      icon:'👹',hp:40,  atk:7,  shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
-  {name:'コボルト',      icon:'🐲',hp:50,  atk:9,  shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
-  {name:'オーク',        icon:'🧌',hp:60,  atk:12, shield:0,  rank:2, pattern:['atk','poisonatk','def','big'],                               boss:false, img:'enemy3.png'},
-  {name:'スケルトン',    icon:'💀',hp:70,  atk:13, shield:0,  rank:2, pattern:['big','curse','atk','poisonatk'],                             boss:false, img:'enemy4.png'},
-  {name:'ヴァンパイア',  icon:'🧛',hp:80,  atk:14, shield:5,  rank:3, pattern:['atk','heal','big','drain'],                                  boss:false, img:'enemy5.png'},
-  {name:'ゴーレム',      icon:'🗿',hp:100, atk:15, shield:15, rank:3, pattern:['bigdef','atk','big','bigdef','atk'],                         boss:false, img:'enemy6.png'},
-  {name:'ダークナイト',  icon:'🖤',hp:120, atk:15, shield:15, rank:3, pattern:['atk','atk','big','bigdef','atk'],                            boss:false, img:'enemy7.png'},
-  {name:'ネクロマンサー',      icon:'🧙',hp:150, atk:15, shield:20, rank:4, pattern:['bigcurse','poisonatk','summon','big','atk'],                 boss:false, img:'enemy8.png'},
-  {name:'シャドウロード',   icon:'👿',hp:220, atk:20, shield:20, rank:5, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
-  {name:'ベヒモス',      icon:'🦣',hp:250, atk:20, shield:20, rank:4, pattern:['bigdef','quake','big','superbigdef','quake'],                 boss:false, img:'enemy10.png'},
+  {name:'ゴブリン',      icon:'👹',hp:60,  atk:10, shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
+  {name:'コボルト',      icon:'🐲',hp:70,  atk:11, shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
+  {name:'オーク',        icon:'🧌',hp:80,  atk:12, shield:0,  rank:2, pattern:['atk','poisonatk','def','big'],                               boss:false, img:'enemy3.png'},
+  {name:'スケルトン',    icon:'💀',hp:90,  atk:13, shield:0,  rank:2, pattern:['big','curse','atk','poisonatk'],                             boss:false, img:'enemy4.png'},
+  {name:'ヴァンパイア',  icon:'🧛',hp:100, atk:14, shield:5,  rank:3, pattern:['atk','heal','big','drain'],                                  boss:false, img:'enemy5.png'},
+  {name:'ゴーレム',      icon:'🗿',hp:120, atk:15, shield:15, rank:3, pattern:['bigdef','atk','big','bigdef','atk'],                         boss:false, img:'enemy6.png'},
+  {name:'ダークナイト',  icon:'🖤',hp:140, atk:18, shield:15, rank:3, pattern:['atk','atk','big','bigdef','atk'],                            boss:false, img:'enemy7.png'},
+  {name:'ネクロマンサー',      icon:'🧙',hp:170, atk:20, shield:20, rank:4, pattern:['bigcurse','poisonatk','summon','big','atk'],                 boss:false, img:'enemy8.png'},
+  {name:'シャドウロード',   icon:'👿',hp:240, atk:21, shield:20, rank:5, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
+  {name:'ベヒモス',      icon:'🦣',hp:250, atk:22, shield:20, rank:4, pattern:['bigdef','quake','big','superbigdef','quake'],                 boss:false, img:'enemy10.png'},
   {name:'ヒドラ',        icon:'🐍',hp:280, atk:23, shield:20, rank:4, pattern:['seal','poisonfang','superbigdef','big','bigheal'],            boss:false, img:'enemy11.png'},
   {name:'ケルベロス',    icon:'🐺',hp:300, atk:25, shield:20, rank:4, pattern:['burn','weaken_e','judgment','big','superbigdef'],             boss:false, img:'enemy12.png'},
   {name:'リッチ',        icon:'💀',hp:350, atk:26, shield:30, rank:5, pattern:['heavywound','soulcrush','big','bigheal','bigcurse'],          boss:false, img:'enemy13.png'},
@@ -2435,7 +2435,7 @@ function _startStageBattle(){
   G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={};
   // エリア効果：灼熱の刻印（炎の神殿）ステージ開始時にもカウント加算
   if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
-    const _initHeat=4+G.stage; // stage=0-indexed なのでステージ1=+5、ステージ10=+14
+    const _initHeat=6;
     G.heatCount=_initHeat;
   }
   G.shield=G.initShieldBonus||0; G.atkBuff=G.permAtkBonus||0;
@@ -3244,8 +3244,8 @@ function playCard(idx, _isChain){
   if(ef.freeNextCard){G.freeNextCard=true;G.freePassUsedThisTurn=true;G.freePassManaAtUse=-1;msgs.push('次のカードのコストが0に！');
     addLog('🎭 '+msgs.join(' / '),'player'); updateUI(); renderHand(); return;
   }
-  // 加速する刃：このターン7以上ダメを与えるたびドロー1
-  if(ef.swiftBladeOn){G.swiftBladeActive=true;msgs.push('7以上ダメージごとにドロー1！');queueEffect(()=>showEffectPopup('Ehiku.png','加速する刃','#a8d8ea','player'),800);}
+  // 加速する刃：このターン10以上ダメを与えるたびドロー1
+  if(ef.swiftBladeOn){G.swiftBladeActive=true;msgs.push('10以上ダメージごとにドロー1！');queueEffect(()=>showEffectPopup('Ehiku.png','加速する刃','#a8d8ea','player'),800);}
   // 解呪：全マイナス状態異常を解除（毒・炎上・重傷・衰弱・地響き・封印・マナ回復ペナルティ）
   if(ef.cleanse){
     let cleaned=[];
@@ -4217,7 +4217,7 @@ function enemyTurn(){
     }
     // エリア効果：灼熱の刻印（炎の神殿）ターン開始時カウント増加
     if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
-      const _heatAdd=4+G.stage;
+      const _heatAdd=6;
       G.heatCount=(G.heatCount||0)+_heatAdd;
       addLog('🔥 灼熱の刻印: カウント+'+_heatAdd+'（現在'+G.heatCount+'）','sys');
       updateUI();
@@ -5482,7 +5482,7 @@ const AREA_DATA = [
       name: '灼熱の刻印',
       icon: '🔥',
       shortDesc: 'ターン開始時カウント増加、終了時ダメージ',
-      fullDesc: 'ターン開始時に「4＋ステージ数」カウントが増加する。ターン終了時にカウント分のダメージを受ける。カードを使用するたびその使用マナ分カウントが減少する（0未満にはならない）。',
+      fullDesc: 'ターン開始時に「6」カウントが増加する。ターン終了時にカウント分のダメージを受ける。カードを使用するたびその使用マナ分カウントが減少する（0未満にはならない）。',
     },
     soulReward: 'zangeki',
     popupBg: 'pop_honoo.png',
@@ -6376,13 +6376,18 @@ function updateUI(){
       const img=document.createElement('img');
       img.src=imgSrc;
       img.className='enemy-img '+sizeClass;
-      // 炎の神殿・雷鳴の高原：フィルター＋縁取りを合成
+      // 炎の神殿・雷鳴の高原：フィルター＋縁取り（黒）を合成
       if(G.areaId===2||G.areaId===3){
         const _baseFilter=(e&&e.filter)||'';
         const _outline='drop-shadow(0 0 3px rgba(0,0,0,1)) drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000) drop-shadow(1px -1px 0 #000) drop-shadow(-1px 1px 0 #000)';
         // ボス（isFinalStage）は縁取りなし
         const _isFinalForOutline=G.stage===getAreaEnemies().length-1;
         img.style.filter=_baseFilter?_baseFilter+(_isFinalForOutline?'':' '+_outline):(_isFinalForOutline?'':_outline);
+      } else if(G.areaId===5){
+        // 鉄壁の砦：モンスターが見えづらいため白縁取りを合成
+        const _baseFilter=(e&&e.filter)||'';
+        const _outlineW='drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff) drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff)';
+        img.style.filter=_baseFilter?_baseFilter+' '+_outlineW:_outlineW;
       } else {
         img.style.filter=(e&&e.filter)||'';
       }
@@ -6488,7 +6493,7 @@ function updateUI(){
     const _lowHp=document.getElementById('low-hp-vignette');
     if(_lowHp){
       const _hpRatio=G.playerMaxHp>0?G.playerHp/G.playerMaxHp:1;
-      _lowHp.classList.toggle('active', _hpRatio>0 && _hpRatio<=0.25);
+      _lowHp.classList.toggle('active', _inBattle && _hpRatio>0 && _hpRatio<=0.25);
     }
   }
   checkHpBlink();
