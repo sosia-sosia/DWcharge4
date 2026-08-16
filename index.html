@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver321</title>
+<title>DUNGEON WALKER DWCver322</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -759,7 +759,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver321</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver322</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -1005,7 +1005,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <!-- ソウル設定画面（#appの外側に配置） -->
 <div class="overlay" id="ov-soul-setup" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(menubg_soul.png);background-size:cover;background-position:center;">
   <div class="ov-title" style="font-size:16px;margin-top:0;">💠 ソウル設定</div>
-  <div id="soul-setup-content" style="width:100%;overflow-y:auto;max-height:64vh;display:flex;flex-direction:column;gap:8px;"></div>
+
+  <!-- チャージ選択パネル -->
+  <div id="soulsetup-charge-panel" style="width:100%;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow:hidden;">
+    <div style="font-size:10px;color:#999;text-align:center;">ソウルを編集するチャージを選んでください</div>
+    <div id="soulsetup-charge-list" style="width:100%;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;min-height:0;"></div>
+  </div>
+
+  <!-- ソウル編集パネル（チャージ選択後に表示） -->
+  <div id="soulsetup-edit-panel" style="display:none;width:100%;flex-direction:column;gap:8px;overflow:hidden;flex:1;">
+    <div id="soulsetup-back" style="align-self:flex-start;font-size:12px;font-weight:bold;color:#c9a84c;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.6);border-radius:8px;padding:6px 14px;cursor:pointer;touch-action:manipulation;">← チャージ選択に戻る</div>
+    <div id="soul-setup-content" style="width:100%;overflow-y:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+
   <div class="ov-btn" id="btn-soul-setup-close" style="margin-top:4px;">閉じる</div>
 </div>
 
@@ -1021,7 +1033,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
   <!-- デッキ編集パネル（チャージ選択後に表示） -->
   <div id="deckedit-edit-panel" style="display:none;width:100%;flex-direction:column;gap:8px;overflow:hidden;flex:1;">
-    <div id="deckedit-back" style="font-size:10px;color:#c9a84c;cursor:pointer;touch-action:manipulation;">← チャージ選択に戻る</div>
+    <div id="deckedit-back" style="align-self:flex-start;font-size:12px;font-weight:bold;color:#c9a84c;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.6);border-radius:8px;padding:6px 14px;cursor:pointer;touch-action:manipulation;">← チャージ選択に戻る</div>
     <div id="deckedit-header" style="width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(201,168,76,.4);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;"></div>
     <div style="width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
       <div>
@@ -1477,8 +1489,8 @@ const RL={common:'COMMON',uncommon:'UNCOMMON',rare:'◆ RARE',epic:'◈ EPIC',le
 // =============================================
 // ===== チャージレベルシステム =====
 // チャージUPのソウルを装着した数（0〜2）に応じて、チャージ能力全体のレベルが1〜3に変化する。
-function getChargeLevel(){
-  const s=getEquippedSouls();
+function getChargeLevel(chargeId){
+  const s=getEquippedSouls(chargeId);
   let lv=1;
   if(s.includes('chargeup1')) lv++;
   if(s.includes('chargeup2')) lv++;
@@ -2281,30 +2293,51 @@ function increaseSoulCapacity(category){
   SAVE.soulCapacity[category]=(SAVE.soulCapacity[category]||0)+1;
   writeSaveData();
 }
-// 現在装着中のソウルIDリスト（存在しないIDは除外して返す）
-function getEquippedSouls(){
-  SAVE.soulEquipped=SAVE.soulEquipped||[];
-  return SAVE.soulEquipped.filter(id=>SOULS[id]&&SAVE.soulsOwned&&SAVE.soulsOwned[id]);
+// 装着中ソウルは、デッキと同様にチャージ種別ごとに個別管理する（SAVE.soulEquippedByCharge[chargeId] = [soulId,...]）
+// 旧バージョン（チャージ共通の単一リストSAVE.soulEquipped）からの移行は初回アクセス時に1度だけ行う
+function _migrateSoulEquipToPerCharge(){
+  if(SAVE._soulEquipMigrated) return;
+  SAVE.soulEquippedByCharge=SAVE.soulEquippedByCharge||{};
+  if(Array.isArray(SAVE.soulEquipped)&&SAVE.soulEquipped.length>0){
+    Object.keys(CHARGE_TYPES).forEach(cid=>{
+      if(!SAVE.soulEquippedByCharge[cid]) SAVE.soulEquippedByCharge[cid]=[...SAVE.soulEquipped];
+    });
+  }
+  SAVE._soulEquipMigrated=true;
+  writeSaveData();
 }
-// 装着中ソウルの系統別合計コスト
-function getEquippedCostByCategory(category){
-  return getEquippedSouls().filter(id=>SOULS[id].category===category).reduce((s,id)=>s+SOULS[id].cost,0);
+// 現在装着中のソウルIDリスト（存在しないIDは除外して返す）。chargeId省略時は現在の戦闘中チャージ（G.chargeType）を使用
+function getEquippedSouls(chargeId){
+  const cid=chargeId||G.chargeType;
+  if(!cid) return [];
+  SAVE.soulEquippedByCharge=SAVE.soulEquippedByCharge||{};
+  _migrateSoulEquipToPerCharge();
+  const arr=SAVE.soulEquippedByCharge[cid]||[];
+  return arr.filter(id=>SOULS[id]&&SAVE.soulsOwned&&SAVE.soulsOwned[id]);
 }
-// ソウルの装着/解除を切り替える（上限を超える場合はfalseを返して失敗）
-function toggleSoulEquip(soulId){
+// 装着中ソウルの系統別合計コスト（chargeId省略時は現在の戦闘中チャージ）
+function getEquippedCostByCategory(category,chargeId){
+  return getEquippedSouls(chargeId).filter(id=>SOULS[id].category===category).reduce((s,id)=>s+SOULS[id].cost,0);
+}
+// ソウルの装着/解除を切り替える（上限を超える場合はfalseを返して失敗）。chargeId省略時は現在の戦闘中チャージ
+function toggleSoulEquip(soulId,chargeId){
+  const cid=chargeId||G.chargeType;
+  if(!cid) return false;
   const soul=SOULS[soulId];
   if(!soul) return false;
-  SAVE.soulEquipped=SAVE.soulEquipped||[];
-  const idx=SAVE.soulEquipped.indexOf(soulId);
+  SAVE.soulEquippedByCharge=SAVE.soulEquippedByCharge||{};
+  _migrateSoulEquipToPerCharge();
+  const arr=SAVE.soulEquippedByCharge[cid]=SAVE.soulEquippedByCharge[cid]||[];
+  const idx=arr.indexOf(soulId);
   if(idx>=0){
-    SAVE.soulEquipped.splice(idx,1);
+    arr.splice(idx,1);
     writeSaveData();
     return true;
   }
   const cap=(SAVE.soulCapacity&&SAVE.soulCapacity[soul.category])||0;
-  const used=getEquippedCostByCategory(soul.category);
+  const used=getEquippedCostByCategory(soul.category,cid);
   if(used+soul.cost>cap) return false; // 上限オーバー
-  SAVE.soulEquipped.push(soulId);
+  arr.push(soulId);
   writeSaveData();
   return true;
 }
@@ -5671,10 +5704,9 @@ function showChargeSelect(){
   list.innerHTML='';
   // エリアによって選択可能チャージを制限
   const _allowed=AREA_CHARGE_ALLOWED[G.areaId];
-  const _csLevel=getChargeLevel();
   const chargeList=(_allowed
     ? Object.values(CHARGE_TYPES).filter(ct=>_allowed.includes(ct.id))
-    : Object.values(CHARGE_TYPES)).map(base=>getChargeTypeAtLevel(base.id,_csLevel));
+    : Object.values(CHARGE_TYPES)).map(base=>getChargeTypeAtLevel(base.id,getChargeLevel(base.id)));
   chargeList.forEach(ct=>{
     const d=document.createElement('div');
     // このエリア×このチャージの組み合わせをクリア済みかどうか
@@ -5717,6 +5749,7 @@ function showChargeSelect(){
       }
       showSimpleConfirm('「<span style="color:'+ct.color+';font-size:18px;letter-spacing:2px;">'+ct.name+'</span>」<br>を選びますか？', '<br><span style="font-size:12px;color:#ccc;">'+(ct.playstyle||'')+'</span>', ()=>{
         G.chargeType=ct.id;
+        G.chargeLevel=getChargeLevel(ct.id);
         G.chargeCount=0;
         G.deck=getEffectiveDeck(ct.id);
         // このエリアに使い捨て(ガチャ生成)カードを持ち込んだかどうかを記録。
@@ -11145,7 +11178,7 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count){
   return d;
 }
 function renderDeckEditPanel(){
-  const ct=getChargeTypeAtLevel(_deckEditChargeId, getChargeLevel());
+  const ct=getChargeTypeAtLevel(_deckEditChargeId, getChargeLevel(_deckEditChargeId));
   const preset=CHARGE_DECKS[_deckEditChargeId]||STARTER;
   const swapsUsed=_deckEditSideDeckArr.length;
   const swapLimit=SAVE.deckSwapLimit||0;
@@ -11261,26 +11294,69 @@ function renderDeckEditPanel(){
 }
 
 
+let _soulSetupChargeId=null;
 function showSoulSetupScreen(){
-  renderSoulSetupContent();
+  _soulSetupChargeId=null;
+  document.getElementById('soulsetup-charge-panel').style.display='flex';
+  document.getElementById('soulsetup-edit-panel').style.display='none';
+  // デッキ編集画面と同様、チャージ選択の一覧（最上位階層）でのみ「閉じる」を表示し、
+  // 編集画面（1階層深い場所）では「← チャージ選択に戻る」のみを操作手段にする
+  const _closeBtn=document.getElementById('btn-soul-setup-close');
+  if(_closeBtn) _closeBtn.style.display='';
+  renderSoulSetupChargeList();
   bind('btn-soul-setup-close',()=>{ sfxBack(); hideOv('ov-soul-setup'); });
+  bind('soulsetup-back',()=>{ sfxBack(); showSoulSetupScreen(); });
   showOv('ov-soul-setup');
+}
+function renderSoulSetupChargeList(){
+  const list=document.getElementById('soulsetup-charge-list');
+  if(!list) return;
+  list.innerHTML='';
+  Object.values(CHARGE_TYPES).forEach(ct=>{
+    const eqCount=getEquippedSouls(ct.id).length;
+    const d=document.createElement('div');
+    d.style.cssText='background:rgba(0,0,0,.85);border:2px solid '+ct.color+';border-radius:10px;padding:9px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;';
+    d.innerHTML='<span style="font-size:22px;">'+ct.icon+'</span>'
+      +'<div style="flex:1;">'
+      +'<div style="font-family:\'Cinzel\',serif;font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</div>'
+      +'<div style="font-size:9px;color:#999;margin-top:2px;">'+(eqCount>0?('💠 '+eqCount+'個装着中'):'未装着')+'</div>'
+      +'</div>'
+      +'<span style="font-size:12px;color:#c9a84c;">＞</span>';
+    bindTapSwipe(d,()=>{ sfxSelect(); openSoulSetupFor(ct.id); });
+    list.appendChild(d);
+  });
+}
+function openSoulSetupFor(chargeId){
+  _soulSetupChargeId=chargeId;
+  document.getElementById('soulsetup-charge-panel').style.display='none';
+  document.getElementById('soulsetup-edit-panel').style.display='flex';
+  const _closeBtn=document.getElementById('btn-soul-setup-close');
+  if(_closeBtn) _closeBtn.style.display='none';
+  renderSoulSetupContent();
 }
 function renderSoulSetupContent(){
   const content=document.getElementById('soul-setup-content');
-  if(!content) return;
+  if(!content||!_soulSetupChargeId) return;
+  const ct=CHARGE_TYPES[_soulSetupChargeId];
   SAVE.soulsOwned=SAVE.soulsOwned||{};
   SAVE.soulCapacity=SAVE.soulCapacity||{};
-  SAVE.soulEquipped=SAVE.soulEquipped||[];
   let html='';
+  if(ct){
+    html+='<div style="width:100%;background:rgba(0,0,0,.6);border:1px solid '+ct.color+'55;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;font-family:sans-serif;">'
+      +'<span style="font-size:18px;">'+ct.icon+'</span>'
+      +'<span style="font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</span>'
+      +'<span style="font-size:9px;color:#999;">のソウル編集</span>'
+      +'</div>';
+  }
   html+='<div style="background:rgba(30,20,45,.85);border:1px solid rgba(201,168,255,.4);border-radius:8px;padding:10px;font-family:sans-serif;font-size:10px;color:#ccc;line-height:1.7;">'
     +'エリアクリアで入手した「ソウル」を、系統ごとの<b style="color:#c9a8ff;">枠上限（コスト）</b>の範囲内で自由に付け替えて使う設備です。'
+    +'デッキと同じく<b style="color:#c9a8ff;">チャージごとに個別</b>に装着状況を設定できます。'
     +'ソウルにはそれぞれ<b style="color:#f0d020;">コスト</b>があり、同じ系統に装着中のソウルのコスト合計が枠上限を超えることはできません。'
     +'ソウルをタップすると装着/解除が切り替わります（未入手のソウルは装着できません）。装着状況はいつでも自由に変更できます。'
     +'</div>';
   [1,2,3,4].forEach(cat=>{
     const cap=SAVE.soulCapacity[cat]||0;
-    const used=getEquippedCostByCategory(cat);
+    const used=getEquippedCostByCategory(cat,_soulSetupChargeId);
     const remaining=cap-used; // 使用できるコスト（残り枠）
     const capColor=(remaining<=0)?'#ff5555':(used>=cap&&cap>0?'#ffd700':'#8ab8d8'); // 残り0（始めから0 or 使い切り）は赤字
     html+='<div style="background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 10px;font-family:sans-serif;">'
@@ -11295,8 +11371,9 @@ function renderSoulSetupContent(){
     } else if(ownedSoulsInCat.length===0){
       html+='<div style="font-size:11px;color:#777;margin-top:6px;padding:8px;text-align:center;background:rgba(0,0,0,.4);border-radius:6px;">未所持</div>';
     } else {
+      const equippedHere=getEquippedSouls(_soulSetupChargeId);
       ownedSoulsInCat.forEach(soul=>{
-        const equipped=SAVE.soulEquipped.includes(soul.id);
+        const equipped=equippedHere.includes(soul.id);
         let rowStyle='display:flex;align-items:center;gap:8px;margin-top:6px;padding:6px 8px;border-radius:6px;';
         let stateLabel='';
         if(equipped){
@@ -11325,7 +11402,7 @@ function renderSoulSetupContent(){
     if(!SAVE.soulsOwned[soulId]) return; // 未入手は操作不可
     bindTapSwipe(row,()=>{
       sfxSelect();
-      const ok=toggleSoulEquip(soulId);
+      const ok=toggleSoulEquip(soulId,_soulSetupChargeId);
       if(!ok){
         addLog&&addLog('💠 系統の上限を超えるため装着できません','sys');
         dwRejectFeedback(row);
