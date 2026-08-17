@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver323</title>
+<title>DUNGEON WALKER DWCver326</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -759,7 +759,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver323</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver326</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -866,6 +866,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
   </div>
 </div>
+
+<!-- エリア攻略中の途中データがある場合の再開確認（起動直後に最優先で表示） -->
+<div class="overlay" id="ov-resume-run" style="gap:8px;padding:14px 12px;position:fixed;z-index:5500;justify-content:center;">
+  <div style="background:linear-gradient(160deg,#1a1508,#0a0a0a);border:2px solid rgba(201,168,76,.8);border-radius:14px;padding:20px 24px;max-width:300px;width:88%;font-family:sans-serif;display:flex;flex-direction:column;gap:12px;align-items:center;">
+    <div style="font-size:32px;">📍</div>
+    <div style="font-family:'Cinzel',serif;font-size:15px;color:#f0d47a;font-weight:bold;text-align:center;">エリア攻略の途中データがあります</div>
+    <div style="font-size:12px;color:#ccc;text-align:center;line-height:1.6;">前回、攻略の途中でゲームが閉じられました。<br>続きから再開しますか？<br>あきらめた場合、このデータは消去されます。</div>
+    <div style="display:flex;gap:12px;width:100%;margin-top:4px;">
+      <button id="rrc-resume" style="flex:1;background:#1a2a10;border:2px solid #7ed6a0;border-radius:6px;padding:10px;color:#7ed6a0;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">続きから再開</button>
+      <button id="rrc-abandon" style="flex:1;background:#1a1a1a;border:2px solid #666;border-radius:6px;padding:10px;color:#ccc;font-size:13px;cursor:pointer;touch-action:manipulation;font-family:'Cinzel',serif;">あきらめる</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- メインメニュー（タイトルとエリア選択の間の選択画面／#appの外側に配置） -->
 <div class="overlay" id="ov-main-menu" style="gap:0;padding:16px 14px;position:fixed;z-index:1900;align-items:stretch;background-image:url(munyu_haikei.png);background-size:cover;background-position:center;">
@@ -2112,6 +2126,162 @@ function writeSaveData(){
     console.warn('[DW] セーブデータの保存に失敗しました（ブラウザ設定・容量等）。',e);
     return false;
   }
+}
+// ===== 攻略中データの自動保存（エリア攻略の途中再開用） =====
+// 「良い場所」を選んでセーブするのではなく、行動する度に常に現在のG（戦闘状態）をまるごと上書き保存する。
+// こうすることで、アプリを閉じて再開しても常に「離脱した瞬間そのまま」にしか戻れず、
+// 不利な展開になった時だけ閉じて有利な状態からやり直す、というセーブスカムができない。
+const RUN_SAVE_KEY='dw_run_v1';
+let _lastRunSaveAt=0;
+function saveRunState(force){
+  if(!G || !G.chargeType) return; // チャージを選んで実際に攻略中でなければ何もしない
+  const now=Date.now();
+  if(!force && now-_lastRunSaveAt<250) return; // 書き込み頻度を抑える（体感上は常時保存と同じ）
+  _lastRunSaveAt=now;
+  try{
+    localStorage.setItem(RUN_SAVE_KEY, JSON.stringify({v:1, savedAt:now, state:G}));
+  }catch(e){
+    console.warn('[DW] 攻略中データの自動保存に失敗しました。', e);
+  }
+}
+function clearRunState(){
+  try{ localStorage.removeItem(RUN_SAVE_KEY); }catch(e){}
+}
+function loadRunState(){
+  try{
+    const raw=localStorage.getItem(RUN_SAVE_KEY);
+    if(!raw) return null;
+    const d=JSON.parse(raw);
+    if(!d||typeof d!=='object'||!d.state||typeof d.state!=='object'||!d.state.chargeType) return null;
+    return d;
+  }catch(e){ return null; }
+}
+// ===== 攻略中データの再開UI =====
+function showResumeRunPrompt(){
+  showOv('ov-resume-run');
+  bind('rrc-resume', _doResumeRun);
+  bind('rrc-abandon', _doAbandonRun);
+}
+function _goToNormalTitleSkippingSplash(){
+  // 「あきらめる」後は改めて起動演出を見せる必要はないため、タイトル画面へ直接進める
+  companyScreen.style.display='none';
+  const opScr=document.getElementById('op-screen');
+  if(opScr) opScr.style.display='none';
+  logoScreen.style.display='flex';
+  logoScreen.style.opacity='1';
+  _logoScreenTapReady=true;
+}
+function _doAbandonRun(){
+  hideOv('ov-resume-run');
+  clearRunState();
+  _consumeDisposableCardsOnAreaExit(); // 破棄されなかった使い捨てカードをここで消滅処理
+  _goToNormalTitleSkippingSplash();
+}
+function _doResumeRun(){
+  hideOv('ov-resume-run');
+  const saved=_pendingRunResume;
+  const st=saved&&saved.state;
+  // 壊れたデータ・敗北直前など、再開すると事故につながる状態は安全側に倒して破棄する
+  const _enemyAlreadyDead=st && st.enemy && typeof st.enemy.curHp==='number' && st.enemy.curHp<=0;
+  if(!st || !st.chargeType || typeof st.playerHp!=='number' || st.playerHp<=0 || st.phase==='gameover' || _enemyAlreadyDead){
+    // 敗北直前・敵撃破直後（報酬選択待ち）など、画面を安全に再構築できない状態は再開させない
+    clearRunState();
+    _consumeDisposableCardsOnAreaExit();
+    _goToNormalTitleSkippingSplash();
+    return;
+  }
+  G=st;
+  if(G.phase!=='player'&&G.phase!=='enemy') G.phase='player'; // 演出待ち等の中断状態は安全に復帰させる
+  companyScreen.style.display='none';
+  const opScr=document.getElementById('op-screen');
+  if(opScr) opScr.style.display='none';
+  logoScreen.style.display='none';
+  appDiv.style.display='flex';
+  _restoreBattleVisualsFromSavedState();
+}
+// 保存済みG（戦闘状態）は既に復元済みという前提で、画面(DOM)側だけを合わせて復元する。
+// _startStageBattle()と違い、G自体は一切リセットしない（=手札・山札・捨札・HP・マナ等はそのまま）。
+function _restoreBattleVisualsFromSavedState(){
+  _inBattle=true;
+  clearEffectQueue();
+  stopCurseOrbs();
+  stopEventBgm();
+  updateBgm();
+  const _bf=document.getElementById('battlefield');
+  const _ha=document.getElementById('hand-area');
+  if(_bf) _bf.style.visibility='visible';
+  if(_ha) _ha.style.visibility='visible';
+  const _eaEl=document.getElementById('enemy-area');
+  if(_eaEl){
+    _eaEl.classList.remove('area-cave','area-ruins','area-temple','area-raimei','area-swamp','area-iron','area-ice');
+    _eaEl.classList.add(G.areaId===0?'area-cave':G.areaId===1?'area-ruins':G.areaId===3?'area-raimei':G.areaId===4?'area-swamp':G.areaId===5?'area-iron':G.areaId===6?'area-ice':'area-temple');
+  }
+  const e=G.enemy;
+  const sp=document.getElementById('enemy-sprite');
+  if(sp && e){
+    sp.style.transition='';sp.style.opacity='1';sp.className='idle'+((G.stage===getAreaEnemies().length-1&&G.areaId!==0)?' slow-anim':'');
+    sp.innerHTML='';sp.style.backgroundImage='none';sp._currentSrc=null;
+    const eArea=document.getElementById('enemy-area');
+    if(eArea) eArea.classList.toggle('boss-overflow', G.stage===getAreaEnemies().length-1&&G.areaId!==0);
+    const eImg=e.img;
+    let _imgEl=null;
+    if(eImg){
+      const isFinalStage=G.stage===getAreaEnemies().length-1;
+      const sizeClass= G.areaId===0
+        ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===4
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===5
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===6
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===2
+          ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
+          : G.areaId===3
+            ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
+            : (G.stage===15?'scale-boss':G.stage>=14?'scale-large':G.stage>=9?'scale-mid':'scale-small');
+      _imgEl=document.createElement('img');
+      _imgEl.src=eImg;
+      _imgEl.className='enemy-img '+sizeClass;
+      _imgEl.onerror=()=>{sp.innerHTML='';sp.textContent=e.icon||'👾';};
+      sp.appendChild(_imgEl);
+      sp._currentSrc=eImg;
+    } else {
+      sp.textContent=e.icon||'👾';
+    }
+    // モンスター視認性の縁取り（炎の神殿・雷鳴の高原＝黒縁／鉄壁の砦＝白縁）を再適用
+    if(_imgEl){
+      if(G.areaId===2||G.areaId===3){
+        const _baseFilter=e.filter||'';
+        const _outline='drop-shadow(0 0 3px rgba(0,0,0,1)) drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000) drop-shadow(1px -1px 0 #000) drop-shadow(-1px 1px 0 #000)';
+        const _isFinalForOutline=G.stage===getAreaEnemies().length-1;
+        _imgEl.style.filter=_baseFilter?_baseFilter+(_isFinalForOutline?'':' '+_outline):(_isFinalForOutline?'':_outline);
+      } else if(G.areaId===5){
+        const _baseFilter=e.filter||'';
+        const _outlineW='drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff) drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff)';
+        _imgEl.style.filter=_baseFilter?_baseFilter+' '+_outlineW:_outlineW;
+      } else {
+        _imgEl.style.filter=e.filter||'';
+      }
+    }
+  }
+  const bgEl=document.getElementById('enemy-area');
+  if(bgEl){
+    const bgUrl='url('+getBgImg(G.stage)+')';
+    bgEl.classList.remove('torch','wave');
+    if(G.stage<9){ bgEl.classList.add('torch'); bgEl.style.setProperty('--bg-url', bgUrl); }
+    else { bgEl.classList.add('wave'); bgEl.style.setProperty('--bg-url', bgUrl); }
+  }
+  const _stageNumEl=document.getElementById('stage-num');
+  if(_stageNumEl) _stageNumEl.textContent=G.stage+1;
+  const stageTotal=document.getElementById('stage-total');
+  if(stageTotal) stageTotal.textContent=getAreaEnemies().length;
+  const _btnEnd=document.getElementById('btn-end');
+  if(_btnEnd) _btnEnd.classList.toggle('disabled', G.phase!=='player');
+  updateGaugeLamps();
+  updateUI();
+  renderHand();
+  addLog('📍 攻略の続きから再開しました','sys');
 }
 // エリアクリア報酬テーブル（ゴールド・ソウルの2通貨）
 // clear：エリアクリアのたびに毎回付与／noContinue・allCharge：達成時に1回だけ付与
@@ -6589,6 +6759,7 @@ function updateUI(){
     }
   }
   renderHand();
+  saveRunState();
 }
 // ===== 手札ページング =====
 const CARDS_PER_PAGE=8; // 手札上限
@@ -9963,6 +10134,12 @@ window.addEventListener('load',()=>{
       setTimeout(()=>{
         tapScreen.style.display='none';
         // ユーザー操作後なのでOP再生可能
+        // 攻略中の途中データがある場合は、演出をスキップして先に再開確認を出す
+        if(_pendingRunResume){
+          playOpBgm();
+          showResumeRunPrompt();
+          return;
+        }
         playOpBgm();
         // Sosiaロゴ2秒
         companyScreen.style.display='flex';
@@ -9997,6 +10174,7 @@ window.addEventListener('load',()=>{
 
 function showLogoThenTitle(){
   _consumeDisposableCardsOnAreaExit();
+  clearRunState(); // エリアを正式に出る時点で「続きから再開」データを消す（以後は戻れない＝ずる防止）
   _gameStarting=false;
   _inBattle=false; // タイトルに戻る際は必ず戦闘中フラグを解除（保険）
   // メニュー関連のオーバーレイが残っていれば念のため非表示にする
@@ -10545,7 +10723,7 @@ function _bindTitleExtraButtons(){
   bind('sc-ok',()=>{
     if(!_shopConfirmItem) return;
     const okBtnEl=document.getElementById('sc-ok');
-    if(okBtnEl && okBtnEl.disabled) return;
+    if(okBtnEl && okBtnEl.disabled){ dwRejectFeedback(okBtnEl); return; }
     const it=_shopConfirmItem;
     _shopConfirmItem=null;
     hideOv('ov-shop-confirm');
@@ -10559,7 +10737,7 @@ function _bindTitleExtraButtons(){
   bind('gacha-buy-crystal',()=>{ _showGachaBuyConfirm('crystal'); });
   bind('gc-ok',()=>{
     const okBtnEl=document.getElementById('gc-ok');
-    if(okBtnEl && okBtnEl.disabled) return;
+    if(okBtnEl && okBtnEl.disabled){ dwRejectFeedback(okBtnEl); return; }
     _executeGacha();
   });
   bind('gc-cancel',()=>{ sfxCancel(); _gachaConfirmCurrency=null; hideOv('ov-gacha-confirm'); });
@@ -10583,7 +10761,7 @@ function _bindTitleExtraButtons(){
   bind('sdc-cancel',()=>{ sfxCancel(); hideOv('ov-save-delete-confirm'); });
   bind('sdc-ok',()=>{
     const okBtn=document.getElementById('sdc-ok');
-    if(okBtn && okBtn.disabled) return; // カウントダウン中は誤タップ防止のため無効
+    if(okBtn && okBtn.disabled){ dwRejectFeedback(okBtn); return; } // カウントダウン中は誤タップ防止のため無効
     sfxConfirm();
     const _keepMuted=SAVE&&SAVE.muted; // 音量設定はプレイ記録と別扱いなので保持する
     try{ localStorage.removeItem(SAVE_KEY); }catch(err){ console.warn('[DW] セーブデータの削除に失敗しました。',err); }
@@ -10843,7 +11021,10 @@ function _restoreGachaCardsToDB(){
 _restoreGachaCardsToDB();
 // アプリがエリア攻略中に強制終了された場合、SAVE.pendingDisposalに消し忘れフラグが残っている可能性があるため、
 // 起動直後（DB復元完了後）に検知して即座に消滅処理を行う。
-_consumeDisposableCardsOnAreaExit();
+// ただし「続きから再開」できる攻略中データが残っている場合は、再開されるかもしれないのでまだ消さない
+// （実際に「あきらめる」が選ばれた時点で_consumeDisposableCardsOnAreaExit()を呼ぶ）。
+const _pendingRunResume=loadRunState();
+if(!_pendingRunResume) _consumeDisposableCardsOnAreaExit();
 
 // ----- ガチャ画面UI -----
 function showGachaSelectScreen(){
@@ -11081,11 +11262,12 @@ function renderDeckEditChargeList(){
   Object.values(CHARGE_TYPES).forEach(ct=>{
     const preset=CHARGE_DECKS[ct.id]||STARTER;
     const hasCustom=!!(SAVE.customDecks && Array.isArray(SAVE.customDecks[ct.id]) && SAVE.customDecks[ct.id].length>0);
+    const isLast=(ct.id===_deckEditLastChargeId);
     const d=document.createElement('div');
-    d.style.cssText='background:rgba(0,0,0,.85);border:2px solid '+ct.color+';border-radius:10px;padding:9px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;';
+    d.style.cssText='background:'+(isLast?'rgba(60,45,10,.9)':'rgba(0,0,0,.85)')+';border:2px solid '+ct.color+';border-radius:10px;padding:9px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;'+(isLast?'box-shadow:0 0 8px '+ct.color+'99;':'');
     d.innerHTML='<span style="font-size:22px;">'+ct.icon+'</span>'
       +'<div style="flex:1;">'
-      +'<div style="font-family:\'Cinzel\',serif;font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</div>'
+      +'<div style="font-family:\'Cinzel\',serif;font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+(isLast?'　<span style="font-size:9px;color:#ffe08a;">📍前回編集</span>':'')+'</div>'
       +'<div style="font-size:9px;color:#999;margin-top:2px;">'+preset.length+'枚デッキ'+(hasCustom?'　<span style="color:#7ed6a0;">編集済み</span>':'')+'</div>'
       +'</div>'
       +'<span style="font-size:12px;color:#c9a84c;">＞</span>';
@@ -11114,8 +11296,10 @@ function _deckEditInitState(chargeId){
   });
   return {workingDeck, sideDeckArr};
 }
+let _deckEditLastChargeId=null; // 直前に編集していたチャージ（一覧で目立たせる用。screen初期化ではリセットしない）
 function openDeckEditFor(chargeId){
   _deckEditChargeId=chargeId;
+  _deckEditLastChargeId=chargeId;
   const st=_deckEditInitState(chargeId);
   _deckEditWorkingDeck=st.workingDeck;
   _deckEditSideDeckArr=st.sideDeckArr;
@@ -11295,6 +11479,7 @@ function renderDeckEditPanel(){
 
 
 let _soulSetupChargeId=null;
+let _soulSetupLastChargeId=null; // 直前に編集していたチャージ（一覧で目立たせる用）
 function showSoulSetupScreen(){
   _soulSetupChargeId=null;
   document.getElementById('soulsetup-charge-panel').style.display='flex';
@@ -11314,11 +11499,12 @@ function renderSoulSetupChargeList(){
   list.innerHTML='';
   Object.values(CHARGE_TYPES).forEach(ct=>{
     const eqCount=getEquippedSouls(ct.id).length;
+    const isLast=(ct.id===_soulSetupLastChargeId);
     const d=document.createElement('div');
-    d.style.cssText='background:rgba(0,0,0,.85);border:2px solid '+ct.color+';border-radius:10px;padding:9px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;';
+    d.style.cssText='background:'+(isLast?'rgba(60,45,10,.9)':'rgba(0,0,0,.85)')+';border:2px solid '+ct.color+';border-radius:10px;padding:9px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;'+(isLast?'box-shadow:0 0 8px '+ct.color+'99;':'');
     d.innerHTML='<span style="font-size:22px;">'+ct.icon+'</span>'
       +'<div style="flex:1;">'
-      +'<div style="font-family:\'Cinzel\',serif;font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</div>'
+      +'<div style="font-family:\'Cinzel\',serif;font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+(isLast?'　<span style="font-size:9px;color:#ffe08a;">📍前回編集</span>':'')+'</div>'
       +'<div style="font-size:9px;color:#999;margin-top:2px;">'+(eqCount>0?('💠 '+eqCount+'個装着中'):'未装着')+'</div>'
       +'</div>'
       +'<span style="font-size:12px;color:#c9a84c;">＞</span>';
@@ -11328,6 +11514,7 @@ function renderSoulSetupChargeList(){
 }
 function openSoulSetupFor(chargeId){
   _soulSetupChargeId=chargeId;
+  _soulSetupLastChargeId=chargeId;
   document.getElementById('soulsetup-charge-panel').style.display='none';
   document.getElementById('soulsetup-edit-panel').style.display='flex';
   const _closeBtn=document.getElementById('btn-soul-setup-close');
