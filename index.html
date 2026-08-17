@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver326</title>
+<title>DUNGEON WALKER DWCver327</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -759,7 +759,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver326</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver327</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2205,8 +2205,9 @@ function _restoreBattleVisualsFromSavedState(){
   _inBattle=true;
   clearEffectQueue();
   stopCurseOrbs();
+  stopOpBgm();    // タイトル(OP)BGMを止めてから
   stopEventBgm();
-  updateBgm();
+  updateBgm();    // エリア/ステージに応じたBGMへ切り替える
   const _bf=document.getElementById('battlefield');
   const _ha=document.getElementById('hand-area');
   if(_bf) _bf.style.visibility='visible';
@@ -8800,10 +8801,10 @@ function _dwInjectFeedbackStyles(){
   if(_dwFeedbackStyleInjected) return; _dwFeedbackStyleInjected=true;
   const st=document.createElement('style');
   st.textContent =
-    '@keyframes dw-tap-press{0%{transform:scale(1);}45%{transform:scale(0.97);}100%{transform:scale(1);}}'+
-    '@keyframes dw-tap-reject{0%{transform:translateX(0);}20%{transform:translateX(-4px);}40%{transform:translateX(4px);}60%{transform:translateX(-3px);}80%{transform:translateX(2px);}100%{transform:translateX(0);}}'+
-    '.dw-tap-press-fx{animation:dw-tap-press .16s ease-out;}'+
-    '.dw-tap-reject-fx{animation:dw-tap-reject .2s ease-in-out;}';
+    '@keyframes dw-tap-press{0%{transform:scale(1);}45%{transform:scale(0.90);}100%{transform:scale(1);}}'+
+    '@keyframes dw-tap-reject{0%{transform:translateX(0);}15%{transform:translateX(-8px);}30%{transform:translateX(7px);}45%{transform:translateX(-6px);}60%{transform:translateX(5px);}75%{transform:translateX(-3px);}90%{transform:translateX(2px);}100%{transform:translateX(0);}}'+
+    '.dw-tap-press-fx{animation:dw-tap-press .18s ease-out;}'+
+    '.dw-tap-reject-fx{animation:dw-tap-reject .32s ease-in-out;}';
   document.head.appendChild(st);
 }
 // 押下フィードバック：対象要素を一瞬だけ縮ませる（連打してもアニメーションが不自然に蓄積しないよう、都度リセットしてから再生する）
