@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver346</title>
+<title>DUNGEON WALKER DWCver347</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -803,7 +803,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver346</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver347</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -11669,7 +11669,7 @@ function showGachaResult(card, detail){
   const box=document.getElementById('gacha-result-card');
   if(box){
     box.innerHTML='';
-    box.appendChild(_buildDeckEditCardEl(card,null,null,false));
+    box.appendChild(_buildDeckEditCardEl(card,null,null,false,1,false));
   }
   const detailEl=document.getElementById('gacha-result-detail');
   if(detailEl){
@@ -11893,7 +11893,7 @@ function _deckEditPoolRemaining(){
   return remain;
 }
 // ミニカード表示要素を作成（タップで拡大詳細＋決定/キャンセルのアクション確認）
-function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count){
+function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
   const d=document.createElement('div');
   const fImg=FRAME_IMGS[c.rarity]||'';
   if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
@@ -11904,7 +11904,8 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count){
   const badgeColor=c._gachaGenerated?'rgba(160,40,40,.85)':'rgba(0,0,0,.75)';
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
   const nameSuffix=(count>1)?(' ×'+count):'';
-  const _dpVal=getCardDeckPoint(c.id);
+  // 初期デッキ由来のカードはデッキポイントを消費しないため0固定。同名でも入れ替え候補（購入品）は別扱いで実際のDPを表示する
+  const _dpVal=isPreset?0:getCardDeckPoint(c.id);
   d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
       '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
@@ -11959,7 +11960,7 @@ function renderDeckEditPanel(){
         if(entry.origin==='preset'){ _deckEditSideDeckArr.push(entry.id); _deckEditShowMsg('🗂️ 「'+c.name+'」を初期デッキカードへ移動しました',true); }
         else { _deckEditShowMsg('🎒 「'+c.name+'」を入れ替え候補へ戻しました',true); }
         renderDeckEditPanel();
-      }, badge, !canRemove);
+      }, badge, !canRemove, 1, !isPoolOrigin);
       curList.appendChild(el);
     });
   }
@@ -11981,7 +11982,7 @@ function renderDeckEditPanel(){
         _deckEditWorkingDeck.push({id, origin:'preset'});
         _deckEditShowMsg('📖 「'+c.name+'」を現在のデッキへ戻しました',true);
         renderDeckEditPanel();
-      }, '', !canReturn);
+      }, '', !canReturn, 1, true);
       sideList.appendChild(el);
     });
   }
@@ -12008,7 +12009,7 @@ function renderDeckEditPanel(){
         _deckEditWorkingDeck.push({id, origin:'pool'});
         _deckEditShowMsg('📖 「'+c.name+'」を現在のデッキへ入れました（DP'+cardPoint+'消費）',true);
         renderDeckEditPanel();
-      }, 'DP'+cardPoint, !canAdd, n);
+      }, '', !canAdd, n, false);
       poolList.appendChild(el);
     });
   }
