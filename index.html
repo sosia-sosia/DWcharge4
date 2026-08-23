@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver344</title>
+<title>DUNGEON WALKER DWCver345</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -803,7 +803,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver344</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver345</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2769,7 +2769,7 @@ const SOULS={
   teppeki: {id:'teppeki', name:'鉄壁のソウル', category:1, cost:1, icon:'🛡️', desc:'ステージ開始時シールド+5'},
   teppeki2:{id:'teppeki2', name:'鉄壁Ⅱ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
   kekkai:  {id:'kekkai',  name:'障壁のソウルⅠ', category:1, cost:3, icon:'🔷', desc:'シールドの最低値が0ではなく5になり、5以下に減少しなくなる'},
-  kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+10する'},
+  kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+3する'},
   taidoku: {id:'taidoku', name:'耐毒のソウル', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-3（0未満にはならない）'},
   taidoku2:{id:'taidoku2', name:'耐毒Ⅱ', category:2, cost:2, icon:'☠️', desc:'敵から受ける毒付与量-6（0未満にはならない）'},
   fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-3（0未満にはならない）'},
@@ -2782,6 +2782,13 @@ const SOULS={
   gogeki:  {id:'gogeki',  name:'強撃のソウル', category:3, cost:1, icon:'🪓', desc:'「強撃」カードの攻撃力（計算後）+2', cardBonus:{cardId:'bash', atkAdd:2}},
   kaifuku: {id:'kaifuku', name:'回復カードのソウル', category:3, cost:1, icon:'💗', desc:'「回復」カードの回復力（計算後）+1', healBonus:{cardId:'heal', healAdd:1}},
   bougyo:  {id:'bougyo',  name:'防御カードのソウル', category:3, cost:1, icon:'🛡️', desc:'「防御」カードの防御力（計算後）+1', shieldBonus:{cardId:'guard', shieldAdd:1}},
+  karurenSoul:     {id:'karurenSoul',     name:'軽連打カードのソウルⅠ',   category:3, cost:1, icon:'👊', desc:'「軽連打」カードの攻撃力の数値に+1', exclusiveCharge:'renGeki',    cardBonus:{cardId:'karuren', atkAdd:1}},
+  chikaraSoul:     {id:'chikaraSoul',     name:'力溜めカードのソウルⅠ',   category:3, cost:1, icon:'💪', desc:'「力溜め」カードのドロー+1をドロー+2に', exclusiveCharge:'tameAtk'},
+  bakudokuSoul:    {id:'bakudokuSoul',    name:'爆毒カードのソウルⅠ',     category:3, cost:1, icon:'💀', desc:'「爆毒」カードの攻撃力の数値に+2', exclusiveCharge:'dokushi'},
+  tsumikasaneSoul: {id:'tsumikasaneSoul', name:'積み重ねカードのソウルⅠ', category:3, cost:1, icon:'📚', desc:'「積み重ね」カードの攻撃力の数値に+2', exclusiveCharge:'teppeki'},
+  healReserveSoul: {id:'healReserveSoul', name:'回復予約カードのソウルⅠ', category:3, cost:1, icon:'💊', desc:'「回復予約」カードの回復力の数値に+2', exclusiveCharge:'jikoSaisei'},
+  funnuSoul:       {id:'funnuSoul',       name:'憤怒の舞カードのソウルⅠ', category:3, cost:1, icon:'💃', desc:'「憤怒の舞」カードの攻撃力の数値に+2', exclusiveCharge:'inori'},
+  ketsuyakuSoul:   {id:'ketsuyakuSoul',   name:'血の契約カードのソウルⅠ', category:3, cost:1, icon:'🩸', desc:'「血の契約」カードのHP-10をHP-5に変更', exclusiveCharge:'haki'},
   saiseiBougyo: {id:'saiseiBougyo', name:'再生防御のソウルⅠ', category:4, cost:1, icon:'💗', desc:'防御カードを使用するたび、HP+2回復する'},
   kozeni:  {id:'kozeni',  name:'小銭稼ぎのソウルⅠ', category:4, cost:1, icon:'🪙', desc:'クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する'},
   kozeni2: {id:'kozeni2', name:'小銭稼ぎのソウルⅡ', category:4, cost:2, icon:'🪙', desc:'クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する'},
@@ -2859,6 +2866,38 @@ function toggleSoulEquip(soulId,chargeId){
 }
 // 装着中ソウルによる特定カードの攻撃力ボーナス（斬撃のソウル・強撃のソウル等）
 // cardBaseId: カードの基本ID（鍛冶屋強化後は_baseIdを渡すこと）
+function getFuryDanceBaseAtk(){
+  return 3+(getEquippedSouls().includes('funnuSoul')?2:0);
+}
+// チャージ専用カードソウルの効果を、ステージ中のカードテキストに反映させる
+function getDisplayCardDesc(c){
+  if(!c) return '';
+  const baseId=c._baseId||c.id;
+  const equipped=getEquippedSouls();
+  if(baseId==='karuren' && equipped.includes('karurenSoul')){
+    const newAtk=(c.effect.atk||0)+1;
+    return '攻撃'+newAtk+'×2（合計'+(newAtk*2)+'）';
+  }
+  if(baseId==='chikara' && equipped.includes('chikaraSoul')){
+    return '次のターン開始時、ドローするカード+2とマナ+1';
+  }
+  if(baseId==='expPoison' && equipped.includes('bakudokuSoul')){
+    return '敵の毒カウント+2分ダメージ / 毒カウントを半減';
+  }
+  if(baseId==='accumulate' && equipped.includes('tsumikasaneSoul')){
+    return 'このステージ中に消費したマナの数+2分ダメージを与える';
+  }
+  if(baseId==='healReserve' && equipped.includes('healReserveSoul')){
+    return '次のターン開始時 HP+6';
+  }
+  if(baseId==='furyDance' && equipped.includes('funnuSoul')){
+    return '攻5 + ドロー1 + 次の憤怒の舞のダメージ+3（ステージクリアでリセット）';
+  }
+  if(baseId==='bloodPact' && equipped.includes('ketsuyakuSoul')){
+    return '自分のHP-5 + 攻撃20';
+  }
+  return c.desc;
+}
 function getSoulCardAtkBonus(cardBaseId){
   if(!cardBaseId) return 0;
   let total=0;
@@ -3425,7 +3464,7 @@ function playCard(idx, _isChain){
   }
   // 自傷ダメージ・HP減少を攻撃より先に処理（魂喰らい+血の契約などの処理順確保）
   if(ef.selfDmg){
-    const sd=ef.selfDmg;
+    const sd=(cid==='bloodPact'&&getEquippedSouls().includes('ketsuyakuSoul'))?5:ef.selfDmg;
     G.playerHp=Math.max(1,G.playerHp-sd);
     msgs.push('HP-'+sd);
     updateUI(); // HPバーを即時更新（演出より先にバーを下げる）
@@ -3574,7 +3613,8 @@ function playCard(idx, _isChain){
   }
   if(ef.costSumDmg){
     const spent=G.stageManaSpent||0;
-    const d=Math.max(1,(spent+G.atkBuff))*(G.doubleNext?2:1);
+    const _tsumikasaneBonus=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul'))?2:0;
+    const d=Math.max(1,(spent+G.atkBuff+_tsumikasaneBonus))*(G.doubleNext?2:1);
     if(G.doubleNext) G.doubleNext=false;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -3802,10 +3842,10 @@ function playCard(idx, _isChain){
   // チャージ保存：次の発動後カウント1残す
   if(ef.holdChargePartial){G.holdChargePartial=true;msgs.push('次のチャージ発動後、カウント1残る（保存中）');updateGaugeLamps();}
   // 力溜め：次のターン開始時ドロー+1、マナ+1
-  if(ef.nextTurnDrawBonus){G.nextTurnDrawBonusPending=(G.nextTurnDrawBonusPending||0)+ef.nextTurnDrawBonus;msgs.push('次T ドロー+'+(ef.nextTurnDrawBonus));}
+  if(ef.nextTurnDrawBonus){const _drawBonusExtra=(cid==='chikara'&&getEquippedSouls().includes('chikaraSoul'))?1:0;G.nextTurnDrawBonusPending=(G.nextTurnDrawBonusPending||0)+ef.nextTurnDrawBonus+_drawBonusExtra;msgs.push('次T ドロー+'+(ef.nextTurnDrawBonus+_drawBonusExtra));}
   if(ef.nextTurnManaBonus){G.nextManaBonus=(G.nextManaBonus||0)+ef.nextTurnManaBonus;msgs.push('次T マナ+'+(ef.nextTurnManaBonus));}
   // 回復予約：次のターン開始時HP+N
-  if(ef.nextTurnHealBonus){G.nextTurnHealBonus=(G.nextTurnHealBonus||0)+ef.nextTurnHealBonus;msgs.push('次T HP+'+(ef.nextTurnHealBonus));}
+  if(ef.nextTurnHealBonus){const _healReserveBonus=(cid==='healReserve'&&getEquippedSouls().includes('healReserveSoul'))?2:0;G.nextTurnHealBonus=(G.nextTurnHealBonus||0)+ef.nextTurnHealBonus+_healReserveBonus;msgs.push('次T HP+'+(ef.nextTurnHealBonus+_healReserveBonus));}
   // 連撃回復：このターン攻撃カード使用ごとHP+3をONにする
   if(ef.comboHealOn){G.comboHealActive=true;G.comboHealVal=ef.comboHealVal||3;msgs.push('攻撃カード使用ごとHP+'+(G.comboHealVal)+'！');}
   // 踏み倒し：次カードコスト0（1ターン1度）
@@ -3855,7 +3895,7 @@ function playCard(idx, _isChain){
   // 憤怒の舞：攻3+ドロー1+累積ダメ（制限なし）
   if(ef.furyDance){
     const furyBonus=G.furyDanceBonus||0;
-    const furyDmg=3+furyBonus+G.atkBuff;
+    const furyDmg=getFuryDanceBaseAtk()+furyBonus+G.atkBuff;
     let fd=furyDmg;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,fd);G.enemyShield-=a;fd-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-fd);
@@ -3999,7 +4039,8 @@ function playCard(idx, _isChain){
   }
   if(ef.explodePoison){
     const pc=G.enemyPoison||0;
-    const pd=(pc+G.atkBuff)*(G.doubleNext?2:1);
+    const _bakudokuBonus=(cid==='expPoison'&&getEquippedSouls().includes('bakudokuSoul'))?2:0;
+    const pd=(pc+G.atkBuff+_bakudokuBonus)*(G.doubleNext?2:1);
     if(G.doubleNext) G.doubleNext=false;
     if(pc>0){
       let epd=pd;
@@ -4332,13 +4373,13 @@ function processPlayerTurnEnd(onDone){
     });
   }
 
-  // 緊急防壁のソウルⅠ：シールド無しでターンを終了した場合、シールド+10
+  // 緊急防壁のソウルⅠ：シールド無しでターンを終了した場合、シールド+3
   if(getEquippedSouls().includes('kinkyu')){
     addStep((next)=>{
       if(G.shield===0){
-        G.shield+=10;
-        queueEffect(()=>{flashShield();flashShieldAdd('player',10);sfxShield();}, 800);
-        addLog('🛡️ 緊急防壁: シールド0でターン終了→シールド+10','sys');
+        G.shield+=3;
+        queueEffect(()=>{flashShield();flashShieldAdd('player',3);sfxShield();}, 800);
+        addLog('🛡️ 緊急防壁: シールド0でターン終了→シールド+3','sys');
         updateUI();
       }
       setTimeout(next,300);
@@ -7637,9 +7678,15 @@ function renderHand(){
     const displayDesc = (()=>{
       switch(_baseId){
         case 'furyDance':{
-          const dmg=_d(3+(G.furyDanceBonus||0)+_atk);
+          const dmg=_d(getFuryDanceBaseAtk()+(G.furyDanceBonus||0)+_atk);
           return '攻'+_hi(dmg)+'+ドロー1'
             +(G.furyDanceBonus>0?' <span style="color:#e74c3c;">累積+'+G.furyDanceBonus+'</span>':'');
+        }
+        case 'bloodPact':{
+          const _ketsuyakuSoul=getEquippedSouls().includes('ketsuyakuSoul');
+          const sd=_ketsuyakuSoul?5:(c.effect.selfDmg||10);
+          const dmgBp=_d((c.effect.atk||20)+_atk);
+          return 'HP-'+sd+' + 攻'+_hi(dmgBp);
         }
         case 'shieldBash':{
           const remain=c.effect.shieldRemain||0;
@@ -7657,8 +7704,9 @@ function renderHand(){
           return '攻'+_hi(dmg)+'（攻カード'+atkCount+'枚）';
         }
         case 'accumulate':{
-          const dmg=_d((G.stageManaSpent||0)+_atk);
-          return '攻'+_hi(dmg)+'（消費マナ'+(G.stageManaSpent||0)+'）';
+          const _tsumikasaneBonus=getEquippedSouls().includes('tsumikasaneSoul')?2:0;
+          const dmg=_d((G.stageManaSpent||0)+_atk+_tsumikasaneBonus);
+          return '攻'+_hi(dmg)+'（消費マナ'+(G.stageManaSpent||0)+(_tsumikasaneBonus?'+'+_tsumikasaneBonus:'')+'）';
         }
         case 'desperate':{
           const n=G.hand.length-1;
@@ -7698,9 +7746,10 @@ function renderHand(){
         }
         case 'expPoison':{
           const pc=G.enemyPoison||0;
-          const dmg=_d(pc+_atk);
+          const _bakudokuBonus=getEquippedSouls().includes('bakudokuSoul')?2:0;
+          const dmg=_d(pc+_atk+(pc>0?_bakudokuBonus:0));
           const half=Math.ceil(pc/2);
-          return pc>0?'攻'+_hi(dmg)+'（毒'+pc+'）→残'+half:'<span style="color:#888;">毒なし</span>';
+          return pc>0?'攻'+_hi(dmg)+'（毒'+pc+(_bakudokuBonus?'+'+_bakudokuBonus:'')+'）→残'+half:'<span style="color:#888;">毒なし</span>';
         }
         case 'poisonKill':{
           return G.enemyPoison<10
@@ -7744,7 +7793,8 @@ function renderHand(){
           return '攻'+_hi(dmg)+' <span style="color:#e74c3c;">次Tドロー-2</span>';
         }
         case 'chikara':{
-          const db=(G.nextTurnDrawBonusPending||0)+1;
+          const _chikaraBonus=getEquippedSouls().includes('chikaraSoul')?1:0;
+          const db=(G.nextTurnDrawBonusPending||0)+1+_chikaraBonus;
           return '次T <span style="color:#7dd4f8;">ドロー+'+db+'</span> マナ+1';
         }
         case 'swift':{
@@ -7756,7 +7806,8 @@ function renderHand(){
           return '次カード2回発動<br><span style="color:#e74c3c;font-size:5px;">→スキル不可</span>';
         }
         case 'healReserve':{
-          const hv=4+(G.nextTurnHealBonus||0)+(G.healBuff||0);
+          const _healReserveBonus=getEquippedSouls().includes('healReserveSoul')?2:0;
+          const hv=4+_healReserveBonus+(G.nextTurnHealBonus||0)+(G.healBuff||0);
           return '次T <span style="color:#52be80;">HP+'+hv+'</span>';
         }
         case 'comboHeal':{
@@ -7798,7 +7849,7 @@ function renderHand(){
         }
         case 'karuren':{
           const t=c.effect.times||2;
-          const dmg=_d((c.effect.atk||2)+_atk);
+          const dmg=_d((c.effect.atk||2)+_atk+getSoulCardAtkBonus('karuren'));
           const total=dmg*t;
           return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
         }
@@ -7854,9 +7905,15 @@ function renderHand(){
           return 'このT攻ダメ毎 半分'+(sb2>0?'+'+sb2:'')+'回復';
         }
         case 'furyDance':{
-          const dmg=_d(3+(G.furyDanceBonus||0)+_atk);
+          const dmg=_d(getFuryDanceBaseAtk()+(G.furyDanceBonus||0)+_atk);
           return '攻'+_hi(dmg)+'+ドロー1'
             +(G.furyDanceBonus>0?' <span style="color:#e74c3c;">累積+'+G.furyDanceBonus+'</span>':'');
+        }
+        case 'bloodPact':{
+          const _ketsuyakuSoul2=getEquippedSouls().includes('ketsuyakuSoul');
+          const sd2=_ketsuyakuSoul2?5:(c.effect.selfDmg||10);
+          const dmgBp2=_d((c.effect.atk||20)+_atk);
+          return 'HP-'+sd2+' + 攻'+_hi(dmgBp2);
         }
         default:{
           const sb=G.shieldBuff||0;
@@ -8009,7 +8066,7 @@ function showCardUsePopup(c,idx,canUse){
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
       '<div class="card-divider"></div>'+
-      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 14px;white-space:normal;word-break:break-all;">'+c.desc+'</div>'+
+      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 14px;white-space:normal;word-break:break-all;">'+getDisplayCardDesc(c)+'</div>'+
       '<div style="margin:5px auto 3px;width:fit-content;background:#000;border:1.5px solid #fff;border-radius:5px;padding:2px 8px;"><span class="rarity-dot '+c.rarity+'" style="display:inline;font-size:8px;">'+(RL[c.rarity]||c.rarity)+'</span></div>'+
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
@@ -8084,7 +8141,7 @@ function showCardDetail(c){
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
       '<div class="card-divider"></div>'+
-      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 14px;white-space:normal;word-break:break-all;">'+c.desc+'</div>'+
+      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 14px;white-space:normal;word-break:break-all;">'+getDisplayCardDesc(c)+'</div>'+
       '<div style="margin:5px auto 3px;width:fit-content;background:#000;border:1.5px solid #fff;border-radius:5px;padding:2px 8px;"><span class="rarity-dot '+c.rarity+'" style="display:inline;font-size:8px;">'+(RL[c.rarity]||c.rarity)+'</span></div>'+
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
@@ -10893,7 +10950,7 @@ const SHOP_ITEMS=[
   {id:'buy_seimei2',  cat:'soul', icon:'❤️', name:'生命のソウルⅡ', desc:'①ステータスアップ系 コスト2・HP+20', price:40, currency:'crystal', unlockArea:'始まりの洞窟', oneTime:true, soulId:'seimei2'},
   {id:'buy_teppeki2', cat:'soul', icon:'🛡️', name:'鉄壁Ⅱ',        desc:'①ステータスアップ系 コスト2・ステージ開始時シールド+10', price:40, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, soulId:'teppeki2'},
   {id:'buy_kekkai',   cat:'soul', icon:'🔷', name:'障壁のソウルⅠ', desc:'①ステータスアップ系 コスト3・シールドの最低値が0ではなく5になり、5以下に減少しなくなる', price:80, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kekkai'},
-  {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+10する', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
+  {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+3する', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
   {id:'buy_taidoku2', cat:'soul', icon:'☠️', name:'耐毒Ⅱ',        desc:'②状態異常軽減系 コスト2・毒付与-6', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taidoku2'},
   {id:'buy_fukutsu',  cat:'soul', icon:'💢', name:'不屈のソウルⅠ',  desc:'②状態異常軽減系 コスト1・呪いダメージ-3', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu'},
   {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈のソウルⅡ', desc:'②状態異常軽減系 コスト2・呪いダメージ-6', price:40, currency:'crystal', unlockArea:null, requireSouls:['fukutsu'], oneTime:true, soulId:'fukutsu2'},
@@ -10901,6 +10958,13 @@ const SHOP_ITEMS=[
   {id:'buy_taika',  cat:'soul', icon:'🔥', name:'耐炎のソウルⅠ', desc:'②状態異常軽減系 コスト2・炎上系の増加コストを-1', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taika'},
   {id:'buy_taiden', cat:'soul', icon:'⚡', name:'耐電のソウルⅠ', desc:'②状態異常軽減系 コスト2・麻痺で無効化されたカードのコストが消費されない', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taiden'},
   {id:'buy_taihyou',cat:'soul', icon:'❄️', name:'耐氷のソウルⅠ', desc:'②状態異常軽減系 コスト2・氷雪弾の使用制限を2枚→3枚に緩和', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taihyou'},
+  {id:'buy_karurenSoul',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅠ',   desc:'③カード強化系 コスト1・「軽連打」の攻撃力+1（格闘家専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'karurenSoul'},
+  {id:'buy_chikaraSoul',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅠ',   desc:'③カード強化系 コスト1・「力溜め」のドロー+1を+2に（重戦士専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'chikaraSoul'},
+  {id:'buy_bakudokuSoul',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅠ',     desc:'③カード強化系 コスト1・「爆毒」の攻撃力+2（錬金術師専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bakudokuSoul'},
+  {id:'buy_tsumikasaneSoul', cat:'soul', icon:'📚', name:'積み重ねカードのソウルⅠ', desc:'③カード強化系 コスト1・「積み重ね」の攻撃力+2（守護者専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'tsumikasaneSoul'},
+  {id:'buy_healReserveSoul', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復予約」の回復力+2（僧侶専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'healReserveSoul'},
+  {id:'buy_funnuSoul',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅠ', desc:'③カード強化系 コスト1・「憤怒の舞」の攻撃力+2（祈祷師専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'funnuSoul'},
+  {id:'buy_ketsuyakuSoul',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅠ', desc:'③カード強化系 コスト1・「血の契約」のHP-10を-5に（狂戦士専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'ketsuyakuSoul'},
   {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウル', desc:'③カード強化系 コスト1・「防御」カードの防御力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
   {id:'buy_saiseiBougyo', cat:'soul', icon:'💗', name:'再生防御のソウルⅠ', desc:'④特殊効果付与系 コスト1・防御カードを使用するたび、HP+2回復する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'saiseiBougyo'},
   {id:'buy_kozeni',   cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅠ', desc:'④特殊効果付与系 コスト1・クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kozeni'},
@@ -12046,7 +12110,7 @@ function renderSoulSetupContent(){
       +'<span>'+SOUL_CATEGORY_NAMES[cat]+'</span>'
       +'<span style="color:'+capColor+';">'+used+' / '+cap+'</span>'
       +'</div>';
-    const soulsInCat=Object.values(SOULS).filter(s=>s.category===cat);
+    const soulsInCat=Object.values(SOULS).filter(s=>s.category===cat && (!s.exclusiveCharge || s.exclusiveCharge===_soulSetupChargeId));
     const ownedSoulsInCat=soulsInCat.filter(s=>!!SAVE.soulsOwned[s.id]);
     if(soulsInCat.length===0){
       html+='<div style="font-size:10px;color:#666;margin-top:6px;">（このカテゴリのソウルはまだありません）</div>';
