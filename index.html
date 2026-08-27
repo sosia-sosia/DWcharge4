@@ -5,7 +5,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="DWicon.png">
   <link rel="icon" type="image/png" sizes="180x180" href="DWicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DUNGEON WALKER DWCver347</title>
+<title>DUNGEON WALKER DWCver351</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -803,7 +803,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver347</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver351</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -1505,11 +1505,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
   <div class="overlay" id="ov-deck">
     <div class="ov-title" style="font-size:16px;">📖 DECK (<span id="deck-total">0</span>枚)</div>
-    <div id="deck-list"></div>
-    <div id="deck-charge-area"></div>
-    <div id="deck-soul-area"></div>
-    <div id="deck-stat-area"></div>
-    <div class="ov-btn" id="btn-close-deck">閉じる</div>
+    <div id="deck-list" style="width:100%;margin-bottom:6px;"></div>
+    <div id="deck-charge-area" style="width:100%;margin-bottom:10px;"></div>
+    <div id="deck-soul-area" style="width:100%;margin-bottom:10px;"></div>
+    <div id="deck-stat-area" style="width:100%;margin-bottom:6px;"></div>
+    <div class="ov-btn" id="btn-close-deck" style="margin-top:8px;">閉じる</div>
   </div>
 
   <div class="overlay" id="ov-statup" style="gap:10px;background-image:url(sabhaikei.png);background-size:cover;background-position:center;background-color:#07050e;">
@@ -1712,6 +1712,12 @@ const AREA_CHARGE_ALLOWED={
   6: ['jikoSaisei','teppeki','dokushi'],        // 氷壁の迷宮：僧侶・守護者・錬金術師
   7: ['renGeki'],                               // チュートリアル：格闘家のみ
 };
+// エリアごとの「クリアしやすいおすすめチャージ」表示用
+const AREA_RECOMMENDED_CHARGE={
+  0: 'renGeki',   // 始まりの洞窟：格闘家
+  4: 'teppeki',   // 毒の沼地：守護者
+  5: 'dokushi',   // 鉄壁の砦：錬金術師
+};
 const DB={
   // 攻撃
   strike:      {id:'strike',      name:'斬撃',    icon:'⚔️', type:'attack',  rarity:'common',   cost:1, desc:'攻撃 6',shortDesc:"攻撃 6",                    effect:{atk:6}},
@@ -1892,21 +1898,21 @@ function getBgImg(stage){
 const ENEMY_IMGS=['enemy1.png','enemy2.png','enemy3.png','enemy4.png','enemy5.png','enemy6.png','enemy7.png','enemy8.png','enemy9.png','enemy10.png','enemy11.png','enemy12.png','enemy13.png','enemy14.png','enemy15.png'];
 const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png'};
 const ENEMIES=[
-  {name:'ゴブリン',      icon:'👹',hp:60,  atk:10, shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
-  {name:'コボルト',      icon:'🐲',hp:70,  atk:11, shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
+  {name:'ゴブリン',      icon:'👹',hp:60,  atk:8,  shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
+  {name:'コボルト',      icon:'🐲',hp:70,  atk:10, shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
   {name:'オーク',        icon:'🧌',hp:80,  atk:12, shield:0,  rank:2, pattern:['atk','poisonatk','def','big'],                               boss:false, img:'enemy3.png'},
   {name:'スケルトン',    icon:'💀',hp:90,  atk:13, shield:0,  rank:2, pattern:['big','curse','atk','poisonatk'],                             boss:false, img:'enemy4.png'},
   {name:'ヴァンパイア',  icon:'🧛',hp:100, atk:14, shield:5,  rank:3, pattern:['atk','heal','big','drain'],                                  boss:false, img:'enemy5.png'},
   {name:'ゴーレム',      icon:'🗿',hp:120, atk:15, shield:15, rank:3, pattern:['bigdef','atk','big','bigdef','atk'],                         boss:false, img:'enemy6.png'},
   {name:'ダークナイト',  icon:'🖤',hp:140, atk:18, shield:15, rank:3, pattern:['atk','atk','big','bigdef','atk'],                            boss:false, img:'enemy7.png'},
   {name:'ネクロマンサー',      icon:'🧙',hp:170, atk:20, shield:20, rank:4, pattern:['bigcurse','poisonatk','summon','big','atk'],                 boss:false, img:'enemy8.png'},
-  {name:'シャドウロード',   icon:'👿',hp:240, atk:21, shield:20, rank:5, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
-  {name:'ベヒモス',      icon:'🦣',hp:250, atk:22, shield:20, rank:4, pattern:['bigdef','quake','big','superbigdef','quake'],                 boss:false, img:'enemy10.png'},
-  {name:'ヒドラ',        icon:'🐍',hp:280, atk:23, shield:20, rank:4, pattern:['seal','poisonfang','superbigdef','big','bigheal'],            boss:false, img:'enemy11.png'},
-  {name:'ケルベロス',    icon:'🐺',hp:300, atk:25, shield:20, rank:4, pattern:['burn','weaken_e','judgment','big','superbigdef'],             boss:false, img:'enemy12.png'},
-  {name:'リッチ',        icon:'💀',hp:350, atk:26, shield:30, rank:5, pattern:['heavywound','soulcrush','big','bigheal','bigcurse'],          boss:false, img:'enemy13.png'},
-  {name:'デーモン',      icon:'😈',hp:400, atk:28, shield:30, rank:5, pattern:['curse_bind','despair','big','superbigdef','big'],             boss:false, img:'enemy14.png'},
-  {name:'エンシェントドラゴン',    icon:'🐲',hp:500, atk:30, shield:40, rank:5, pattern:['enervate','big','poisonfang','reflect_e','bigheal'],          boss:true,  img:'enemy15.png'},
+  {name:'シャドウロード',   icon:'👿',hp:200, atk:21, shield:20, rank:5, pattern:['poisonatk','big','bigdef','bigcurse','bigheal','big'],        boss:true,  img:'enemy9.png'},
+  {name:'ベヒモス',      icon:'🦣',hp:240, atk:22, shield:20, rank:4, pattern:['bigdef','quake','big','superbigdef','quake'],                 boss:false, img:'enemy10.png'},
+  {name:'ヒドラ',        icon:'🐍',hp:250, atk:23, shield:20, rank:4, pattern:['seal','poisonfang','superbigdef','big','bigheal'],            boss:false, img:'enemy11.png'},
+  {name:'ケルベロス',    icon:'🐺',hp:280, atk:25, shield:20, rank:4, pattern:['burn','weaken_e','judgment','big','superbigdef'],             boss:false, img:'enemy12.png'},
+  {name:'リッチ',        icon:'💀',hp:300, atk:26, shield:30, rank:5, pattern:['heavywound','soulcrush','big','bigheal','bigcurse'],          boss:false, img:'enemy13.png'},
+  {name:'デーモン',      icon:'😈',hp:320, atk:28, shield:30, rank:5, pattern:['curse_bind','despair','big','superbigdef','big'],             boss:false, img:'enemy14.png'},
+  {name:'エンシェントドラゴン',    icon:'🐲',hp:350, atk:30, shield:40, rank:5, pattern:['enervate','big','poisonfang','reflect_e','bigheal'],          boss:true,  img:'enemy15.png'},
 ];
 // 始まりの洞窟 敵データ
 const CAVE_ENEMIES=[
@@ -1928,9 +1934,9 @@ const TEMPLE_ENEMIES=[
   {name:'ブレイズオーク',      icon:'🧌',hp:130, atk:14, shield:10, rank:2, pattern:['ignite','ignite','curse','bigdef','ignite'],                             boss:false, img:'enemy3.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
   {name:'ブレイズスケルトン',  icon:'💀',hp:160, atk:16, shield:20, rank:2, pattern:['seal','ignite','bigignite','bigdef','weaken_e'],                         boss:false, img:'enemy4.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
   {name:'ブレイズマンイーター',icon:'🌿',hp:180, atk:17, shield:15, rank:2, pattern:['curse','ignite','bigignite','ignite','ignite'],                          boss:false, img:'cave_enemy4.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズゴーレム',    icon:'🗿',hp:220, atk:19, shield:20, rank:3, pattern:['bigdef','quake','bigignite','superbigdef','bigignite'],                  boss:false, img:'enemy6.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズトロール',    icon:'🧌',hp:290, atk:22, shield:25, rank:3, pattern:['bigignite','bigheal','bigignite','reflect_e','bigheal'],                 boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
-  {name:'ブレイズデーモンロード',icon:'😈',hp:450,atk:28, shield:35, rank:5, pattern:['superignite','superbigdef','bigignite','superignite','bigheal'],          boss:true,  img:'BOSS_demonlord.png'},
+  {name:'ブレイズゴーレム',    icon:'🗿',hp:200, atk:19, shield:20, rank:3, pattern:['bigdef','quake','bigignite','superbigdef','bigignite'],                  boss:false, img:'enemy6.png',      filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズトロール',    icon:'🧌',hp:250, atk:22, shield:25, rank:3, pattern:['bigignite','bigheal','bigignite','reflect_e','bigheal'],                 boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
+  {name:'ブレイズデーモンロード',icon:'😈',hp:260,atk:28, shield:20, rank:5, pattern:['superignite','superbigdef','bigignite','superignite','bigheal'],          boss:true,  img:'BOSS_demonlord.png'},
 ];
 // 雷鳴の高原 敵データ（areaId:3）※ボス以外は既存モンスター画像を黄色系フィルターで流用
 const RAIMEI_ENEMIES=[
@@ -1941,9 +1947,9 @@ const RAIMEI_ENEMIES=[
   {name:'ボルトオーク',        icon:'🧌',hp:130, atk:14, shield:10, rank:2, pattern:['atk','poisonatk','paralyze','bigdef','atk'],             boss:false, img:'enemy3.png',      filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
   {name:'ボルトスケルトン',    icon:'💀',hp:160, atk:16, shield:20, rank:2, pattern:['seal','paralyze','big','bigdef','weaken_e'],             boss:false, img:'enemy4.png',      filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
   {name:'ボルトマンイーター',  icon:'🌿',hp:180, atk:17, shield:15, rank:2, pattern:['curse','paralyze','big','poisonatk','atk'],              boss:false, img:'cave_enemy4.png', filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
-  {name:'ボルトゴーレム',      icon:'🗿',hp:220, atk:19, shield:20, rank:3, pattern:['bigdef','quake','paralyze','superbigdef','big'],         boss:false, img:'enemy6.png',      filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
-  {name:'ボルトトロール',      icon:'🧌',hp:290, atk:22, shield:25, rank:3, pattern:['paralyze','bigheal','big','paralyze','bigheal'],         boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
-  {name:'ボルトドラゴンロード',icon:'🐉',hp:450, atk:28, shield:35, rank:5, pattern:['weaken_e','paralyze','superbigdef','big','paralyze','bigheal'], boss:true,  img:'BOSS_rairyuu.png'},
+  {name:'ボルトゴーレム',      icon:'🗿',hp:200, atk:19, shield:20, rank:3, pattern:['bigdef','quake','paralyze','superbigdef','big'],         boss:false, img:'enemy6.png',      filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
+  {name:'ボルトトロール',      icon:'🧌',hp:250, atk:22, shield:25, rank:3, pattern:['paralyze','bigheal','big','paralyze','bigheal'],         boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
+  {name:'ボルトドラゴンロード',icon:'🐉',hp:270, atk:27, shield:25, rank:5, pattern:['weaken_e','paralyze','superbigdef','big','paralyze','bigheal'], boss:true,  img:'BOSS_rairyuu.png'},
 ];
 // 毒の沼地 敵データ（areaId:4）※新規画像を使用、名前は仮（後日変更予定）。全個体の先制行動を毒攻撃に統一。
 // 追加モンスター種族マスター（enemy_tuika1〜50.png）。今後の新エリアで随時使用予定。
@@ -2007,18 +2013,18 @@ const SWAMP_ENEMIES=[
   {name:'腐敗妖精',      icon:'🧚',hp:85,  atk:12, shield:8,  rank:1, pattern:['poisonatk','poisonatk','def','big'],   boss:false, img:'enemy_tuika26.png'},
   {name:'呪われた樹精',  icon:'🌲',hp:100, atk:14, shield:10, rank:2, pattern:['poisonatk','atk','big','def'],         boss:false, img:'enemy_tuika24.png'},
   {name:'ポイズングール',icon:'🧟',hp:120, atk:16, shield:12, rank:2, pattern:['poisonatk','big','def','poisonatk'],   boss:false, img:'enemy_tuika2.png'},
-  {name:'ダークフェアリー',icon:'🧚',hp:220,atk:20, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
+  {name:'ダークフェアリー',icon:'🧚',hp:150,atk:18, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
 ];
 // 鉄壁の砦 敵データ（areaId:5）※1〜4は既存モンスター（名前に「（防御型）」を付与）、5〜7は追加モンスター(enemy_tuika)を使用
 // ステージ1〜6：石造りモンスターとして半角英字名に変更し、グレー寄りの石調フィルターを適用（ステージ7のボスは対象外）
 const IRON_ENEMIES=[
-  {name:'Stone Goblin',   icon:'👹',hp:50,  atk:8,  shield:5,  rank:1, pattern:['def','atk','def','big'],                boss:false, img:'enemy1.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'Stone Kobold',   icon:'🐲',hp:65,  atk:9,  shield:8,  rank:1, pattern:['atk','def','def','big'],                boss:false, img:'enemy2.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'Stone Orc',      icon:'🧌',hp:80,  atk:10, shield:10, rank:2, pattern:['def','big','atk','def'],                boss:false, img:'enemy3.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'Stone Golem',    icon:'🗿',hp:95,  atk:12, shield:14, rank:3, pattern:['def','def','big','atk'],                boss:false, img:'enemy6.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'Stone Skeleton', icon:'💀',hp:115, atk:13, shield:18, rank:2, pattern:['bigdef','atk','big','bigdef'],          boss:false, img:'enemy_tuika6.png',  filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'Stone Demon',    icon:'😈',hp:135, atk:15, shield:22, rank:3, pattern:['bigdef','big','def','big'],             boss:false, img:'enemy_tuika14.png', filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
-  {name:'鉄球兵（防御型）',        icon:'⚙️',hp:240, atk:18, shield:30, rank:3, pattern:['superbigdef','big','bigdef','big','superbigdef'], boss:true, img:'enemy_tuika47.png'},
+  {name:'ｽﾄｰﾝｺﾞﾌﾞﾘﾝ',   icon:'👹',hp:50,  atk:8,  shield:5,  rank:1, pattern:['def','atk','def','big'],                boss:false, img:'enemy1.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'ｽﾄｰﾝｺﾎﾞﾙﾄ',   icon:'🐲',hp:65,  atk:9,  shield:8,  rank:1, pattern:['atk','def','def','big'],                boss:false, img:'enemy2.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'ｽﾄｰﾝｵｰｸ',      icon:'🧌',hp:80,  atk:10, shield:10, rank:2, pattern:['def','big','atk','def'],                boss:false, img:'enemy3.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'ｽﾄｰﾝｺﾞｰﾚﾑ',    icon:'🗿',hp:95,  atk:12, shield:14, rank:3, pattern:['def','def','big','atk'],                boss:false, img:'enemy6.png',        filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'ｽﾄｰﾝｽｹﾙﾄﾝ', icon:'💀',hp:115, atk:13, shield:18, rank:2, pattern:['bigdef','atk','big','bigdef'],          boss:false, img:'enemy_tuika6.png',  filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'ｽﾄｰﾝﾃﾞﾓﾝ',    icon:'😈',hp:135, atk:15, shield:22, rank:3, pattern:['bigdef','big','def','big'],             boss:false, img:'enemy_tuika14.png', filter:'grayscale(0.75) saturate(0.6) brightness(0.85) contrast(1.1)'},
+  {name:'鉄球兵（防御型）',        icon:'⚙️',hp:170, atk:17, shield:30, rank:3, pattern:['superbigdef','big','bigdef','big','superbigdef'], boss:true, img:'enemy_tuika47.png'},
 ];
 // 氷壁の迷宮 敵データ（areaId:6）※既存モンスターの水属性カラー流用＋改名。先制行動は全個体が氷雪弾で統一。
 // 半角カタカナ表記ルール：長いカタカナ名は半角カタカナに変換（既存ルールに準拠）
@@ -2030,9 +2036,9 @@ const ICE_ENEMIES=[
   {name:'ｱｲｽｽｹﾙﾄﾝ',    icon:'💀',hp:130, atk:14, shield:10, rank:2, pattern:['iceshot','curse','atk','bigdef','big'],        boss:false, img:'enemy4.png',      filter:'hue-rotate(190deg) saturate(1.8) brightness(1.15)'},
   {name:'ｱｲｽﾏﾝｲｰﾀｰ',  icon:'🌿',hp:160, atk:16, shield:20, rank:2, pattern:['iceshot','curse','def','big','curse'],         boss:false, img:'cave_enemy4.png', filter:'hue-rotate(190deg) saturate(1.8) brightness(1.15)'},
   {name:'氷呪の樹精',      icon:'🌲',hp:180, atk:17, shield:15, rank:2, pattern:['iceshot','atk','big','def','curse'],          boss:false, img:'enemy_tuika24.png',filter:'hue-rotate(190deg) saturate(1.8) brightness(1.15)'},
-  {name:'ｱｲｽﾄﾛｰﾙ',      icon:'🧌',hp:220, atk:19, shield:20, rank:3, pattern:['iceshot','bigheal','big','def','bigheal'],     boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(190deg) saturate(1.8) brightness(1.15)'},
-  {name:'氷精霊',          icon:'❄️',hp:290, atk:22, shield:25, rank:3, pattern:['iceshot','big','iceshot','bigdef','big'],     boss:false, img:'enemy_tuika23.png'},
-  {name:'ｱｲｽﾀｲﾀﾝｺﾞｰﾚﾑ',icon:'🧊',hp:450, atk:28, shield:35, rank:5, pattern:['iceshot','superbigdef','iceshot','big','bigheal','superbigdef'], boss:true, img:'BOSS_iceTaitan.png'},
+  {name:'ｱｲｽﾄﾛｰﾙ',      icon:'🧌',hp:200, atk:19, shield:20, rank:3, pattern:['iceshot','bigheal','big','def','bigheal'],     boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(190deg) saturate(1.8) brightness(1.15)'},
+  {name:'氷精霊',          icon:'❄️',hp:250, atk:22, shield:25, rank:3, pattern:['iceshot','big','iceshot','bigdef','big'],     boss:false, img:'enemy_tuika23.png'},
+  {name:'ｱｲｽﾀｲﾀﾝｺﾞｰﾚﾑ',icon:'🧊',hp:300, atk:23, shield:25, rank:5, pattern:['iceshot','superbigdef','iceshot','big','bigheal','superbigdef'], boss:true, img:'BOSS_iceTaitan.png'},
 ];
 const SANDBAG_ENEMY={name:'サンドバッグ（テスト用）',icon:'🛡️',hp:9999,atk:0,shield:0,pattern:['def'],boss:false,img:null};
 // エリア効果：感電結界（雷鳴の高原）偶数ターンはカードコスト2倍
@@ -2406,7 +2412,7 @@ function getRewards(stage){
 // 将来的にデッキ内容・最高到達ステージ等を追加する場合もこのSAVE_KEYの1エントリにまとめて追記していく想定。
 const SAVE_KEY='dw_save_v2';
 function _defaultSaveData(){
-  return { clearedAreas:[false,false,false], bestStage:[0,0,0], muted:false, noContinueCleared:[], chargeCleared:{}, soulsOwned:{}, soulCapacity:{1:1,2:1,3:1,4:1}, soulEquipped:[], gold:0, crystal:0, shopNewBadge:false, customDecks:{}, deckSwapLimit:1, deckPointLimit:5, unlockedCards:{}, areasUnlocked:{}, shopPurchased:{}, pendingDisposal:null, tutorialCleared:false };
+  return { clearedAreas:[false,false,false], bestStage:[0,0,0], muted:false, noContinueCleared:[], chargeCleared:{}, soulsOwned:{}, soulCapacity:{1:1,2:1,3:1,4:1}, soulEquipped:[], gold:0, crystal:0, shopNewBadge:false, shopNewItemIds:[], customDecks:{}, deckSwapLimit:1, deckPointLimit:5, unlockedCards:{}, areasUnlocked:{}, shopPurchased:{}, pendingDisposal:null, tutorialCleared:false };
 }
 function loadSaveData(){
   try{
@@ -2435,6 +2441,7 @@ function loadSaveData(){
     // 次回起動時にこのフラグを検知して消滅処理を行うための永続化フラグ。
     if(d.pendingDisposal===undefined) d.pendingDisposal=null;
     if(d.tutorialCleared===undefined) d.tutorialCleared=false;
+    if(d.shopNewItemIds===undefined) d.shopNewItemIds=[];
     return d;
   }catch(e){
     console.warn('[DW] セーブデータの読み込みに失敗しました。初期状態で続行します。',e);
@@ -2689,12 +2696,17 @@ function markAreaCleared(areaId){
   SAVE.clearedAreas=SAVE.clearedAreas||[];
   while(SAVE.clearedAreas.length<=areaId) SAVE.clearedAreas.push(false);
   if(!SAVE.clearedAreas[areaId]){
+    const _shopIdsBefore=(typeof _shopUnlockedItems==='function')?_shopUnlockedItems().map(it=>it.id):[];
     SAVE.clearedAreas[areaId]=true;
-    // このエリアクリアで追加販売されるショップ品があればNEWバッジを立てる
+    // このエリアクリアで新たに追加販売されるショップ品を特定し、入れ替え式でNEWマークを付ける
     try{
-      const areaName=AREA_DATA[areaId]&&AREA_DATA[areaId].name;
-      if(areaName && typeof SHOP_ITEMS!=='undefined' && SHOP_ITEMS.some(it=>it.unlockArea===areaName)){
-        SAVE.shopNewBadge=true;
+      if(typeof _shopUnlockedItems==='function'){
+        const _shopIdsAfter=_shopUnlockedItems().map(it=>it.id);
+        const _newlyUnlocked=_shopIdsAfter.filter(id=>!_shopIdsBefore.includes(id));
+        if(_newlyUnlocked.length>0){
+          SAVE.shopNewItemIds=_newlyUnlocked; // 前回のNEW一覧を置き換える（累積せず入れ替え）
+          SAVE.shopNewBadge=true;
+        }
       }
     }catch(_e){}
     writeSaveData();
@@ -2770,18 +2782,22 @@ const SOULS={
   teppeki2:{id:'teppeki2', name:'鉄壁Ⅱ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
   kekkai:  {id:'kekkai',  name:'障壁のソウルⅠ', category:1, cost:3, icon:'🔷', desc:'シールドの最低値が0ではなく5になり、5以下に減少しなくなる'},
   kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+3する'},
-  taidoku: {id:'taidoku', name:'耐毒のソウル', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-3（0未満にはならない）'},
-  taidoku2:{id:'taidoku2', name:'耐毒Ⅱ', category:2, cost:2, icon:'☠️', desc:'敵から受ける毒付与量-6（0未満にはならない）'},
-  fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-3（0未満にはならない）'},
-  fukutsu2:{id:'fukutsu2', name:'不屈のソウルⅡ', category:2, cost:2, icon:'💢', desc:'敵の呪いダメージ-6（0未満にはならない）'},
-  fukutsu3:{id:'fukutsu3', name:'不屈のソウルⅢ', category:2, cost:3, icon:'💢', desc:'敵の呪いダメージ-12（0未満にはならない）'},
+  joukou:  {id:'joukou',  name:'常攻のソウルⅠ', category:1, cost:1, icon:'⚔️', desc:'常時攻撃力+1（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  shogeki: {id:'shogeki', name:'初撃のソウルⅠ', category:1, cost:1, icon:'💥', desc:'最初の一撃攻撃力+3（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  hatsuMana: {id:'hatsuMana', name:'初マナのソウル', category:1, cost:1, icon:'💎', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初ターンマナ+1を獲得する'},
+  hatsuFuda: {id:'hatsuFuda', name:'初札のソウル', category:1, cost:1, icon:'🃏', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初期手札+1を獲得する'},
+  taidoku: {id:'taidoku', name:'耐毒のソウルⅠ', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-5（0未満にはならない）'},
+  taidoku2:{id:'taidoku2', name:'耐毒のソウルⅡ', category:2, cost:2, icon:'☠️', desc:'敵から受ける毒付与量-10（0未満にはならない）'},
+  fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-5（0未満にはならない）'},
+  fukutsu2:{id:'fukutsu2', name:'不屈のソウルⅡ', category:2, cost:2, icon:'💢', desc:'敵の呪いダメージ-10（0未満にはならない）'},
+  fukutsu3:{id:'fukutsu3', name:'不屈のソウルⅢ', category:2, cost:3, icon:'💢', desc:'敵の呪いダメージ-15（0未満にはならない）'},
   taika:   {id:'taika',   name:'耐炎のソウルⅠ', category:2, cost:2, icon:'🔥', desc:'炎上・大炎上・超炎上の増加コストを-1する（0未満にはならない）'},
   taiden:  {id:'taiden',  name:'耐電のソウルⅠ', category:2, cost:2, icon:'⚡', desc:'麻痺で次に使用したカードの効果が無効化された場合、そのカードのコストは消費されない'},
   taihyou: {id:'taihyou', name:'耐氷のソウルⅠ', category:2, cost:2, icon:'❄️', desc:'氷雪弾による次ターンの使用可能カード枚数制限を、2枚までではなく3枚までにする'},
-  zangeki: {id:'zangeki', name:'斬撃のソウル', category:3, cost:1, icon:'⚔️', desc:'「斬撃」カードの攻撃力（計算後）+1', cardBonus:{cardId:'strike', atkAdd:1}},
-  gogeki:  {id:'gogeki',  name:'強撃のソウル', category:3, cost:1, icon:'🪓', desc:'「強撃」カードの攻撃力（計算後）+2', cardBonus:{cardId:'bash', atkAdd:2}},
-  kaifuku: {id:'kaifuku', name:'回復カードのソウル', category:3, cost:1, icon:'💗', desc:'「回復」カードの回復力（計算後）+1', healBonus:{cardId:'heal', healAdd:1}},
-  bougyo:  {id:'bougyo',  name:'防御カードのソウル', category:3, cost:1, icon:'🛡️', desc:'「防御」カードの防御力（計算後）+1', shieldBonus:{cardId:'guard', shieldAdd:1}},
+  zangeki: {id:'zangeki', name:'斬撃カードのソウルⅠ', category:3, cost:1, icon:'⚔️', desc:'「斬撃」カードの攻撃力（計算後）+1', cardBonus:{cardId:'strike', atkAdd:1}},
+  gogeki:  {id:'gogeki',  name:'強撃カードのソウルⅠ', category:3, cost:1, icon:'🪓', desc:'「強撃」カードの攻撃力（計算後）+2', cardBonus:{cardId:'bash', atkAdd:2}},
+  kaifuku: {id:'kaifuku', name:'回復カードのソウルⅠ', category:3, cost:1, icon:'💗', desc:'「回復」カードの回復力（計算後）+1', healBonus:{cardId:'heal', healAdd:1}},
+  bougyo:  {id:'bougyo',  name:'防御カードのソウルⅠ', category:3, cost:1, icon:'🛡️', desc:'「防御」カードの防御力（計算後）+1', shieldBonus:{cardId:'guard', shieldAdd:1}},
   karurenSoul:     {id:'karurenSoul',     name:'軽連打カードのソウルⅠ',   category:3, cost:1, icon:'👊', desc:'「軽連打」カードの攻撃力の数値に+1', exclusiveCharge:'renGeki',    cardBonus:{cardId:'karuren', atkAdd:1}},
   chikaraSoul:     {id:'chikaraSoul',     name:'力溜めカードのソウルⅠ',   category:3, cost:1, icon:'💪', desc:'「力溜め」カードのドロー+1をドロー+2に', exclusiveCharge:'tameAtk'},
   bakudokuSoul:    {id:'bakudokuSoul',    name:'爆毒カードのソウルⅠ',     category:3, cost:1, icon:'💀', desc:'「爆毒」カードの攻撃力の数値に+2', exclusiveCharge:'dokushi'},
@@ -2803,7 +2819,12 @@ const SOUL_CATEGORY_NAMES={1:'①ステータスアップ系',2:'②状態異常
 // 戻り値：今回のクリアで新たにソウルを入手したらtrue
 function grantAreaClearSoul(areaId){
   const area=AREA_DATA[areaId];
-  if(!area || !area.soulReward) return false;
+  if(!area) return false;
+  if(area.capReward){
+    increaseSoulCapacity(area.capReward.category);
+    return {capReward:area.capReward};
+  }
+  if(!area.soulReward) return false;
   SAVE.soulsOwned=SAVE.soulsOwned||{};
   if(SAVE.soulsOwned[area.soulReward]) return false;
   SAVE.soulsOwned[area.soulReward]=true;
@@ -2937,15 +2958,18 @@ function initGame(){
   const _equippedSouls=getEquippedSouls();
   const _soulHpBonus=(_equippedSouls.includes('seimei')?10:0)+(_equippedSouls.includes('seimei2')?20:0)+(_equippedSouls.includes('seimei3')?40:0);
   const _soulShieldBonus=(_equippedSouls.includes('teppeki')?5:0)+(_equippedSouls.includes('teppeki2')?10:0);
-  const _soulPoisonReduce=(_equippedSouls.includes('taidoku')?3:0)+(_equippedSouls.includes('taidoku2')?6:0);
-  const _soulCurseReduce=(_equippedSouls.includes('fukutsu')?3:0)+(_equippedSouls.includes('fukutsu2')?6:0)+(_equippedSouls.includes('fukutsu3')?12:0);
+  const _soulPoisonReduce=(_equippedSouls.includes('taidoku')?5:0)+(_equippedSouls.includes('taidoku2')?10:0);
+  const _soulCurseReduce=(_equippedSouls.includes('fukutsu')?5:0)+(_equippedSouls.includes('fukutsu2')?10:0)+(_equippedSouls.includes('fukutsu3')?15:0);
   const _soulManaBonus=_equippedSouls.includes('manaAmp')?1:0;
+  // 初マナのソウル／初札のソウル：通常のステータス強化で獲得した時と同じ処理（firstTurnManaBonus/initHandBonusとフラグを同時にセット）
+  const _soulFirstMana=_equippedSouls.includes('hatsuMana')?1:0;
+  const _soulInitHand=_equippedSouls.includes('hatsuFuda')?1:0;
   G={stage:0,areaId:1,playerHp:20+_soulHpBonus,playerMaxHp:20+_soulHpBonus,shield:0,mana:3+_soulManaBonus,manaMax:10,manaRegen:3+_soulManaBonus,atkBuff:0,nextManaBonus:0,weakenTurns:0,weakenHalf:false,weakenHalfTurns:0,invincibleTurns:0,mirrorActive:false,exileOnBattle:[],tempExiled:[],cardGauge:0,chargeType:null,chargeCount:0,chargeLevel:getChargeLevel(),chargeActive:false,nextDmgNull:false,nextTurnHealPending:false,regenTurns:0,regenVal:0,doubleNext:false,doubleMultiplier:1,halfShieldLossTurns:0,
      deck:[...STARTER],drawPile:[],discard:[],hand:[],enemy:null,
      enemyShield:0,enemyPoison:0,enemyAtkDebuff:0,playerPoison:0,playerBurn:0,heatCount:0,igniteCostPenalties:[],ignitedCards:{},turnCount:1,phase:'block',
-     permAtkBonus:0, initShieldBonus:_soulShieldBonus, turnStartHealPct:0, firstTurnManaBonus:0,
+     permAtkBonus:0, initShieldBonus:_soulShieldBonus, turnStartHealPct:0, firstTurnManaBonus:_soulFirstMana,
      soulPoisonReduce:_soulPoisonReduce, soulCurseReduce:_soulCurseReduce,
-     gotTurnStartHeal:false, gotFirstTurnMana:false,
+     gotTurnStartHeal:false, gotFirstTurnMana:_soulFirstMana>0,
      totalDmgDealt:0, totalDmgTaken:0, totalCardsUsed:0, totalTurns:0,
      hakiCountThisStage:0,
      lastUsedCardId:null,
@@ -2955,8 +2979,8 @@ function initGame(){
      absorbHealPending:false, absorbHealAccum:0,
      doubleNextCard:false, miniComboBuff:0, holdCharge:false, holdChargePartial:false, chargeEffectActive:false,
      nextTurnAtkBuff:0, nextTurnHealDraw:0, nextTurnAtkCostDown:false, nextDmgHalf:false,
-     turnStartShieldBonus:0, initHandBonus:0, fullChargeStart:false, nextDmgHalfTurns:0,
-     permAtkBuff2:0, gotPermAtkBuff2:false, gotHandPlus:false, gotFullCharge:false,
+     turnStartShieldBonus:0, initHandBonus:_soulInitHand, fullChargeStart:false, nextDmgHalfTurns:0,
+     permAtkBuff2:0, gotPermAtkBuff2:false, gotHandPlus:_soulInitHand>0, gotFullCharge:false,
      gotChargeHelper:false, chargeHelperBonus:0, permAtkCount:0, permAtkBuff2Count:0, turnStartShieldCount:0,
      usedFirstAtkBuff2:false,
      healBuff:0, healBuffCount:0, shieldBuff:0, shieldBuffCount:0,
@@ -2998,6 +3022,7 @@ function _startStageBattle(){
   _inBattle=true;
   clearEffectQueue(); // 前ステージの残留エフェクトロックをリセット
   stopCurseOrbs();
+  stopOpBgm();    // タイトル(OP)BGMを止めてから
   stopEventBgm();
   if(!G._cardTestMode) markBestStage(G.areaId, G.stage);
   updateBgm();
@@ -3786,7 +3811,7 @@ function playCard(idx, _isChain){
   if(ef.exile){G.exileOnBattle=G.exileOnBattle||[];G.exileOnBattle.push(cid);}
   // 毒滅：敵が毒でない場合使用不可
   if(ef.requirePoisonHigh && G.enemyPoison<10){addLog('💢 敵の毒カウントが10以上でないと使えない！','sys');G.mana+=c.cost;G.hand.splice(G.hand.indexOf(cid)-1,0,cid);G.discard.pop();clampPage();updateUI();return;}
-  if(ef.regenTurns){G.regenTurns=(G.regenTurns||0)+ef.regenTurns;G.regenVal=ef.regenVal;msgs.push(ef.regenTurns+'T HP毎ターン+'+ef.regenVal);}
+  if(ef.regenTurns){G.regenTurns=(G.regenTurns||0)+ef.regenTurns;G.regenVal=(G.regenVal||0)+ef.regenVal;msgs.push(ef.regenTurns+'T HP毎ターン+'+ef.regenVal);}
   if(ef.doubleBuff){G.doubleMultiplier=(G.doubleMultiplier||1)*2;G.doubleNext=true;msgs.push('次の攻撃'+G.doubleMultiplier+'倍');}
   if(ef.halfShieldLoss){G.halfShieldLossTurns=(G.halfShieldLossTurns||0)+ef.halfShieldLoss;msgs.push('1T 盾半減防止');}
   if(ef.tempExile){
@@ -3925,11 +3950,10 @@ function playCard(idx, _isChain){
     queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
     checkEnemyDeath(); // HP0でもここではreturnしない（後続の効果ブロックを継続処理。最終判定は関数末尾）
   }
-  // 二段構え・三段構え：ターン終了時に盾付与
+  // 二段構え・三段構え：ターン終了時に盾付与（重ねて使用した場合は蓄積する）
   if(ef.endTurnShield){
-    // 既存の値を上書き（二段→三段で重複しないよう最大値を取る）
-    G.endTurnShieldVal=Math.max(G.endTurnShieldVal||0, ef.endTurnShield+(G.shieldBuff||0));
-    G.endTurnShieldTurns=Math.max(G.endTurnShieldTurns||0, ef.endTurnShieldTurns||2);
+    G.endTurnShieldVal=(G.endTurnShieldVal||0)+ef.endTurnShield+(G.shieldBuff||0);
+    G.endTurnShieldTurns=(G.endTurnShieldTurns||0)+(ef.endTurnShieldTurns||2);
     msgs.push(ef.endTurnShieldTurns+'ターン終了時 盾+'+(ef.endTurnShield+(G.shieldBuff||0)));
     queueEffect(()=>showEffectPopup('Etate.png','構え：終了時盾+'+ef.endTurnShield,'#5dade2','player'),800);
   }
@@ -4468,6 +4492,7 @@ function enemyTurn(){
         const _dealtDmg=dealToPlayer(ea,e.name+'の毒攻撃☠️')||0;
         if(G.playerHp>0){
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
+          if(G.soulPoisonReduce>0) addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
           if(_poisonAdd>0){
             G.playerPoison=(G.playerPoison||0)+_poisonAdd;
             addLog('☠️ 毒を受けた！+'+_poisonAdd+'（'+G.playerPoison+'T）','enemy');
@@ -4487,6 +4512,7 @@ function enemyTurn(){
         if(G.playerHp>0){
           // 実際に与えたダメージ分そのまま毒カウントを付与（シールド等での減少後の実ダメージ基準）
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
+          if(G.soulPoisonReduce>0) addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
           if(_poisonAdd>0){
             G.playerPoison=(G.playerPoison||0)+_poisonAdd;
             addLog('☠️ 猛毒を受けた！+'+_poisonAdd+'（'+G.playerPoison+'T）','enemy');
@@ -4505,7 +4531,9 @@ function enemyTurn(){
         enemySpriteAttack();
         dealToPlayer(ea,e.name+'の氷雪弾❄️');
         if(G.playerHp>0){
-          G.cardPlayLimitNextTurn=getEquippedSouls().includes('taihyou')?3:2;
+          const _taihyouEquipped=getEquippedSouls().includes('taihyou');
+          G.cardPlayLimitNextTurn=_taihyouEquipped?3:2;
+          if(_taihyouEquipped) addLog('💠 耐氷のソウル発動: 制限枚数+1','sys');
           addLog('❄️ 氷雪弾！次ターン、使用できるカードが'+G.cardPlayLimitNextTurn+'枚までに制限される！','enemy');
           updateUI();
         }
@@ -4615,7 +4643,9 @@ function enemyTurn(){
       dealToPlayer(ea,e.name+'の'+_ignLabel+'🔥');
       if(G.playerHp>0){
         // コスト増加量・枚数の設定
-        const _costAdd=Math.max(0, (act==='ignite'?1:2) - (getEquippedSouls().includes('taika')?1:0)); // 炎上+1、大炎上/超炎上+2（耐炎のソウルⅠで-1、0未満にはならない）
+        const _taikaEquipped=getEquippedSouls().includes('taika');
+        const _costAdd=Math.max(0, (act==='ignite'?1:2) - (_taikaEquipped?1:0)); // 炎上+1、大炎上/超炎上+2（耐炎のソウルⅠで-1、0未満にはならない）
+        if(_taikaEquipped) addLog('💠 耐炎のソウル発動: 増加コスト-1','sys');
         const _cardNum=act==='superignite'?2:1; // 超炎上のみ2枚、他は1枚
         // pending配列に積む（次ターンのドロー時に適用）
         G.igniteCostPenalties=G.igniteCostPenalties||[];
@@ -4868,7 +4898,7 @@ function enemyTurn(){
       setTimeout(()=>{
         const warn=document.createElement('div');
         warn.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9200;background:rgba(80,0,0,.96);border:2px solid #e74c3c;border-radius:12px;padding:16px 22px;text-align:center;max-width:280px;cursor:pointer;touch-action:manipulation;';
-        warn.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#e74c3c;font-weight:bold;margin-bottom:8px;">⏳ あと１ターンで呪縛発動！</div><div style="font-family:sans-serif;font-size:11px;color:#ffbbbb;line-height:1.6;">次のターン終了時にダメージを受け始めます。<br>呪縛ダメージ = 経過ターン数×5</div><div style="margin-top:12px;background:rgba(231,76,60,.3);border:1px solid rgba(231,76,60,.6);border-radius:6px;padding:6px 16px;font-size:11px;color:#fff;font-family:\'Cinzel\',serif;">タップで閉じる</div>';
+        warn.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#e74c3c;font-weight:bold;margin-bottom:8px;">⏳ 6ターン目終了時に呪縛発動！</div><div style="font-family:sans-serif;font-size:11px;color:#ffbbbb;line-height:1.6;">6ターン目の終了時からダメージを受け始めます。<br>呪縛ダメージ = 経過ターン数×5</div><div style="margin-top:12px;background:rgba(231,76,60,.3);border:1px solid rgba(231,76,60,.6);border-radius:6px;padding:6px 16px;font-size:11px;color:#fff;font-family:\'Cinzel\',serif;">タップで閉じる</div>';
         const close=()=>{if(warn.parentNode)(function(){var _el=warn;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();};
         warn.addEventListener('click',close);
         warn.addEventListener('touchend',e=>{e.preventDefault();close();});
@@ -5063,7 +5093,7 @@ function showBougaiPopup(cardId,count,callback){
 
 function dealDirectToPlayer(dmg,lbl){
   if(G.invincibleTurns>0){addLog('🌟 無敵: '+lbl+' 無効！','sys');return;}
-  if(G.soulCurseReduce) dmg=Math.max(0,dmg-G.soulCurseReduce);
+  if(G.soulCurseReduce){ dmg=Math.max(0,dmg-G.soulCurseReduce); addLog('💠 不屈のソウル発動: 呪いダメージ-'+G.soulCurseReduce,'sys'); }
   if(G.nextDmgNull){G.nextDmgNull=false;addLog('🛡️ 守護者(旧): '+lbl+' 無効！','sys');updateGaugeLamps();return;}
   if(G.nextDmgHalf){G.nextDmgHalf=false;dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 守護者: 半減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalfTurns>0){dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 神盾: 半減！','sys');}
@@ -5414,8 +5444,14 @@ function _showGrandEnding(){
     ];
     let _delayCursor=5200;
     if(G._newSoulUnlocked){
-      const _soul=SOULS[AREA_DATA[G.areaId].soulReward];
-      lines.push({text:'🏆 '+_soul.icon+' '+_soul.name+'を入手！（ソウル設定で装着できます）', size:'12px', color:'#c9a8ff', delay:_delayCursor, glow:'rgba(201,168,255,0.6)'});
+      if(G._newSoulUnlocked.capReward){
+        const _cat=G._newSoulUnlocked.capReward.category;
+        const _catLabel={1:'①ステータスアップ系',2:'②状態異常軽減系',3:'③カード強化系',4:'④特殊効果付与系'}[_cat]||'';
+        lines.push({text:'🏆 ソウルの'+_catLabel+'の枠上限+1！', size:'12px', color:'#c9a8ff', delay:_delayCursor, glow:'rgba(201,168,255,0.6)'});
+      } else {
+        const _soul=SOULS[AREA_DATA[G.areaId].soulReward];
+        lines.push({text:'🏆 '+_soul.icon+' '+_soul.name+'を入手！（ソウル設定で装着できます）', size:'12px', color:'#c9a8ff', delay:_delayCursor, glow:'rgba(201,168,255,0.6)'});
+      }
       _delayCursor+=1100;
     }
     if(G._clearReward && (G._clearReward.gold>0||G._clearReward.crystal>0)){
@@ -5985,6 +6021,7 @@ function initAreaBackBtn(){
   if(!btn) return;
   const doBack=(e)=>{
     e.stopPropagation();if(e.type==='touchend')e.preventDefault();
+    sfxBack();
     hideOv('ov-area-select');
     // メインメニューは非表示にしていない（下に表示されたまま）ので、そのまま戻る
   };
@@ -6116,7 +6153,8 @@ const AREA_DATA = [
       shortDesc: 'ターン開始時カウント増加、終了時ダメージ',
       fullDesc: 'ターン開始時に「6」カウントが増加する。ターン終了時にカウント分のダメージを受ける。カードを使用するたびその使用マナ分カウントが減少する（0未満にはならない）。',
     },
-    soulReward: 'zangeki',
+    soulReward: null,
+    capReward: {category:1, amount:1},
     popupBg: 'pop_honoo.png',
   },
   {
@@ -6133,7 +6171,8 @@ const AREA_DATA = [
       fullDesc: '偶数ターン（2,4,6…）はカードのコストが2倍になる。',
       evenTurnMultiplier: 2,
     },
-    soulReward: 'gogeki',
+    soulReward: null,
+    capReward: {category:1, amount:1},
     popupBg: 'pop_kougen.png',
   },
   {
@@ -6143,7 +6182,7 @@ const AREA_DATA = [
     difficulty: '★★',
     desc: '毒の沼が広がる湿地帯。毒を操る敵が待ち受ける',
     areaEffect: null,
-    soulReward: 'taidoku',
+    soulReward: 'taidoku2',
     popupBg: 'pop_dokunuma.png',
   },
   {
@@ -6169,7 +6208,8 @@ const AREA_DATA = [
       shortDesc: 'マナを使い切らずにターン終了→次ターン開始マナ-1',
       fullDesc: 'マナを使い切らずにターンを終了すると、次のターン開始時のマナが1少なくなる。',
     },
-    soulReward: 'kaifuku',
+    soulReward: null,
+    capReward: {category:2, amount:1},
     popupBg: 'pop_hyouheki.png',
   },
   {
@@ -6226,7 +6266,7 @@ function showAreaSelect(){
       } else {
         btn.style.filter='';
         btn.style.cursor='pointer';
-        bindTapSafe('area-btn-'+idx, ()=>{ showAreaConfirm(idx); });
+        bindTapSafe('area-btn-'+idx, ()=>{ sfxSelect(); showAreaConfirm(idx); });
       }
     }
     const badge=document.getElementById('area-clear-badge-'+idx);
@@ -6323,6 +6363,7 @@ function showChargeSelect(){
     const _chargeIdsAll=Object.keys(CHARGE_TYPES);
     const _ccIdx=_chargeIdsAll.indexOf(ct.id);
     const isCleared=_ccIdx>=0 && !!_ccArr[_ccIdx];
+    const isRecommended=AREA_RECOMMENDED_CHARGE[G.areaId]===ct.id;
     d.style.cssText='position:relative;background:rgba(0,0,0,.85);border:2px solid '+ct.color+';border-radius:10px;padding:10px 12px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:10px;min-height:88px;box-sizing:border-box;';
     // ランプ表示
     let lamps='';
@@ -6345,7 +6386,8 @@ function showChargeSelect(){
         <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">${lamps}<span style="font-size:8px;color:#888;font-family:Cinzel,serif;margin-left:4px;">×${ct.maxCount}</span></div>
         <div style="font-size:10px;color:#aaa;font-family:sans-serif;line-height:1.4;margin-top:4px;">${ct.desc}</div>
       </div>`
-      +(isCleared?'<div style="position:absolute;top:6px;right:8px;background:rgba(120,200,140,.18);border:1px solid #7ec88c;color:#9ee8ac;font-size:9px;font-family:sans-serif;font-weight:bold;padding:2px 7px;border-radius:10px;letter-spacing:1px;display:flex;align-items:center;gap:3px;">✅ クリア済み</div>':'');
+      +(isCleared?'<div style="position:absolute;top:6px;right:8px;background:rgba(120,200,140,.18);border:1px solid #7ec88c;color:#9ee8ac;font-size:9px;font-family:sans-serif;font-weight:bold;padding:2px 7px;border-radius:10px;letter-spacing:1px;display:flex;align-items:center;gap:3px;">✅ クリア済み</div>':'')
+      +(isRecommended?'<div style="position:absolute;top:6px;left:8px;background:rgba(240,212,122,.18);border:1px solid #f0d47a;color:#f0d47a;font-size:9px;font-family:sans-serif;font-weight:bold;padding:2px 7px;border-radius:10px;letter-spacing:1px;">⭐ おすすめ</div>':'');
     const pick=(ev)=>{
       if(ev&&ev.type==='touchend') ev.preventDefault();
       // デッキが12枚未満の場合はステージを開始できない（使い捨てカードの消滅・カード削除等でも同様にチェック）
@@ -6361,6 +6403,24 @@ function showChargeSelect(){
         G.chargeLevel=getChargeLevel(ct.id);
         G.chargeCount=0;
         G.deck=getEffectiveDeck(ct.id);
+        // ソウルボーナスの再計算：initGame()はチャージ選択より前（タイトル→メインメニュー遷移時）に呼ばれるため、
+        // その時点ではG.chargeTypeがまだ未選択（null）または前回の値のままで、装着中ソウルの判定が正しく行えない。
+        // チャージが確定したこの時点で、正しいチャージの装着ソウルを基に再計算する。
+        {
+          const _equippedSoulsNow2=getEquippedSouls(ct.id);
+          const _soulHpBonus2=(_equippedSoulsNow2.includes('seimei')?10:0)+(_equippedSoulsNow2.includes('seimei2')?20:0)+(_equippedSoulsNow2.includes('seimei3')?40:0);
+          const _soulShieldBonus2=(_equippedSoulsNow2.includes('teppeki')?5:0)+(_equippedSoulsNow2.includes('teppeki2')?10:0);
+          const _soulPoisonReduce2=(_equippedSoulsNow2.includes('taidoku')?5:0)+(_equippedSoulsNow2.includes('taidoku2')?10:0);
+          const _soulCurseReduce2=(_equippedSoulsNow2.includes('fukutsu')?5:0)+(_equippedSoulsNow2.includes('fukutsu2')?10:0)+(_equippedSoulsNow2.includes('fukutsu3')?15:0);
+          const _soulManaBonus2=_equippedSoulsNow2.includes('manaAmp')?1:0;
+          G.playerMaxHp=20+_soulHpBonus2; G.playerHp=20+_soulHpBonus2;
+          G.initShieldBonus=_soulShieldBonus2;
+          G.soulPoisonReduce=_soulPoisonReduce2;
+          G.soulCurseReduce=_soulCurseReduce2;
+          G.manaRegen=3+_soulManaBonus2; G.mana=3+_soulManaBonus2;
+          G.permAtkBonus=(G.permAtkBonus||0)+(_equippedSoulsNow2.includes('joukou')?1:0);
+          G.permAtkBuff2=(G.permAtkBuff2||0)+(_equippedSoulsNow2.includes('shogeki')?3:0);
+        }
         // このエリアに使い捨て(ガチャ生成)カードを持ち込んだかどうかを記録。
         // メモリ上のフラグだけだとアプリ強制終了時に消えてしまうため、SAVEにも即座に永続化しておく。
         // エリアを出る際（クリア／敗北／タイトルへ戻る、いずれも showLogoThenTitle 経由）に消滅処理を行う。
@@ -8511,9 +8571,7 @@ function addCharge(n){
   if(!G.chargeType) return;
   const ct=curCT();
   if(!ct) return;
-  // 守護者：効果発動中は蓄積停止
-  if(ct.id==='teppeki' && (G.nextDmgNull||G.nextDmgHalf)) return;
-  // 狂戦士：回数制限なし（蓄積停止なし）
+  // 全チャージ共通：効果発動中でもチャージは蓄積される（守護者なども効果終了を待たずに溜まる）
   const prev=G.chargeCount;
   G.chargeCount=Math.min(ct.maxCount, G.chargeCount+n);
   if(G.chargeCount!==prev){
@@ -9452,7 +9510,10 @@ function setMuted(v){
 
 // ===== 非アクティブ時に全音声を停止（他アプリ切替・画面ロック等） =====
 let _wasPlayingBeforeHidden={bgm:false,op:false,event:false};
+let _audioInactive=false; // 非アクティブ処理が既に行われたかどうか（blur→visibilitychange等の重複呼び出しで再生状態を上書きしないためのフラグ）
 function _pauseAllAudioForInactive(){
+  if(_audioInactive) return; // 既に非アクティブ処理済みなら「再生していたか」の記録を上書きしない（重複呼び出し対策）
+  _audioInactive=true;
   const ctx=_audioCtx;
   if(_bgmAudio){ _wasPlayingBeforeHidden.bgm=!_bgmAudio.paused; if(!_bgmAudio.paused) _bgmAudio.pause(); }
   if(_opAudio){ _wasPlayingBeforeHidden.op=!_opAudio.paused; if(!_opAudio.paused) _opAudio.pause(); }
@@ -9460,6 +9521,8 @@ function _pauseAllAudioForInactive(){
   if(ctx&&ctx.state==='running'){ ctx.suspend().catch(()=>{}); }
 }
 function _resumeAudioAfterActive(){
+  if(!_audioInactive) return; // 非アクティブ状態でなければ何もしない（重複呼び出し対策）
+  _audioInactive=false;
   if(isMuted()) return; // ミュート中は復帰させない
   const ctx=_audioCtx;
   if(ctx&&ctx.state==='suspended'){ ctx.resume().catch(()=>{}); }
@@ -9469,8 +9532,26 @@ function _resumeAudioAfterActive(){
 }
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ _pauseAllAudioForInactive(); }
-  else { _resumeAudioAfterActive(); }
+  else {
+    _resumeAudioAfterActive();
+    // 一部のモバイルブラウザではvisibilitychange契機の自動再生がブロックされることがあるため、
+    // 復帰直後の最初の実タップでも念のため再試行する（保険）
+    _armAudioResumeOnNextTap();
+  }
 });
+let _audioResumeArmed=false;
+function _armAudioResumeOnNextTap(){
+  if(_audioResumeArmed) return;
+  _audioResumeArmed=true;
+  const _retry=()=>{
+    _audioResumeArmed=false;
+    document.removeEventListener('touchstart',_retry);
+    document.removeEventListener('click',_retry);
+    _resumeAudioAfterActive();
+  };
+  document.addEventListener('touchstart',_retry,{once:true,passive:true});
+  document.addEventListener('click',_retry,{once:true});
+}
 // iOS Safari等、visibilitychangeが取りこぼされる場合のフォールバック
 window.addEventListener('pagehide',_pauseAllAudioForInactive);
 window.addEventListener('blur',_pauseAllAudioForInactive);
@@ -10763,7 +10844,6 @@ function startGame(){
   _gameStarting=true;
   hideOv('ov-charge-select'); // 念のため非表示
   sfxConfirm();
-  stopOpBgm();
   logoScreen.style.opacity='0';
   _logoScreenTapReady=false;
   setTimeout(()=>{
@@ -10949,29 +11029,36 @@ const SHOP_ITEMS=[
   // ===== ソウル =====
   {id:'buy_seimei2',  cat:'soul', icon:'❤️', name:'生命のソウルⅡ', desc:'①ステータスアップ系 コスト2・HP+20', price:40, currency:'crystal', unlockArea:'始まりの洞窟', oneTime:true, soulId:'seimei2'},
   {id:'buy_teppeki2', cat:'soul', icon:'🛡️', name:'鉄壁Ⅱ',        desc:'①ステータスアップ系 コスト2・ステージ開始時シールド+10', price:40, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, soulId:'teppeki2'},
-  {id:'buy_kekkai',   cat:'soul', icon:'🔷', name:'障壁のソウルⅠ', desc:'①ステータスアップ系 コスト3・シールドの最低値が0ではなく5になり、5以下に減少しなくなる', price:80, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kekkai'},
-  {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+3する', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
-  {id:'buy_taidoku2', cat:'soul', icon:'☠️', name:'耐毒Ⅱ',        desc:'②状態異常軽減系 コスト2・毒付与-6', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taidoku2'},
-  {id:'buy_fukutsu',  cat:'soul', icon:'💢', name:'不屈のソウルⅠ',  desc:'②状態異常軽減系 コスト1・呪いダメージ-3', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu'},
-  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈のソウルⅡ', desc:'②状態異常軽減系 コスト2・呪いダメージ-6', price:40, currency:'crystal', unlockArea:null, requireSouls:['fukutsu'], oneTime:true, soulId:'fukutsu2'},
-  {id:'buy_fukutsu3', cat:'soul', icon:'💢', name:'不屈のソウルⅢ', desc:'②状態異常軽減系 コスト3・呪いダメージ-12', price:80, currency:'crystal', unlockArea:null, requireSouls:['fukutsu2'], oneTime:true, soulId:'fukutsu3'},
-  {id:'buy_taika',  cat:'soul', icon:'🔥', name:'耐炎のソウルⅠ', desc:'②状態異常軽減系 コスト2・炎上系の増加コストを-1', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taika'},
-  {id:'buy_taiden', cat:'soul', icon:'⚡', name:'耐電のソウルⅠ', desc:'②状態異常軽減系 コスト2・麻痺で無効化されたカードのコストが消費されない', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taiden'},
-  {id:'buy_taihyou',cat:'soul', icon:'❄️', name:'耐氷のソウルⅠ', desc:'②状態異常軽減系 コスト2・氷雪弾の使用制限を2枚→3枚に緩和', price:80, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taihyou'},
-  {id:'buy_karurenSoul',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅠ',   desc:'③カード強化系 コスト1・「軽連打」の攻撃力+1（格闘家専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'karurenSoul'},
-  {id:'buy_chikaraSoul',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅠ',   desc:'③カード強化系 コスト1・「力溜め」のドロー+1を+2に（重戦士専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'chikaraSoul'},
-  {id:'buy_bakudokuSoul',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅠ',     desc:'③カード強化系 コスト1・「爆毒」の攻撃力+2（錬金術師専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bakudokuSoul'},
-  {id:'buy_tsumikasaneSoul', cat:'soul', icon:'📚', name:'積み重ねカードのソウルⅠ', desc:'③カード強化系 コスト1・「積み重ね」の攻撃力+2（守護者専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'tsumikasaneSoul'},
-  {id:'buy_healReserveSoul', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復予約」の回復力+2（僧侶専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'healReserveSoul'},
-  {id:'buy_funnuSoul',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅠ', desc:'③カード強化系 コスト1・「憤怒の舞」の攻撃力+2（祈祷師専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'funnuSoul'},
-  {id:'buy_ketsuyakuSoul',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅠ', desc:'③カード強化系 コスト1・「血の契約」のHP-10を-5に（狂戦士専用）', price:40, currency:'crystal', unlockArea:null, oneTime:true, soulId:'ketsuyakuSoul'},
-  {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウル', desc:'③カード強化系 コスト1・「防御」カードの防御力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
+  {id:'buy_kekkai',   cat:'soul', icon:'🔷', name:'障壁のソウルⅠ', desc:'①ステータスアップ系 コスト3・シールドの最低値が0ではなく5になり、5以下に減少しなくなる', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kekkai'},
+  {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+3する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
+  {id:'buy_taidoku',  cat:'soul', icon:'☠️', name:'耐毒のソウルⅠ', desc:'②状態異常軽減系 コスト1・毒付与-5', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'taidoku'},
+  {id:'buy_fukutsu',  cat:'soul', icon:'💢', name:'不屈のソウルⅠ',  desc:'②状態異常軽減系 コスト1・呪いダメージ-5', price:30, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu'},
+  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈のソウルⅡ', desc:'②状態異常軽減系 コスト2・呪いダメージ-10', price:30, currency:'crystal', unlockArea:null, requireSouls:['fukutsu'], oneTime:true, soulId:'fukutsu2'},
+  {id:'buy_fukutsu3', cat:'soul', icon:'💢', name:'不屈のソウルⅢ', desc:'②状態異常軽減系 コスト3・呪いダメージ-15', price:40, currency:'crystal', unlockArea:null, requireSouls:['fukutsu2'], oneTime:true, soulId:'fukutsu3'},
+  {id:'buy_taika',  cat:'soul', icon:'🔥', name:'耐炎のソウルⅠ', desc:'②状態異常軽減系 コスト2・炎上系の増加コストを-1', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taika'},
+  {id:'buy_taiden', cat:'soul', icon:'⚡', name:'耐電のソウルⅠ', desc:'②状態異常軽減系 コスト2・麻痺で無効化されたカードのコストが消費されない', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taiden'},
+  {id:'buy_taihyou',cat:'soul', icon:'❄️', name:'耐氷のソウルⅠ', desc:'②状態異常軽減系 コスト2・氷雪弾の使用制限を2枚→3枚に緩和', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taihyou'},
+  {id:'buy_zangeki', cat:'soul', icon:'⚔️', name:'斬撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「斬撃」カードの攻撃力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'zangeki'},
+  {id:'buy_gogeki',  cat:'soul', icon:'🪓', name:'強撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「強撃」カードの攻撃力（計算後）+2', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'gogeki'},
+  {id:'buy_kaifuku', cat:'soul', icon:'💗', name:'回復カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復」カードの回復力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kaifuku'},
+  {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウルⅠ', desc:'③カード強化系 コスト1・「防御」カードの防御力（計算後）+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
+  {id:'buy_karurenSoul',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅠ',   desc:'③カード強化系 コスト1・「軽連打」の攻撃力+1（格闘家専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'karurenSoul'},
+  {id:'buy_chikaraSoul',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅠ',   desc:'③カード強化系 コスト1・「力溜め」のドロー+1を+2に（重戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'chikaraSoul'},
+  {id:'buy_bakudokuSoul',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅠ',     desc:'③カード強化系 コスト1・「爆毒」の攻撃力+2（錬金術師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bakudokuSoul'},
+  {id:'buy_tsumikasaneSoul', cat:'soul', icon:'📚', name:'積み重ねカードのソウルⅠ', desc:'③カード強化系 コスト1・「積み重ね」の攻撃力+2（守護者専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'tsumikasaneSoul'},
+  {id:'buy_healReserveSoul', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復予約」の回復力+2（僧侶専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'healReserveSoul'},
+  {id:'buy_funnuSoul',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅠ', desc:'③カード強化系 コスト1・「憤怒の舞」の攻撃力+2（祈祷師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'funnuSoul'},
+  {id:'buy_ketsuyakuSoul',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅠ', desc:'③カード強化系 コスト1・「血の契約」のHP-10を-5に（狂戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'ketsuyakuSoul'},
   {id:'buy_saiseiBougyo', cat:'soul', icon:'💗', name:'再生防御のソウルⅠ', desc:'④特殊効果付与系 コスト1・防御カードを使用するたび、HP+2回復する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'saiseiBougyo'},
   {id:'buy_kozeni',   cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅠ', desc:'④特殊効果付与系 コスト1・クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kozeni'},
-  {id:'buy_kozeni2',  cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅡ', desc:'④特殊効果付与系 コスト2・クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する', price:30, currency:'crystal', unlockArea:'炎の神殿', oneTime:true, soulId:'kozeni2'},
-  {id:'buy_chargeup1', cat:'soul', icon:'⚡', name:'チャージUPのソウル',  desc:'④特殊効果付与系 コスト1・チャージのレベルを1つ上げる', costs:[{currency:'gold',amount:200},{currency:'crystal',amount:50}], unlockArea:'忘却の遺跡', oneTime:true, soulId:'chargeup1'},
-  {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'gold',amount:400},{currency:'crystal',amount:100}], unlockArea:'鉄壁の砦', oneTime:true, soulId:'chargeup2'},
+  {id:'buy_kozeni2',  cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅡ', desc:'④特殊効果付与系 コスト2・クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する', price:20, currency:'crystal', unlockArea:'炎の神殿', oneTime:true, soulId:'kozeni2'},
+  {id:'buy_chargeup1', cat:'soul', icon:'⚡', name:'チャージUPのソウル',  desc:'④特殊効果付与系 コスト1・チャージのレベルを1つ上げる', costs:[{currency:'crystal',amount:10}], unlockArea:'忘却の遺跡', oneTime:true, soulId:'chargeup1'},
+  {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'crystal',amount:20}], unlockArea:'雷鳴の高原', oneTime:true, soulId:'chargeup2'},
   {id:'buy_boukiIji1', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅠ', desc:'④特殊効果付与系 コスト2・ターン開始時のシールド減少量が40％になる', price:100, currency:'crystal', unlockArea:null, requireSouls:['teppeki','kekkai','kinkyu'], oneTime:true, soulId:'boukiIji1'},
+  {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト1・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
+  {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト1・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
+  {id:'buy_hatsuMana', cat:'soul', icon:'💎', name:'初マナのソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初ターンマナ+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuMana'},
+  {id:'buy_hatsuFuda', cat:'soul', icon:'🃏', name:'初札のソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初期手札+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuFuda'},
   {id:'buy_boukiIji2', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅡ', desc:'④特殊効果付与系 コスト3・ターン開始時のシールド減少量が30％になる', price:200, currency:'crystal', unlockArea:null, requireSouls:['boukiIji1'], oneTime:true, soulId:'boukiIji2'},
   // ===== カード（1度のみ購入。購入するとデッキ編集の入れ替え候補に加わる） =====
   {id:'buy_teate',      cat:'card', icon:'🩹', name:'手当',   desc:'カードポイント5のカードをデッキ編集の入れ替え候補に追加', price:40, currency:'gold', unlockArea:null, oneTime:true, cardId:'teate'},
@@ -10987,21 +11074,21 @@ const SHOP_ITEMS=[
   {id:'buy_miniCombo',  cat:'card', icon:'🤜', name:'ミニコンボ',   desc:'カードポイント10のカードをデッキ編集の入れ替え候補に追加', price:60, currency:'gold', unlockArea:'始まりの洞窟', oneTime:true, cardId:'miniCombo'},
   {id:'buy_guideStrike',cat:'card', icon:'✨', name:'導きの一撃',   desc:'カードポイント10のカードをデッキ編集の入れ替え候補に追加', price:60, currency:'gold', unlockArea:'始まりの洞窟', oneTime:true, cardId:'guideStrike'},
   // ===== エリア解放（初期は選択画面に出ず、購入で追加される） =====
-  {id:'buy_area_ruins', cat:'area', icon:'🗺️', name:'忘却の遺跡', desc:'エリア選択に「忘却の遺跡」が追加される', price:500, currency:'gold', unlockArea:null, oneTime:true, areaId:1},
+  {id:'buy_area_ruins', cat:'area', icon:'🗺️', name:'忘却の遺跡', desc:'エリア選択に「忘却の遺跡」が追加される', price:100, currency:'gold', unlockArea:null, oneTime:true, areaId:1},
   // ===== キャパシティアップ（すべて1度のみ購入） =====
-  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
-  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'swap', amount:1},
-  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:200, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:1},
-  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:200, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:2},
-  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:200, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'soulcat', category:3},
-  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:200, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, capType:'soulcat', category:4},
+  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:20, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
+  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:20, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, capType:'swap', amount:1},
+  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:20, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:20, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
+  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:20, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:3},
+  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:20, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, capType:'soulcat', category:4},
   // ===== キャパシティアップ（最初から販売・1度のみ購入） =====
-  {id:'buy_cardpoint5_early', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:50, currency:'crystal', unlockArea:null, oneTime:true, capType:'point', amount:5},
-  {id:'buy_swap1_early',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:50, currency:'crystal', unlockArea:null, oneTime:true, capType:'swap', amount:1},
-  {id:'buy_soulcap1_early',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:50, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:1},
-  {id:'buy_soulcap2_early',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:50, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
-  {id:'buy_soulcap3_early',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:50, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:3},
-  {id:'buy_soulcap4_early',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:50, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:4},
+  {id:'buy_cardpoint5_early', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'point', amount:5},
+  {id:'buy_swap1_early',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'swap', amount:1},
+  {id:'buy_soulcap1_early',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap2_early',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:10, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
+  {id:'buy_soulcap3_early',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:3},
+  {id:'buy_soulcap4_early',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:4},
 ];
 function _shopUnlockedItems(){
   // 常時販売品＋クリア済みエリアに紐づく追加販売品＋特定ソウル所持が条件の追加販売品のみを対象にする
@@ -11026,8 +11113,6 @@ function _updateShopNewBadge(){
 }
 function showShopScreen(){
   renderShopContent();
-  // ショップを一度開いたらNEWバッジは消える
-  if(SAVE.shopNewBadge){ SAVE.shopNewBadge=false; writeSaveData(); }
   _updateShopNewBadge();
   showOv('ov-shop');
 }
@@ -11138,11 +11223,20 @@ function renderShopContent(){
       const canAfford=_canAffordItem(it);
       const row=document.createElement('div');
       row.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(10,8,6,.78);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;margin-bottom:6px;';
+      let _rowDesc=it.desc;
+      if(it.cat==='card' && it.cardId && DB[it.cardId]){
+        const _cardRef=DB[it.cardId];
+        const _dp=getCardDeckPoint(it.cardId);
+        const _rarityAbbr={common:'C',uncommon:'U',rare:'R',epic:'E',legendary:'L',gauge:'G',bougai:'D',D:'D'}[_cardRef.rarity]||_cardRef.rarity;
+        const _typeLabel={attack:'攻撃',shield:'防御',heal:'回復',skill:'スキル',curse:'呪い',bougai:'妨害'}[_cardRef.type]||_cardRef.type;
+        _rowDesc='<span style="color:#8ab8d8;">コスト'+_cardRef.cost+'　'+_rarityAbbr+'　'+_typeLabel+'</span><br>'
+          +_cardRef.desc+'　<span style="color:#f0d47a;">DP'+_dp+'</span>（デッキ編集の入れ替え候補に追加）';
+      }
       row.innerHTML=
         '<span style="font-size:20px;">'+it.icon+'</span>'+
         '<div style="flex:1;min-width:0;">'+
-          '<div style="font-size:12px;color:#fff;font-weight:bold;">'+it.name+'</div>'+
-          '<div style="font-size:9px;color:#aaa;line-height:1.4;">'+it.desc+'</div>'+
+          '<div style="font-size:12px;color:#fff;font-weight:bold;">'+it.name+((SAVE.shopNewItemIds||[]).includes(it.id)?' <span style="background:#e74c3c;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:6px;vertical-align:middle;">NEW</span>':'')+'</div>'+
+          '<div style="font-size:9px;color:#aaa;line-height:1.4;">'+_rowDesc+'</div>'+
         '</div>'+
         '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'+
           '<div style="font-size:10px;color:'+(canAfford?'#c9a84c':'#e07070')+';white-space:nowrap;">'+priceLabel+'</div>'+
@@ -11171,7 +11265,12 @@ function _showShopBuyConfirm(it){
   const canAfford=_canAffordItem(it);
   document.getElementById('sc-icon').textContent=it.icon;
   document.getElementById('sc-name').textContent=it.name;
-  document.getElementById('sc-desc').textContent=it.desc;
+  if(it.cat==='card' && it.cardId && DB[it.cardId]){
+    const _dp=getCardDeckPoint(it.cardId);
+    document.getElementById('sc-desc').textContent=DB[it.cardId].desc+'（DP'+_dp+'／デッキ編集の入れ替え候補に追加）';
+  } else {
+    document.getElementById('sc-desc').textContent=it.desc;
+  }
   document.getElementById('sc-price').textContent='価格：'+_formatItemPrice(it);
   const beforeLines=costs.map(c=>_currencyIcon(c.currency)+_getBalance(c.currency)).join('　');
   const afterLines=costs.map(c=>_currencyIcon(c.currency)+Math.max(_getBalance(c.currency)-c.amount,0)).join('　');
@@ -11538,7 +11637,7 @@ function generateGachaCard(gachaTypeId){
     // 同じ元カードを引いた場合は同じ生成IDにまとめる → 入れ替え候補一覧で「×2」のように重ねて表示できる
     const genId='gacha_'+pick.cardId;
     if(!DB[genId]){
-      DB[genId]=Object.assign({}, base, { id:genId, _gachaGenerated:true, _gachaSourceType:gachaTypeId, _gachaBaseId:pick.cardId });
+      DB[genId]=Object.assign({}, base, { id:genId, _baseId:pick.cardId, _gachaGenerated:true, _gachaSourceType:gachaTypeId, _gachaBaseId:pick.cardId });
     }
     return { card:DB[genId], detail:{fixed:true, point} };
   }
@@ -12726,20 +12825,6 @@ function initUiImages(){
   });
 }
 setTimeout(initUiImages,200);
-
-// 非アクティブ時BGM停止
-document.addEventListener('visibilitychange', ()=>{
-  const audios = [
-    window._opAudio,
-    window._bgmAudio,
-    window._eventAudio,
-  ].filter(Boolean);
-  if(document.hidden){
-    audios.forEach(a=>{ if(!a.paused) { a._wasPlaying=true; a.pause(); } });
-  } else {
-    audios.forEach(a=>{ if(a._wasPlaying) { a.play().catch(()=>{}); a._wasPlaying=false; } });
-  }
-});
 
 </script>
 
