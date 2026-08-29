@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver354</title>
+<title>DUNGEON WALKER DWCver357</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -806,7 +806,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver354</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver357</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2013,12 +2013,12 @@ const MONSTER_TUIKA=[
 // 毒の沼地 敵データ（areaId:4）※追加モンスター(enemy_tuika)から選出
 const SWAMP_ENEMIES=[
   {name:'グール',        icon:'🧟',hp:50,  atk:8,  shield:0,  rank:1, pattern:['poisonatk','atk','atk'],                boss:false, img:'enemy_tuika1.png'},
-  {name:'グール犬',      icon:'🐕',hp:60,  atk:9,  shield:5,  rank:1, pattern:['poisonatk','atk','def','big'],         boss:false, img:'enemy_tuika5.png'},
-  {name:'腐敗樹',        icon:'🌳',hp:70,  atk:10, shield:5,  rank:1, pattern:['poisonatk','atk','big'],                boss:false, img:'enemy_tuika37.png'},
-  {name:'腐敗妖精',      icon:'🧚',hp:85,  atk:12, shield:8,  rank:1, pattern:['poisonatk','poisonatk','def','big'],   boss:false, img:'enemy_tuika26.png'},
-  {name:'呪われた樹精',  icon:'🌲',hp:100, atk:14, shield:10, rank:2, pattern:['poisonatk','atk','big','def'],         boss:false, img:'enemy_tuika24.png'},
-  {name:'ポイズングール',icon:'🧟',hp:120, atk:16, shield:12, rank:2, pattern:['poisonatk','big','def','poisonatk'],   boss:false, img:'enemy_tuika2.png'},
-  {name:'ダークフェアリー',icon:'🧚',hp:150,atk:18, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
+  {name:'グール犬',      icon:'🐕',hp:50,  atk:9,  shield:5,  rank:1, pattern:['poisonatk','atk','def','big'],         boss:false, img:'enemy_tuika5.png'},
+  {name:'腐敗樹',        icon:'🌳',hp:60,  atk:10, shield:5,  rank:1, pattern:['poisonatk','atk','big'],                boss:false, img:'enemy_tuika37.png'},
+  {name:'腐敗妖精',      icon:'🧚',hp:70,  atk:12, shield:8,  rank:1, pattern:['poisonatk','poisonatk','def','big'],   boss:false, img:'enemy_tuika26.png'},
+  {name:'呪われた樹精',  icon:'🌲',hp:80,  atk:14, shield:10, rank:2, pattern:['poisonatk','atk','big','def'],         boss:false, img:'enemy_tuika24.png'},
+  {name:'ポイズングール',icon:'🧟',hp:100, atk:16, shield:12, rank:2, pattern:['poisonatk','big','def','poisonatk'],   boss:false, img:'enemy_tuika2.png'},
+  {name:'ダークフェアリー',icon:'🧚',hp:120,atk:17, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
 ];
 // 鉄壁の砦 敵データ（areaId:5）※1〜4は既存モンスター（名前に「（防御型）」を付与）、5〜7は追加モンスター(enemy_tuika)を使用
 // ステージ1〜6：石造りモンスターとして半角英字名に変更し、グレー寄りの石調フィルターを適用（ステージ7のボスは対象外）
@@ -4517,7 +4517,10 @@ function enemyTurn(){
         const _dealtDmg=dealToPlayer(ea,e.name+'の毒攻撃☠️')||0;
         if(G.playerHp>0){
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
-          if(G.soulPoisonReduce>0) addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
+          if(G.soulPoisonReduce>0){
+            addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
+            _showSoulEffectToast('💠 耐毒のソウル発動！\n毒付与量 -'+G.soulPoisonReduce);
+          }
           if(_poisonAdd>0){
             G.playerPoison=(G.playerPoison||0)+_poisonAdd;
             addLog('☠️ 毒を受けた！+'+_poisonAdd+'（'+G.playerPoison+'T）','enemy');
@@ -4537,7 +4540,10 @@ function enemyTurn(){
         if(G.playerHp>0){
           // 実際に与えたダメージ分そのまま毒カウントを付与（シールド等での減少後の実ダメージ基準）
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
-          if(G.soulPoisonReduce>0) addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
+          if(G.soulPoisonReduce>0){
+            addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
+            _showSoulEffectToast('💠 耐毒のソウル発動！\n毒付与量 -'+G.soulPoisonReduce);
+          }
           if(_poisonAdd>0){
             G.playerPoison=(G.playerPoison||0)+_poisonAdd;
             addLog('☠️ 猛毒を受けた！+'+_poisonAdd+'（'+G.playerPoison+'T）','enemy');
@@ -5118,7 +5124,7 @@ function showBougaiPopup(cardId,count,callback){
 
 function dealDirectToPlayer(dmg,lbl){
   if(G.invincibleTurns>0){addLog('🌟 無敵: '+lbl+' 無効！','sys');return;}
-  if(G.soulCurseReduce){ dmg=Math.max(0,dmg-G.soulCurseReduce); addLog('💠 不屈のソウル発動: 呪いダメージ-'+G.soulCurseReduce,'sys'); }
+  if(G.soulCurseReduce){ dmg=Math.max(0,dmg-G.soulCurseReduce); addLog('💠 不屈のソウル発動: 呪いダメージ-'+G.soulCurseReduce,'sys'); _showSoulEffectToast('💠 不屈のソウル発動！\n呪いダメージ -'+G.soulCurseReduce); }
   if(G.nextDmgNull){G.nextDmgNull=false;addLog('🛡️ 守護者(旧): '+lbl+' 無効！','sys');updateGaugeLamps();return;}
   if(G.nextDmgHalf){G.nextDmgHalf=false;dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 守護者: 半減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalfTurns>0){dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 神盾: 半減！','sys');}
@@ -11908,6 +11914,28 @@ function _showCenterWarning(text, ms){
     setTimeout(()=>{ el.style.display='none'; },400);
   }, ms||3000);
 }
+// ソウル効果（耐毒・不屈など軽減系）が発動したことを画面中央に大きく目立たせて知らせるダイアログ
+function _showSoulEffectToast(text, ms){
+  let el=document.getElementById('soul-effect-toast');
+  if(!el){
+    el=document.createElement('div');
+    el.id='soul-effect-toast';
+    el.style.cssText='position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);font-size:14px;font-weight:bold;padding:16px 24px;border-radius:14px;z-index:9850;pointer-events:none;max-width:80%;text-align:center;line-height:1.7;white-space:pre-line;background:rgba(10,14,24,.95);color:#cfe4ff;border:2px solid rgba(138,184,216,.85);box-shadow:0 0 24px rgba(120,180,255,.35),0 4px 20px rgba(0,0,0,.7);font-family:sans-serif;';
+    document.body.appendChild(el);
+  }
+  el.textContent=text;
+  el.style.display='block';
+  el.style.transition='none';
+  el.style.opacity='1';
+  el.style.transform='translate(-50%,-50%) scale(1.08)';
+  clearTimeout(el._hideTimer);
+  requestAnimationFrame(()=>{ el.style.transition='transform .18s'; el.style.transform='translate(-50%,-50%) scale(1)'; });
+  el._hideTimer=setTimeout(()=>{
+    el.style.transition='opacity .4s';
+    el.style.opacity='0';
+    setTimeout(()=>{ el.style.display='none'; },400);
+  }, ms||1800);
+}
 
 // エリア（ステージ実行中）に持ち込んだ使い捨て(ガチャ生成)カードを、エリアを出るタイミングで永久に消滅させる。
 // 呼び出し元：
@@ -12090,9 +12118,9 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
   if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
   d.className='card '+c.rarity;
   if(dim) d.style.opacity='.45';
-  // ガチャ生成カード（使い捨てカード）は、他の入れ替え候補バッジより優先して「使い捨て」枠であることを明示する
-  const effBadge=c._gachaGenerated?'使い捨て':badgeText;
-  const badgeColor=c._gachaGenerated?'rgba(160,40,40,.85)':'rgba(0,0,0,.75)';
+  // ガチャ生成カード（使い捨てカード）でも、右上バッジは通常の入れ替えバッジ表示のみとする（「使い捨て」表示は行わない）
+  const effBadge=badgeText;
+  const badgeColor='rgba(0,0,0,.75)';
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
   const nameSuffix=(count>1)?(' ×'+count):'';
   // 初期デッキ由来のカードはデッキポイントを消費しないため0固定。同名でも入れ替え候補（購入品）は別扱いで実際のDPを表示する
