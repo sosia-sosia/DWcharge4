@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver360</title>
+<title>DUNGEON WALKER DWCver361</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -808,7 +808,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver359</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver361</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -3190,6 +3190,9 @@ function _startStageBattle(){
   stopEventBgm();
   if(!G._cardTestMode) markBestStage(G.areaId, G.stage);
   updateBgm();
+  // チュートリアル専用のターン終了ボタン暗転ロックが、チュートリアル終了後も残ってしまうバグの対策。
+  // チュートリアルエリア以外では必ず解除しておく（tutorialRender側は毎回trueにするだけで、falseに戻す箇所が無かった）。
+  if(G.areaId!==7) tutorialLockEndTurn(false);
   {
     const _spReset=document.getElementById('enemy-sprite');
     if(_spReset){
@@ -3987,7 +3990,7 @@ function playCard(idx, _isChain){
   if(ef.exile){G.exileOnBattle=G.exileOnBattle||[];G.exileOnBattle.push(cid);}
   // 毒滅：敵が毒でない場合使用不可
   if(ef.requirePoisonHigh && G.enemyPoison<10){addLog('💢 敵の毒カウントが10以上でないと使えない！','sys');G.mana+=c.cost;G.hand.splice(G.hand.indexOf(cid)-1,0,cid);G.discard.pop();clampPage();updateUI();return;}
-  if(ef.regenTurns){G.regenTurns=(G.regenTurns||0)+ef.regenTurns;G.regenVal=(G.regenVal||0)+ef.regenVal;msgs.push(ef.regenTurns+'T HP毎ターン+'+ef.regenVal);}
+  if(ef.regenTurns){G.regenTurns=(G.regenTurns||0)+ef.regenTurns;G.regenVal=Math.max(G.regenVal||0,ef.regenVal);msgs.push(ef.regenTurns+'T HP毎ターン+'+ef.regenVal);}
   if(ef.doubleBuff){G.doubleMultiplier=(G.doubleMultiplier||1)*2;G.doubleNext=true;msgs.push('次の攻撃'+G.doubleMultiplier+'倍');}
   if(ef.halfShieldLoss){G.halfShieldLossTurns=(G.halfShieldLossTurns||0)+ef.halfShieldLoss;msgs.push('1T 盾半減防止');}
   if(ef.tempExile){
@@ -4550,12 +4553,13 @@ function processPlayerTurnEnd(onDone){
     });
   }
 
-  // 再生
+  // 再生（聖域）
   if(G.regenTurns>0){
     addStep((next)=>{
-      const rv=G.regenVal||3;
-      G.playerHp=Math.min(G.playerMaxHp,G.playerHp+rv);
-      addLog('💚 再生: HP+'+rv,'sys');
+      const baseRv=G.regenVal||3;
+      const rv=baseRv+(G.healBuff||0);
+      const _rha=healPlayer(rv);
+      addLog('🕊️ 聖域: HP+'+(G.healBuff>0?baseRv+'+'+G.healBuff+'=':'')+_rha,'sys');
       queueEffect(()=>spawnDmgNum('+'+rv,'heal'),80);
       G.regenTurns--;
       if(G.regenTurns<=0){ G.regenVal=0; }
@@ -5136,16 +5140,8 @@ function enemyTurn(){
       queueEffect(()=>{flashShield();flashShieldAdd('player',G.turnStartShieldBonus);sfxShield();}, 800);
       updateUI();
     }
-    // 聖域再生（healBuff適用）
-    if(G.regenTurns>0){
-      const baseRv=G.regenVal;
-      const rv=baseRv+(G.healBuff||0);
-      const _rha=healPlayer(rv);
-      addLog('🕊️ 聖域: HP+'+(G.healBuff>0?baseRv+'+'+G.healBuff+'=':'')+_rha,'sys');
-      G.regenTurns--;
-      if(G.regenTurns<=0) G.regenVal=0;
-      setTimeout(()=>{spawnDmgNum('+'+rv,'heal'); updateUI();},380);
-    }
+    // 聖域再生はプレイヤーターン終了時のみ処理する（旧：ここでも二重に回復していたバグを修正）
+
     // オートエンドターン判定
     setTimeout(()=>{
       if(G.phase==='player'){
@@ -6047,7 +6043,7 @@ function showSmithEvent(){
     const skipBtn=document.createElement('div');
     skipBtn.className='ov-btn';
     skipBtn.textContent='スキップして次へ';
-    bindTouch(skipBtn,()=>{restoreSmithBg();hideOv('ov-statup');afterEventNext();});
+    bindTouch(skipBtn,()=>{showSkipConfirm('本当にスキップしますか？',()=>{restoreSmithBg();hideOv('ov-statup');afterEventNext();});});
     list.appendChild(skipBtn);
     showOv('ov-statup');
     return;
@@ -6084,7 +6080,7 @@ function showSmithEvent(){
   const bottomBtn=document.createElement('div');
   bottomBtn.className='ov-btn';
   bottomBtn.textContent='スキップして次へ';
-  bindTouch(bottomBtn,()=>{restoreSmithBg();hideOv('ov-statup');afterEventNext();});
+  bindTouch(bottomBtn,()=>{showSkipConfirm('本当にスキップしますか？',()=>{restoreSmithBg();hideOv('ov-statup');afterEventNext();});});
   list.appendChild(bottomBtn);
 
   showOv('ov-statup');
@@ -8625,7 +8621,7 @@ function showAltarBeforeEnding(nextFn){
   // スキップもgoNextへ
   const skipBtn=document.getElementById('altar-skip');
   if(skipBtn){
-    const doSkip=()=>{if(_altarHandled)return;_altarHandled=true;hideOv('ov-altar');goNext();};
+    const doSkip=()=>{if(_altarHandled)return;showSkipConfirm('本当にスキップしますか？',()=>{if(_altarHandled)return;_altarHandled=true;hideOv('ov-altar');goNext();});};
     skipBtn.onclick=doSkip;
     skipBtn.ontouchend=(e)=>{e.preventDefault();doSkip();};
   }
@@ -10023,7 +10019,7 @@ function showSimpleConfirm(title, desc, onConfirm, appendToBody){
   if(appendToBody) document.body.appendChild(popup); else appendToApp(popup);
 }
 // btn-clear-restart / btn-over-restart は動的生成内でバインド済み（ver150）
-bind('banish-skip',()=>{sfxCancel();hideOv('ov-banish');afterEventNext();});
+bind('banish-skip',()=>{sfxCancel();showSkipConfirm('本当にスキップしますか？',()=>{hideOv('ov-banish');afterEventNext();});});
 bind('spring-skip',()=>{sfxCancel();hideOv('ov-spring');document.getElementById('confirm-box').classList.remove('show');afterEventNext();});
 bind('spring-cancel',()=>{sfxCancel();hideOv('ov-spring');document.getElementById('confirm-box').classList.remove('show');showEventSelection();});
 bind('duplicate-cancel',()=>{sfxCancel();hideOv('ov-duplicate');showEventSelection();});
@@ -11108,6 +11104,15 @@ function startGame(){
   }, 800);
 }
 
+// 汎用「スキップ」確認ダイアログ（confirm-boxを流用）
+function showSkipConfirm(message, onConfirm){
+  const cb=document.getElementById('confirm-box');
+  document.getElementById('cb-title').textContent=message||'本当にスキップしますか？';
+  cb.style.top=''; cb.style.bottom='';
+  document.getElementById('cb-ok').onclick=()=>{ cb.classList.remove('show'); onConfirm(); };
+  document.getElementById('cb-cancel').onclick=()=>cb.classList.remove('show');
+  cb.classList.add('show');
+}
 // タイトルへ戻るボタン
 bind('btn-to-title',()=>{
   if(G._cardTestMode){ exitCardTestMode(); return; }
