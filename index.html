@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver357</title>
+<title>DUNGEON WALKER DWCver358</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -808,7 +808,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver357</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver358</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2681,6 +2681,8 @@ function _restoreBattleVisualsFromSavedState(){
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===6
           ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===8
+          ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===2
           ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
           : G.areaId===3
@@ -3239,6 +3241,8 @@ function _startStageBattle(){
         : G.areaId===5
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===6
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===8
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===2
           ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
@@ -5539,22 +5543,25 @@ function _doVictoryReward(){
   selectedRewardEl=null;
   showOv('ov-reward');
 }
+// ===== エリアごとのクリア演出メッセージ（areaIdをキーに管理。未定義エリアはAREA_DATAの名前から自動生成） =====
+const AREA_END_MSG = {
+  0: {title:'CAVE CLEAR！', sub:'始まりの洞窟を踏破した！', color:'#7ec8a0'},
+  1: {title:'ALL CLEAR！', sub:'忘却の遺跡を完全踏破した！', color:'#c9a84c'},
+  2: {title:'TEMPLE CLEAR！', sub:'炎の神殿の神を討ち倒した！', color:'#e07030'},
+  3: {title:'RAIMEI CLEAR！', sub:'雷鳴の高原の支配者を討ち倒した！', color:'#f0d020'},
+  4: {title:'SWAMP CLEAR！', sub:'毒の沼地の主を討ち倒した！', color:'#7cc47a'},
+  5: {title:'FORTRESS CLEAR！', sub:'鉄壁の砦の番人を討ち倒した！', color:'#9cb0c8'},
+  6: {title:'ICE LABYRINTH CLEAR！', sub:'氷壁の迷宮の氷帝を討ち倒した！', color:'#78c8f0'},
+  8: {title:'RUINS CLEAR！', sub:'呪いの廃墟の呪縛を打ち払った！', color:'#a888c8'},
+};
 // ===== ステージ15クリア：豪華エンディング演出 =====
 function _showGrandEnding(){
-  // エリアごとのクリアメッセージ
-  const areaEndMsg= G.areaId===0
-    ? {title:'CAVE CLEAR！', sub:'始まりの洞窟を踏破した！', color:'#7ec8a0'}
-    : G.areaId===2
-      ? {title:'TEMPLE CLEAR！', sub:'炎の神殿の神を討ち倒した！', color:'#e07030'}
-      : G.areaId===3
-        ? {title:'RAIMEI CLEAR！', sub:'雷鳴の高原の支配者を討ち倒した！', color:'#f0d020'}
-        : G.areaId===4
-          ? {title:'SWAMP CLEAR！', sub:'毒の沼地の主を討ち倒した！', color:'#7cc47a'}
-          : G.areaId===5
-            ? {title:'FORTRESS CLEAR！', sub:'鉄壁の砦の番人を討ち倒した！', color:'#9cb0c8'}
-            : G.areaId===6
-              ? {title:'ICE LABYRINTH CLEAR！', sub:'氷壁の迷宮の氷帝を討ち倒した！', color:'#78c8f0'}
-              : {title:'ALL CLEAR！', sub:'忘却の遺跡を完全踏破した！', color:'#c9a84c'};
+  // エリアごとのクリアメッセージ（未登録のareaIdが来ても、AREA_DATAの名前から自動的にフォールバック生成する）
+  const areaEndMsg = AREA_END_MSG[G.areaId] || {
+    title: (AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].name || 'AREA')+' CLEAR！',
+    sub: (AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].name || 'このエリア')+'を踏破した！',
+    color: '#c9a84c'
+  };
   // 1. 画面を黒くフェードイン
   const fadeOverlay=document.createElement('div');
   fadeOverlay.style.cssText='position:fixed;inset:0;z-index:8500;background:#000;opacity:0;transition:opacity 1s;pointer-events:none;';
@@ -7251,7 +7258,9 @@ function updateUI(){
               ? ((e&&e.img)||null) // 氷壁の迷宮：既存画像流用＋新規ボス画像を直接使用
               : G.areaId===7
                 ? ((e&&e.img)||null) // チュートリアル：スライム(cave_enemy1.png)を直接使用
-                : (ENEMY_IMGS[G.stage]||(e&&e.img)||null));  // 遺跡：従来通りインデックス参照
+                : G.areaId===8
+                  ? ((e&&e.img)||null) // 呪いの廃墟：enemy_tuika系画像を直接使用
+                  : (ENEMY_IMGS[G.stage]||(e&&e.img)||null));  // 遺跡：従来通りインデックス参照
   if(imgSrc){
     // imgタグ方式でサイズを確実に指定する
     const _isFinal2=G.stage===getAreaEnemies().length-1;
@@ -7262,6 +7271,8 @@ function updateUI(){
       :G.areaId===5
         ?(_isFinal2?'scale-mid':'scale-small')
       :G.areaId===6
+        ?(_isFinal2?'scale-mid':'scale-small')
+      :G.areaId===8
         ?(_isFinal2?'scale-mid':'scale-small')
       :G.areaId===2
         ?(_isFinal2?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
@@ -11242,6 +11253,8 @@ const SHOP_ITEMS=[
   {id:'buy_gogeki',  cat:'soul', icon:'🪓', name:'強撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「強撃」カードの攻撃力+2', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'gogeki'},
   {id:'buy_kaifuku', cat:'soul', icon:'💗', name:'回復カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復」カードの回復力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kaifuku'},
   {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウルⅠ', desc:'③カード強化系 コスト1・「防御」カードの防御力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
+  {id:'buy_kyougekiSoul', cat:'soul', icon:'😤', name:'狂撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「狂撃」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kyougekiSoul'},
+  {id:'buy_dokubariSoul', cat:'soul', icon:'🪡', name:'毒針カードのソウルⅠ', desc:'③カード強化系 コスト1・「毒針」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'dokubariSoul'},
   {id:'buy_karurenSoul',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅠ',   desc:'③カード強化系 コスト1・「軽連打」の攻撃力+1（格闘家専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'karurenSoul'},
   {id:'buy_chikaraSoul',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅠ',   desc:'③カード強化系 コスト1・「力溜め」のドロー+1を+2に（重戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'chikaraSoul'},
   {id:'buy_bakudokuSoul',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅠ',     desc:'③カード強化系 コスト1・「爆毒」の攻撃力+2（錬金術師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bakudokuSoul'},
@@ -11249,8 +11262,6 @@ const SHOP_ITEMS=[
   {id:'buy_healReserveSoul', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅠ', desc:'③カード強化系 コスト1・「回復予約」の回復力+2（僧侶専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'healReserveSoul'},
   {id:'buy_funnuSoul',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅠ', desc:'③カード強化系 コスト1・「憤怒の舞」の攻撃力+2（祈祷師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'funnuSoul'},
   {id:'buy_ketsuyakuSoul',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅠ', desc:'③カード強化系 コスト1・「血の契約」のHP-10を-5に（狂戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'ketsuyakuSoul'},
-  {id:'buy_kyougekiSoul', cat:'soul', icon:'😤', name:'狂撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「狂撃」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kyougekiSoul'},
-  {id:'buy_dokubariSoul', cat:'soul', icon:'🪡', name:'毒針カードのソウルⅠ', desc:'③カード強化系 コスト1・「毒針」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'dokubariSoul'},
   {id:'buy_saiseiBougyo', cat:'soul', icon:'💗', name:'再生防御のソウルⅠ', desc:'④特殊効果付与系 コスト1・防御カードを使用するたび、HP+2回復する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'saiseiBougyo'},
   {id:'buy_kozeni',   cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅠ', desc:'④特殊効果付与系 コスト1・クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kozeni'},
   {id:'buy_kozeni2',  cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅡ', desc:'④特殊効果付与系 コスト2・クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する', price:20, currency:'crystal', unlockArea:'炎の神殿', oneTime:true, soulId:'kozeni2'},
@@ -11458,16 +11469,29 @@ function renderShopContent(){
     }
     // ソウルタブ・全て表示の時は、①〜④ごとに小見出しを挟んで見やすくする
     let _lastSoulSubcat=null;
+    // ③カード強化系の中で「共有カード強化のソウル」と「チャージ専用カードのソウル」をさらに見出しで区切る
+    let _lastCardSoulGroup=null;
     list.forEach(it=>{
+      const _soulRef=(cat==='soul')?SOULS[it.soulId]:null;
       if(cat==='soul' && !_shopActiveSoulCat){
-        const s=SOULS[it.soulId];
-        const sc=s?s.category:0;
+        const sc=_soulRef?_soulRef.category:0;
         if(sc!==_lastSoulSubcat){
           _lastSoulSubcat=sc;
+          _lastCardSoulGroup=null; // カテゴリ(①〜④)が切り替わったら③内の区切り状態もリセット
           const subTitle=document.createElement('div');
           subTitle.style.cssText='font-size:10px;color:#8ab8d8;margin:6px 0 4px;font-family:sans-serif;';
           subTitle.textContent=SOUL_SUBCAT_LABEL[sc]||'';
           sec.appendChild(subTitle);
+        }
+      }
+      if(cat==='soul' && _soulRef && _soulRef.category===3){
+        const grp=_soulRef.exclusiveCharge?'exclusive':'shared';
+        if(grp!==_lastCardSoulGroup){
+          _lastCardSoulGroup=grp;
+          const grpTitle=document.createElement('div');
+          grpTitle.style.cssText='font-size:9px;color:#7ec8a0;margin:8px 0 4px;padding-top:7px;border-top:1px dashed rgba(255,255,255,.18);font-family:sans-serif;letter-spacing:.5px;';
+          grpTitle.textContent=(grp==='exclusive')?'⚡ チャージ専用カードのソウル':'🃏 共有カード強化のソウル';
+          sec.appendChild(grpTitle);
         }
       }
       const priceLabel=_formatItemPrice(it);
