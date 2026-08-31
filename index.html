@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver361</title>
+<title>DUNGEON WALKER DWCver364</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -808,7 +808,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver361</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver364</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -992,7 +992,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div style="font-size:10px;color:#ccc;line-height:1.5;padding:6px 8px;background:rgba(0,0,0,.55);border-radius:6px;">
     ダンジョン攻略で手に入るゴールド・ソウルを使って、ソウル・カード・エリア解放・各種上限拡張を購入できます。特定のエリアをクリアすると、追加の品が並ぶことがあります。
   </div>
-  <div id="shop-tabs" style="width:100%;display:flex;gap:4px;">
+  <div id="shop-tabs" style="display:none;width:100%;gap:4px;">
     <div class="shop-tab" data-cat="soul" style="flex:1;text-align:center;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:6px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">💠 ソウル</div>
     <div class="shop-tab" data-cat="card" style="flex:1;text-align:center;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:6px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">🃏 カード</div>
     <div class="shop-tab" data-cat="area" style="flex:1;text-align:center;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:6px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">🗺️ エリア</div>
@@ -11446,7 +11446,11 @@ function renderShopContent(){
 
   // カテゴリ未選択時：4分類を選ぶ大きなボックスだけを表示する
   const subtabsEl0=document.getElementById('shop-soul-subtabs');
-  if(subtabsEl0) subtabsEl0.style.display='none';
+  if(subtabsEl0){
+    subtabsEl0.style.display='none';
+    // content.innerHTML=''で誤って破棄されないよう、contentの外（body直下）へ退避しておく
+    if(subtabsEl0.parentElement===content) document.body.appendChild(subtabsEl0);
+  }
   if(!_shopActiveCat){
     content.innerHTML='';
     const boxWrap=document.createElement('div');
@@ -11457,12 +11461,16 @@ function renderShopContent(){
       area:{icon:'🗺️',label:'エリア解放',desc:'新しいエリアの解放'},
       cap:{icon:'📦',label:'上限解放',desc:'デッキポイントやソウル枠などの各種上限を拡張'}
     };
+    const _unlockedNow=_shopUnlockedItems();
     Object.keys(BOX_INFO).forEach(cat=>{
       const info=BOX_INFO[cat];
-      const cnt=_shopUnlockedItems().filter(it=>it.cat===cat && !(it.oneTime && SAVE.shopPurchased[it.id])).length;
+      const _catItems=_unlockedNow.filter(it=>it.cat===cat && !(it.oneTime && SAVE.shopPurchased[it.id]));
+      const cnt=_catItems.length;
+      const _hasNew=_catItems.some(it=>(SAVE.shopNewItemIds||[]).includes(it.id));
       const box=document.createElement('div');
-      box.style.cssText='width:100%;display:flex;align-items:center;gap:12px;background:rgba(10,8,6,.78);border:1px solid rgba(201,168,76,.4);border-radius:12px;padding:14px 16px;cursor:pointer;touch-action:manipulation;';
+      box.style.cssText='width:100%;display:flex;align-items:center;gap:12px;background:rgba(10,8,6,.78);border:1px solid rgba(201,168,76,.4);border-radius:12px;padding:14px 16px;cursor:pointer;touch-action:manipulation;position:relative;';
       box.innerHTML=
+        (_hasNew?'<span style="position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;font-size:9px;font-weight:bold;padding:2px 6px;border-radius:10px;letter-spacing:1px;box-shadow:0 0 6px rgba(231,76,60,.8);">NEW</span>':'')+
         '<span style="font-size:26px;">'+info.icon+'</span>'+
         '<div style="flex:1;min-width:0;">'+
           '<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#f0d47a;font-weight:bold;">'+info.label+' <span style="font-size:10px;color:#999;font-weight:normal;">（'+cnt+'点）</span></div>'+
@@ -11487,8 +11495,10 @@ function renderShopContent(){
   items=items.filter(it=>it.cat===_shopActiveCat);
 
   // ソウルタブの時だけ、①〜④の系統サブタブを表示する
+  // 戻るボタンの下に来るよう、shop-content内（戻るボタンの直後）に付け替えて表示する
   const subtabsEl=document.getElementById('shop-soul-subtabs');
   if(subtabsEl){
+    content.appendChild(subtabsEl);
     subtabsEl.style.display=(_shopActiveCat==='soul')?'flex':'none';
     document.querySelectorAll('#shop-soul-subtabs .shop-subtab').forEach(el=>{
       const sc=el.getAttribute('data-soulcat');
@@ -11668,9 +11678,15 @@ function _buyShopItem(it){
     else if(it.capType==='soulcat') increaseSoulCapacity(it.category);
   }
   if(it.oneTime) SAVE.shopPurchased[it.id]=true;
+  // 購入した商品のNEWタグを消す。残りが無くなったらショップアイコンのNEWバッジも消す。
+  if(SAVE.shopNewItemIds && SAVE.shopNewItemIds.includes(it.id)){
+    SAVE.shopNewItemIds=SAVE.shopNewItemIds.filter(id=>id!==it.id);
+    if(SAVE.shopNewItemIds.length===0) SAVE.shopNewBadge=false;
+  }
   writeSaveData();
   _deckEditShowMsg('🛒 「'+it.name+'」を購入しました！ '+beforeLabel+' → '+afterLabel,true);
   renderShopContent();
+  _updateShopNewBadge();
   if(it.cat==='area' && typeof showAreaSelect==='function'){
     // エリア選択画面が開いていれば解放状態を反映
     const areaSelEl=document.getElementById('ov-area-select');
