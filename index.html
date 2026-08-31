@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver364</title>
+<title>DUNGEON WALKER DWCver365</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -808,7 +808,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver364</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver365</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2054,7 +2054,7 @@ const SWAMP_ENEMIES=[
   {name:'腐敗妖精',      icon:'🧚',hp:70,  atk:12, shield:8,  rank:1, pattern:['poisonatk','poisonatk','def','big'],   boss:false, img:'enemy_tuika26.png'},
   {name:'呪われた樹精',  icon:'🌲',hp:80,  atk:14, shield:10, rank:2, pattern:['poisonatk','atk','big','def'],         boss:false, img:'enemy_tuika24.png'},
   {name:'ポイズングール',icon:'🧟',hp:100, atk:16, shield:12, rank:2, pattern:['poisonatk','big','def','poisonatk'],   boss:false, img:'enemy_tuika2.png'},
-  {name:'ダークフェアリー',icon:'🧚',hp:120,atk:17, shield:18, rank:3, pattern:['poisonatk','moudokuatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
+  {name:'ダークフェアリー',icon:'🧚',hp:120,atk:17, shield:18, rank:3, pattern:['poisonatk','poisonatk','def','poisonatk','bigheal'], boss:true, img:'enemy_tuika20.png'},
 ];
 // 鉄壁の砦 敵データ（areaId:5）※1〜4は既存モンスター（名前に「（防御型）」を付与）、5〜7は追加モンスター(enemy_tuika)を使用
 // ステージ1〜6：石造りモンスターとして半角英字名に変更し、グレー寄りの石調フィルターを適用（ステージ7のボスは対象外）
@@ -2737,13 +2737,13 @@ function _restoreBattleVisualsFromSavedState(){
 // clear：エリアクリアのたびに毎回付与／noContinue・allCharge：達成時に1回だけ付与
 const AREA_REWARDS={
   0: {clearGold:5,  clearCrystal:3,  noContinueGold:10, noContinueCrystal:5,  allChargeGold:30,  allChargeCrystal:15},
-  4: {clearGold:10, clearCrystal:5,  noContinueGold:30, noContinueCrystal:15, allChargeGold:40,  allChargeCrystal:20},
-  5: {clearGold:10, clearCrystal:5,  noContinueGold:30, noContinueCrystal:15, allChargeGold:40,  allChargeCrystal:20},
-  2: {clearGold:20, clearCrystal:10, noContinueGold:50, noContinueCrystal:30, allChargeGold:80,  allChargeCrystal:40},
-  3: {clearGold:20, clearCrystal:10, noContinueGold:50, noContinueCrystal:30, allChargeGold:80,  allChargeCrystal:40},
-  6: {clearGold:20, clearCrystal:10, noContinueGold:50, noContinueCrystal:30, allChargeGold:80,  allChargeCrystal:40},
-  1: {clearGold:40, clearCrystal:20, noContinueGold:80, noContinueCrystal:40, allChargeGold:160, allChargeCrystal:80},
-  8: {clearGold:7,  clearCrystal:5,  noContinueGold:12, noContinueCrystal:7,  allChargeGold:20,  allChargeCrystal:10},
+  4: {clearGold:20, clearCrystal:10, noContinueGold:25, noContinueCrystal:15, allChargeGold:40,  allChargeCrystal:20},
+  5: {clearGold:20, clearCrystal:10, noContinueGold:25, noContinueCrystal:15, allChargeGold:40,  allChargeCrystal:20},
+  2: {clearGold:40, clearCrystal:20, noContinueGold:45, noContinueCrystal:25, allChargeGold:80,  allChargeCrystal:40},
+  3: {clearGold:40, clearCrystal:20, noContinueGold:45, noContinueCrystal:25, allChargeGold:80,  allChargeCrystal:40},
+  6: {clearGold:40, clearCrystal:20, noContinueGold:45, noContinueCrystal:25, allChargeGold:80,  allChargeCrystal:40},
+  1: {clearGold:100,clearCrystal:50, noContinueGold:120,noContinueCrystal:60, allChargeGold:160, allChargeCrystal:80},
+  8: {clearGold:10, clearCrystal:6,  noContinueGold:15, noContinueCrystal:9,  allChargeGold:20,  allChargeCrystal:10},
 };
 // 全体共通報酬（クリア済みエリア数に応じて1回だけ付与）※未設定
 const GLOBAL_AREA_COUNT_REWARDS={2:null, 4:null, 6:null};
@@ -2928,21 +2928,21 @@ const SOULS={
   funnuSoul:       {id:'funnuSoul',       name:'憤怒の舞カードのソウルⅠ', category:3, cost:1, icon:'💃', desc:'「憤怒の舞」カードの攻撃力の数値に+2', exclusiveCharge:'inori'},
   ketsuyakuSoul:   {id:'ketsuyakuSoul',   name:'血の契約カードのソウルⅠ', category:3, cost:1, icon:'🩸', desc:'「血の契約」カードのHP-10をHP-5に変更', exclusiveCharge:'haki'},
   // ===== カード強化系ソウルⅡ（すべてⅠ所持が前提。コスト2。3エリアクリア後販売） =====
-  zangeki2: {id:'zangeki2', name:'斬撃カードのソウルⅡ', category:3, cost:2, icon:'⚔️', desc:'「斬撃」カードの攻撃力+2', requireSouls:['zangeki'], cardBonus:{cardId:'strike', atkAdd:2}},
-  gogeki2:  {id:'gogeki2',  name:'強撃カードのソウルⅡ', category:3, cost:2, icon:'🪓', desc:'「強撃」カードの攻撃力+4', requireSouls:['gogeki'], cardBonus:{cardId:'bash', atkAdd:4}},
-  kaifuku2: {id:'kaifuku2', name:'回復カードのソウルⅡ', category:3, cost:2, icon:'💗', desc:'「回復」カードの回復力+2', requireSouls:['kaifuku'], healBonus:{cardId:'heal', healAdd:2}},
-  bougyo2:  {id:'bougyo2',  name:'防御カードのソウルⅡ', category:3, cost:2, icon:'🛡️', desc:'「防御」カードの防御力+2', requireSouls:['bougyo'], shieldBonus:{cardId:'guard', shieldAdd:2}},
-  karurenSoul2:     {id:'karurenSoul2',     name:'軽連打カードのソウルⅡ',   category:3, cost:2, icon:'👊', desc:'「軽連打」カードの攻撃力の数値に+2', exclusiveCharge:'renGeki',    requireSouls:['karurenSoul'],     cardBonus:{cardId:'karuren', atkAdd:2}},
+  zangeki2: {id:'zangeki2', name:'斬撃カードのソウルⅡ', category:3, cost:2, icon:'⚔️', desc:'「斬撃」カードの攻撃力+3', requireSouls:['zangeki'], cardBonus:{cardId:'strike', atkAdd:3}},
+  gogeki2:  {id:'gogeki2',  name:'強撃カードのソウルⅡ', category:3, cost:2, icon:'🪓', desc:'「強撃」カードの攻撃力+6', requireSouls:['gogeki'], cardBonus:{cardId:'bash', atkAdd:6}},
+  kaifuku2: {id:'kaifuku2', name:'回復カードのソウルⅡ', category:3, cost:2, icon:'💗', desc:'「回復」カードの回復力+3', requireSouls:['kaifuku'], healBonus:{cardId:'heal', healAdd:3}},
+  bougyo2:  {id:'bougyo2',  name:'防御カードのソウルⅡ', category:3, cost:2, icon:'🛡️', desc:'「防御」カードの防御力+3', requireSouls:['bougyo'], shieldBonus:{cardId:'guard', shieldAdd:3}},
+  karurenSoul2:     {id:'karurenSoul2',     name:'軽連打カードのソウルⅡ',   category:3, cost:2, icon:'👊', desc:'「軽連打」カードの攻撃力の数値に+3', exclusiveCharge:'renGeki',    requireSouls:['karurenSoul'],     cardBonus:{cardId:'karuren', atkAdd:3}},
   chikaraSoul2:     {id:'chikaraSoul2',     name:'力溜めカードのソウルⅡ',   category:3, cost:2, icon:'💪', desc:'「力溜め」カードのマナ+1をマナ+2に', exclusiveCharge:'tameAtk',    requireSouls:['chikaraSoul']},
   bakudokuSoul2:    {id:'bakudokuSoul2',    name:'爆毒カードのソウルⅡ',     category:3, cost:2, icon:'💀', desc:'「爆毒」カードの攻撃力の数値に+4', exclusiveCharge:'dokushi',     requireSouls:['bakudokuSoul']},
-  tsumikasaneSoul2: {id:'tsumikasaneSoul2', name:'積み重ねカードのソウルⅡ', category:3, cost:2, icon:'📚', desc:'「積み重ね」カードの攻撃力の数値に+4', exclusiveCharge:'teppeki',   requireSouls:['tsumikasaneSoul']},
-  healReserveSoul2: {id:'healReserveSoul2', name:'回復予約カードのソウルⅡ', category:3, cost:2, icon:'💊', desc:'「回復予約」カードの回復力の数値に+4', exclusiveCharge:'jikoSaisei', requireSouls:['healReserveSoul']},
-  funnuSoul2:       {id:'funnuSoul2',       name:'憤怒の舞カードのソウルⅡ', category:3, cost:2, icon:'💃', desc:'「憤怒の舞」カードの攻撃力の数値に+4', exclusiveCharge:'inori',      requireSouls:['funnuSoul']},
-  ketsuyakuSoul2:   {id:'ketsuyakuSoul2',   name:'血の契約カードのソウルⅡ', category:3, cost:2, icon:'🩸', desc:'「血の契約」カードの攻撃力の数値に+4', exclusiveCharge:'haki',      requireSouls:['ketsuyakuSoul'], cardBonus:{cardId:'bloodPact', atkAdd:4}},
+  tsumikasaneSoul2: {id:'tsumikasaneSoul2', name:'積み重ねカードのソウルⅡ', category:3, cost:2, icon:'📚', desc:'「積み重ね」カードの攻撃力の数値に+6', exclusiveCharge:'teppeki',   requireSouls:['tsumikasaneSoul']},
+  healReserveSoul2: {id:'healReserveSoul2', name:'回復予約カードのソウルⅡ', category:3, cost:2, icon:'💊', desc:'「回復予約」カードの回復力の数値に+6', exclusiveCharge:'jikoSaisei', requireSouls:['healReserveSoul']},
+  funnuSoul2:       {id:'funnuSoul2',       name:'憤怒の舞カードのソウルⅡ', category:3, cost:2, icon:'💃', desc:'「憤怒の舞」カードの攻撃力の数値に+6', exclusiveCharge:'inori',      requireSouls:['funnuSoul']},
+  ketsuyakuSoul2:   {id:'ketsuyakuSoul2',   name:'血の契約カードのソウルⅡ', category:3, cost:2, icon:'🩸', desc:'「血の契約」カードの攻撃力の数値に+6', exclusiveCharge:'haki',      requireSouls:['ketsuyakuSoul'], cardBonus:{cardId:'bloodPact', atkAdd:6}},
   kyougekiSoul:    {id:'kyougekiSoul',    name:'狂撃カードのソウルⅠ',     category:3, cost:1, icon:'😤', desc:'「狂撃」カードの攻撃力+1', cardBonus:{cardId:'kyougeki', atkAdd:1}},
   dokubariSoul:    {id:'dokubariSoul',    name:'毒針カードのソウルⅠ',     category:3, cost:1, icon:'🪡', desc:'「毒針」カードの攻撃力+1', cardBonus:{cardId:'poisonNeedle', atkAdd:1}},
-  kyougekiSoul2:   {id:'kyougekiSoul2',   name:'狂撃カードのソウルⅡ',     category:3, cost:2, icon:'😤', desc:'「狂撃」カードの攻撃力+3', requireSouls:['kyougekiSoul'], cardBonus:{cardId:'kyougeki', atkAdd:3}},
-  dokubariSoul2:   {id:'dokubariSoul2',   name:'毒針カードのソウルⅡ',     category:3, cost:2, icon:'🪡', desc:'「毒針」カードの攻撃力+3', requireSouls:['dokubariSoul'], cardBonus:{cardId:'poisonNeedle', atkAdd:3}},
+  kyougekiSoul2:   {id:'kyougekiSoul2',   name:'狂撃カードのソウルⅡ',     category:3, cost:2, icon:'😤', desc:'「狂撃」カードの攻撃力+4', requireSouls:['kyougekiSoul'], cardBonus:{cardId:'kyougeki', atkAdd:4}},
+  dokubariSoul2:   {id:'dokubariSoul2',   name:'毒針カードのソウルⅡ',     category:3, cost:2, icon:'🪡', desc:'「毒針」カードの攻撃力+4', requireSouls:['dokubariSoul'], cardBonus:{cardId:'poisonNeedle', atkAdd:4}},
   saiseiBougyo: {id:'saiseiBougyo', name:'再生防御のソウルⅠ', category:4, cost:1, icon:'💗', desc:'防御カードを使用するたび、HP+2回復する'},
   kozeni:  {id:'kozeni',  name:'小銭稼ぎのソウルⅠ', category:4, cost:1, icon:'🪙', desc:'クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する'},
   kozeni2: {id:'kozeni2', name:'小銭稼ぎのソウルⅡ', category:4, cost:2, icon:'🪙', desc:'クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する'},
@@ -3026,7 +3026,7 @@ function toggleSoulEquip(soulId,chargeId){
 // 装着中ソウルによる特定カードの攻撃力ボーナス（斬撃のソウル・強撃のソウル等）
 // cardBaseId: カードの基本ID（鍛冶屋強化後は_baseIdを渡すこと）
 function getFuryDanceBaseAtk(){
-  return 3+(getEquippedSouls().includes('funnuSoul')?2:0)+(getEquippedSouls().includes('funnuSoul2')?4:0);
+  return 3+(getEquippedSouls().includes('funnuSoul')?2:0)+(getEquippedSouls().includes('funnuSoul2')?6:0);
 }
 // チャージ専用カードソウルの効果を、ステージ中のカードテキストに反映させる
 function getDisplayCardDesc(c){
@@ -3047,11 +3047,11 @@ function getDisplayCardDesc(c){
     return '敵の毒カウント+'+_b+'分ダメージ / 毒カウントを半減';
   }
   if(baseId==='accumulate' && (equipped.includes('tsumikasaneSoul')||equipped.includes('tsumikasaneSoul2'))){
-    const _b=(equipped.includes('tsumikasaneSoul')?2:0)+(equipped.includes('tsumikasaneSoul2')?4:0);
+    const _b=(equipped.includes('tsumikasaneSoul')?2:0)+(equipped.includes('tsumikasaneSoul2')?6:0);
     return 'このステージ中に消費したマナの数+'+_b+'分ダメージを与える';
   }
   if(baseId==='healReserve' && (equipped.includes('healReserveSoul')||equipped.includes('healReserveSoul2'))){
-    const _b=4+(equipped.includes('healReserveSoul')?2:0)+(equipped.includes('healReserveSoul2')?4:0);
+    const _b=4+(equipped.includes('healReserveSoul')?2:0)+(equipped.includes('healReserveSoul2')?6:0);
     return '次のターン開始時 HP+'+_b;
   }
   if(baseId==='furyDance' && (equipped.includes('funnuSoul')||equipped.includes('funnuSoul2'))){
@@ -3817,7 +3817,7 @@ function playCard(idx, _isChain){
   if(ef.costSumDmg){
     const spent=G.stageManaSpent||0;
     const _tsumikasaneBonus=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul'))?2:0;
-    const _tsumikasaneBonus2=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul2'))?4:0;
+    const _tsumikasaneBonus2=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul2'))?6:0;
     const d=Math.max(1,(spent+G.atkBuff+_tsumikasaneBonus+_tsumikasaneBonus2))*(G.doubleNext?2:1);
     if(G.doubleNext) G.doubleNext=false;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;}
@@ -4049,7 +4049,7 @@ function playCard(idx, _isChain){
   if(ef.nextTurnDrawBonus){const _drawBonusExtra=(cid==='chikara'&&getEquippedSouls().includes('chikaraSoul'))?1:0;G.nextTurnDrawBonusPending=(G.nextTurnDrawBonusPending||0)+ef.nextTurnDrawBonus+_drawBonusExtra;msgs.push('次T ドロー+'+(ef.nextTurnDrawBonus+_drawBonusExtra));}
   if(ef.nextTurnManaBonus){const _chikaraManaExtra=(cid==='chikara'&&getEquippedSouls().includes('chikaraSoul2'))?1:0;G.nextManaBonus=(G.nextManaBonus||0)+ef.nextTurnManaBonus+_chikaraManaExtra;msgs.push('次T マナ+'+(ef.nextTurnManaBonus+_chikaraManaExtra));}
   // 回復予約：次のターン開始時HP+N
-  if(ef.nextTurnHealBonus){const _healReserveBonus=(cid==='healReserve'&&getEquippedSouls().includes('healReserveSoul'))?2:0;const _healReserveBonus2=(cid==='healReserve'&&getEquippedSouls().includes('healReserveSoul2'))?4:0;G.nextTurnHealBonus=(G.nextTurnHealBonus||0)+ef.nextTurnHealBonus+_healReserveBonus+_healReserveBonus2;msgs.push('次T HP+'+(ef.nextTurnHealBonus+_healReserveBonus+_healReserveBonus2));}
+  if(ef.nextTurnHealBonus){const _healReserveBonus=(cid==='healReserve'&&getEquippedSouls().includes('healReserveSoul'))?2:0;const _healReserveBonus2=(cid==='healReserve'&&getEquippedSouls().includes('healReserveSoul2'))?6:0;G.nextTurnHealBonus=(G.nextTurnHealBonus||0)+ef.nextTurnHealBonus+_healReserveBonus+_healReserveBonus2;msgs.push('次T HP+'+(ef.nextTurnHealBonus+_healReserveBonus+_healReserveBonus2));}
   // 連撃回復：このターン攻撃カード使用ごとHP+3をONにする
   if(ef.comboHealOn){G.comboHealActive=true;G.comboHealVal=ef.comboHealVal||3;msgs.push('攻撃カード使用ごとHP+'+(G.comboHealVal)+'！');}
   // 踏み倒し：次カードコスト0（1ターン1度）
@@ -7999,7 +7999,7 @@ function renderHand(){
           return '攻'+_hi(dmg)+'（攻カード'+atkCount+'枚）';
         }
         case 'accumulate':{
-          const _tsumikasaneBonus=(getEquippedSouls().includes('tsumikasaneSoul')?2:0)+(getEquippedSouls().includes('tsumikasaneSoul2')?4:0);
+          const _tsumikasaneBonus=(getEquippedSouls().includes('tsumikasaneSoul')?2:0)+(getEquippedSouls().includes('tsumikasaneSoul2')?6:0);
           const dmg=_d((G.stageManaSpent||0)+_atk+_tsumikasaneBonus);
           return '攻'+_hi(dmg)+'（消費マナ'+(G.stageManaSpent||0)+(_tsumikasaneBonus?'+'+_tsumikasaneBonus:'')+'）';
         }
@@ -8102,7 +8102,7 @@ function renderHand(){
           return '次カード2回発動<br><span style="color:#e74c3c;font-size:5px;">→スキル不可</span>';
         }
         case 'healReserve':{
-          const _healReserveBonus=(getEquippedSouls().includes('healReserveSoul')?2:0)+(getEquippedSouls().includes('healReserveSoul2')?4:0);
+          const _healReserveBonus=(getEquippedSouls().includes('healReserveSoul')?2:0)+(getEquippedSouls().includes('healReserveSoul2')?6:0);
           const hv=4+_healReserveBonus+(G.nextTurnHealBonus||0)+(G.healBuff||0);
           return '次T <span style="color:#52be80;">HP+'+hv+'</span>';
         }
@@ -11294,8 +11294,8 @@ const SHOP_ITEMS=[
   {id:'buy_bougyo',   cat:'soul', icon:'🛡️', name:'防御カードのソウルⅠ', desc:'③カード強化系 コスト1・「防御」カードの防御力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bougyo'},
   {id:'buy_kyougekiSoul', cat:'soul', icon:'😤', name:'狂撃カードのソウルⅠ', desc:'③カード強化系 コスト1・「狂撃」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kyougekiSoul'},
   {id:'buy_dokubariSoul', cat:'soul', icon:'🪡', name:'毒針カードのソウルⅠ', desc:'③カード強化系 コスト1・「毒針」カードの攻撃力+1', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'dokubariSoul'},
-  {id:'buy_kyougekiSoul2', cat:'soul', icon:'😤', name:'狂撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「狂撃」カードの攻撃力+3', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['kyougekiSoul'], oneTime:true, soulId:'kyougekiSoul2'},
-  {id:'buy_dokubariSoul2', cat:'soul', icon:'🪡', name:'毒針カードのソウルⅡ', desc:'③カード強化系 コスト2・「毒針」カードの攻撃力+3', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['dokubariSoul'], oneTime:true, soulId:'dokubariSoul2'},
+  {id:'buy_kyougekiSoul2', cat:'soul', icon:'😤', name:'狂撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「狂撃」カードの攻撃力+4', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['kyougekiSoul'], oneTime:true, soulId:'kyougekiSoul2'},
+  {id:'buy_dokubariSoul2', cat:'soul', icon:'🪡', name:'毒針カードのソウルⅡ', desc:'③カード強化系 コスト2・「毒針」カードの攻撃力+4', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['dokubariSoul'], oneTime:true, soulId:'dokubariSoul2'},
   {id:'buy_karurenSoul',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅠ',   desc:'③カード強化系 コスト1・「軽連打」の攻撃力+1（格闘家専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'karurenSoul'},
   {id:'buy_chikaraSoul',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅠ',   desc:'③カード強化系 コスト1・「力溜め」のドロー+1を+2に（重戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'chikaraSoul'},
   {id:'buy_bakudokuSoul',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅠ',     desc:'③カード強化系 コスト1・「爆毒」の攻撃力+2（錬金術師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'bakudokuSoul'},
@@ -11304,17 +11304,17 @@ const SHOP_ITEMS=[
   {id:'buy_funnuSoul',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅠ', desc:'③カード強化系 コスト1・「憤怒の舞」の攻撃力+2（祈祷師専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'funnuSoul'},
   {id:'buy_ketsuyakuSoul',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅠ', desc:'③カード強化系 コスト1・「血の契約」のHP-10を-5に（狂戦士専用）', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'ketsuyakuSoul'},
   // ===== カード強化系ソウルⅡ（3エリアクリア後販売・共用4種＋専用7種、すべて1度のみ購入） =====
-  {id:'buy_zangeki2', cat:'soul', icon:'⚔️', name:'斬撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「斬撃」カードの攻撃力+2', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['zangeki'], oneTime:true, soulId:'zangeki2'},
-  {id:'buy_gogeki2',  cat:'soul', icon:'🪓', name:'強撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「強撃」カードの攻撃力+4', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['gogeki'], oneTime:true, soulId:'gogeki2'},
-  {id:'buy_kaifuku2', cat:'soul', icon:'💗', name:'回復カードのソウルⅡ', desc:'③カード強化系 コスト2・「回復」カードの回復力+2', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['kaifuku'], oneTime:true, soulId:'kaifuku2'},
-  {id:'buy_bougyo2',  cat:'soul', icon:'🛡️', name:'防御カードのソウルⅡ', desc:'③カード強化系 コスト2・「防御」カードの防御力+2', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['bougyo'], oneTime:true, soulId:'bougyo2'},
-  {id:'buy_karurenSoul2',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅡ',   desc:'③カード強化系 コスト2・「軽連打」カードの攻撃力の数値に+2（格闘家専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['karurenSoul'], oneTime:true, soulId:'karurenSoul2'},
+  {id:'buy_zangeki2', cat:'soul', icon:'⚔️', name:'斬撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「斬撃」カードの攻撃力+3', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['zangeki'], oneTime:true, soulId:'zangeki2'},
+  {id:'buy_gogeki2',  cat:'soul', icon:'🪓', name:'強撃カードのソウルⅡ', desc:'③カード強化系 コスト2・「強撃」カードの攻撃力+6', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['gogeki'], oneTime:true, soulId:'gogeki2'},
+  {id:'buy_kaifuku2', cat:'soul', icon:'💗', name:'回復カードのソウルⅡ', desc:'③カード強化系 コスト2・「回復」カードの回復力+3', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['kaifuku'], oneTime:true, soulId:'kaifuku2'},
+  {id:'buy_bougyo2',  cat:'soul', icon:'🛡️', name:'防御カードのソウルⅡ', desc:'③カード強化系 コスト2・「防御」カードの防御力+3', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['bougyo'], oneTime:true, soulId:'bougyo2'},
+  {id:'buy_karurenSoul2',     cat:'soul', icon:'👊', name:'軽連打カードのソウルⅡ',   desc:'③カード強化系 コスト2・「軽連打」カードの攻撃力の数値に+3（格闘家専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['karurenSoul'], oneTime:true, soulId:'karurenSoul2'},
   {id:'buy_chikaraSoul2',     cat:'soul', icon:'💪', name:'力溜めカードのソウルⅡ',   desc:'③カード強化系 コスト2・「力溜め」カードのマナ+1をマナ+2に（重戦士専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['chikaraSoul'], oneTime:true, soulId:'chikaraSoul2'},
   {id:'buy_bakudokuSoul2',    cat:'soul', icon:'💀', name:'爆毒カードのソウルⅡ',     desc:'③カード強化系 コスト2・「爆毒」カードの攻撃力の数値に+4（錬金術師専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['bakudokuSoul'], oneTime:true, soulId:'bakudokuSoul2'},
-  {id:'buy_tsumikasaneSoul2', cat:'soul', icon:'📚', name:'積み重ねカードのソウルⅡ', desc:'③カード強化系 コスト2・「積み重ね」カードの攻撃力の数値に+4（守護者専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['tsumikasaneSoul'], oneTime:true, soulId:'tsumikasaneSoul2'},
-  {id:'buy_healReserveSoul2', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅡ', desc:'③カード強化系 コスト2・「回復予約」カードの回復力の数値に+4（僧侶専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['healReserveSoul'], oneTime:true, soulId:'healReserveSoul2'},
-  {id:'buy_funnuSoul2',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅡ', desc:'③カード強化系 コスト2・「憤怒の舞」カードの攻撃力の数値に+4（祈祷師専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['funnuSoul'], oneTime:true, soulId:'funnuSoul2'},
-  {id:'buy_ketsuyakuSoul2',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅡ', desc:'③カード強化系 コスト2・「血の契約」カードの攻撃力の数値に+4（狂戦士専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['ketsuyakuSoul'], oneTime:true, soulId:'ketsuyakuSoul2'},
+  {id:'buy_tsumikasaneSoul2', cat:'soul', icon:'📚', name:'積み重ねカードのソウルⅡ', desc:'③カード強化系 コスト2・「積み重ね」カードの攻撃力の数値に+6（守護者専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['tsumikasaneSoul'], oneTime:true, soulId:'tsumikasaneSoul2'},
+  {id:'buy_healReserveSoul2', cat:'soul', icon:'💊', name:'回復予約カードのソウルⅡ', desc:'③カード強化系 コスト2・「回復予約」カードの回復力の数値に+6（僧侶専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['healReserveSoul'], oneTime:true, soulId:'healReserveSoul2'},
+  {id:'buy_funnuSoul2',       cat:'soul', icon:'💃', name:'憤怒の舞カードのソウルⅡ', desc:'③カード強化系 コスト2・「憤怒の舞」カードの攻撃力の数値に+6（祈祷師専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['funnuSoul'], oneTime:true, soulId:'funnuSoul2'},
+  {id:'buy_ketsuyakuSoul2',   cat:'soul', icon:'🩸', name:'血の契約カードのソウルⅡ', desc:'③カード強化系 コスト2・「血の契約」カードの攻撃力の数値に+6（狂戦士専用）', price:40, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['ketsuyakuSoul'], oneTime:true, soulId:'ketsuyakuSoul2'},
   {id:'buy_saiseiBougyo', cat:'soul', icon:'💗', name:'再生防御のソウルⅠ', desc:'④特殊効果付与系 コスト1・防御カードを使用するたび、HP+2回復する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'saiseiBougyo'},
   {id:'buy_kozeni',   cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅠ', desc:'④特殊効果付与系 コスト1・クリア報酬獲得時、ゴールド+5・クリスタル+2を追加する', price:10, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kozeni'},
   {id:'buy_kozeni2',  cat:'soul', icon:'🪙', name:'小銭稼ぎのソウルⅡ', desc:'④特殊効果付与系 コスト2・クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する', price:20, currency:'crystal', unlockArea:'炎の神殿', oneTime:true, soulId:'kozeni2'},
