@@ -1674,14 +1674,14 @@ const CHARGE_TYPES = {
     triggerType:'shieldGain',
     color:'#2980b9',
     levels:{
-      1:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを半減（切り捨て）',
-         effectType:'nextDmgHalf', manaBonus:0},
-      2:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを半減（切り捨て） + マナ+1',
-         effectType:'nextDmgHalf', manaBonus:1},
-      3:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵からの被ダメを無効 + マナ+1',
-         effectType:'nextDmgNull', manaBonus:1},
-      4:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵攻撃と、状態異常・追加効果を全て無効（呪縛タイマーとエリア効果は除く）',
-         effectType:'nextAttackFullNull', manaBonus:0},
+      1:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵ターンに受けるダメージを30%軽減（小数点以下切り捨て／敵が攻撃してこなくても次の敵ターン終了で効果は切れる）',
+         effectType:'nextDmgPercent', percent:30},
+      2:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵ターンに受けるダメージを40%軽減（小数点以下切り捨て／敵が攻撃してこなくても次の敵ターン終了で効果は切れる）',
+         effectType:'nextDmgPercent', percent:40},
+      3:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵ターンに受けるダメージを50%軽減（小数点以下切り捨て／敵が攻撃してこなくても次の敵ターン終了で効果は切れる）',
+         effectType:'nextDmgPercent', percent:50},
+      4:{maxCount:3, desc:'盾を獲得するたびに1溜まる。3溜まったらゲージをタップして手動発動：次の敵ターンに受けるダメージを60%軽減（小数点以下切り捨て／敵が攻撃してこなくても次の敵ターン終了で効果は切れる）',
+         effectType:'nextDmgPercent', percent:60},
     },
   },
   dokushi: {
@@ -1702,18 +1702,18 @@ const CHARGE_TYPES = {
   },
   inori: {
     id:'inori', name:'祈祷師', icon:'🙏',
-    playstyle:'マナを残して逆転',
-    triggerType:'turnEndWithMana',
+    playstyle:'デッキから引き当てて逆転',
+    triggerType:'turnEnd',
     color:'#f0e060',
     levels:{
-      1:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + デッキから1枚選んでコストなしで使用する',
-         effectType:'inoriDeckCopy', drawExtra:0, addToHandAfterUse:false},
-      2:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用できる',
-         effectType:'inoriDeckCopy', drawExtra:2, addToHandAfterUse:false},
-      3:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：マナ+3 + ドロー2 + デッキから1枚選んでコストなしで使用し、さらに山札から手札にも加える',
-         effectType:'inoriDeckCopy', drawExtra:2, addToHandAfterUse:true},
-      4:{maxCount:2, desc:'ターン終了時にマナが1以上余っていれば1溜まる。2溜まったらゲージをタップして手動発動：デッキから1枚を選び、そのカードをコストなしで3回連続発動する',
-         effectType:'inoriDeckCopy', drawExtra:0, addToHandAfterUse:false, repeatCount:3, noManaBonus:true},
+      1:{maxCount:2, desc:'ターン終了時に1溜まる。2溜まったらゲージをタップして手動発動：デッキから、コスト1以下のカードを1枚選んでコストなしで使用',
+         effectType:'inoriDeckCopy', costMax:1},
+      2:{maxCount:2, desc:'ターン終了時に1溜まる。2溜まったらゲージをタップして手動発動：デッキから、コスト2以下のカードを1枚選んでコストなしで使用',
+         effectType:'inoriDeckCopy', costMax:2},
+      3:{maxCount:2, desc:'ターン終了時に1溜まる。2溜まったらゲージをタップして手動発動：デッキから1枚選び、そのカードをコストなしで使用',
+         effectType:'inoriDeckCopy', costMax:null},
+      4:{maxCount:2, desc:'ターン終了時に1溜まる。2溜まったらゲージをタップして手動発動：デッキから1枚選び、そのカードをコストなしで2回連続発動',
+         effectType:'inoriDeckCopy', costMax:null, repeatCount:2},
     },
   },
   haki: {
@@ -1722,14 +1722,14 @@ const CHARGE_TYPES = {
     triggerType:'turnEndNoShield',
     color:'#e07030',
     levels:{
-      1:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て1にする',
-         effectType:'hakiZeroCost', costTarget:1, manaBonusPerActivation:0},
-      2:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て0にする',
-         effectType:'hakiZeroCost', costTarget:0, manaBonusPerActivation:0},
-      3:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札のカードコストを全て0にする + このステージ中ターン開始マナ+1（累積）',
-         effectType:'hakiZeroCost', costTarget:0, manaBonusPerActivation:1},
-      4:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：このステージ中、デッキに含まれる全てのカードのコストが-2になる（0未満にはならない／手札・山札・捨札すべてが対象）',
-         effectType:'hakiStageDiscount', discount:2},
+      1:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札の攻撃カードのコストをすべて1にする',
+         effectType:'hakiZeroCost', costTarget:1, attackOnly:true, manaBonusPerActivation:0},
+      2:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札の攻撃カードのコストをすべて0にする',
+         effectType:'hakiZeroCost', costTarget:0, attackOnly:true, manaBonusPerActivation:0},
+      3:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札をすべて0コストにする',
+         effectType:'hakiZeroCost', costTarget:0, attackOnly:false, manaBonusPerActivation:0},
+      4:{maxCount:2, desc:'盾0でターン終了で1溜まる。2溜まったらゲージをタップして手動発動：現在手札をすべて0コストにする + このステージ中、ターン開始マナ+1（累積）',
+         effectType:'hakiZeroCost', costTarget:0, attackOnly:false, manaBonusPerActivation:1},
     },
   },
 };
@@ -1753,6 +1753,9 @@ const AREA_RECOMMENDED_CHARGE={
 };
 // エリアごとの「攻略のヒント」（チャージ選択画面の下に固定表示）。未設定のエリアは非表示。
 const AREA_HINTS={
+  0: {title:'始まりの洞窟', lines:[
+    'エリア攻略中のステージ間はHPが持ち越されます。',
+  ]},
   4: {title:'毒の沼地', lines:[
     'このエリアの毒攻撃は、実際に受けたダメージと同じ量の毒を受けます。',
     'シールドでダメージを防げば、受ける毒も減らせます。',
@@ -2988,7 +2991,7 @@ const SOULS={
   kozeni2: {id:'kozeni2', name:'小銭稼ぎのソウルⅡ', category:4, cost:2, icon:'🪙', desc:'クリア報酬獲得時、その報酬のゴールドに+10、クリスタルに+5を追加する'},
   chargeup1: {id:'chargeup1', name:'チャージUPのソウルⅠ', category:4, cost:1, icon:'⚡', desc:'チャージのレベルを1つ上げる（現在の上限：レベル4）'},
   chargeup2: {id:'chargeup2', name:'チャージUPのソウルⅡ', category:4, cost:1, icon:'⚡', desc:'チャージのレベルをさらに1つ上げる（現在の上限：レベル4）'},
-  chargeup3: {id:'chargeup3', name:'チャージUPのソウルⅢ（変質）', category:4, cost:2, icon:'⚡', desc:'チャージのレベルをさらに1つ上げ、より特化した効果になる（現在の上限：レベル4／チャージUPのソウルⅠ・Ⅱを装備している場合のみ装備できる）', requireSouls:['chargeup1','chargeup2']},
+  chargeup3: {id:'chargeup3', name:'チャージUPのソウルⅢ', category:4, cost:2, icon:'⚡', desc:'チャージのレベルをさらに1つ上げ、より特化した効果になる（現在の上限：レベル4／チャージUPのソウルⅠ・Ⅱを装備している場合のみ装備できる）', requireSouls:['chargeup1','chargeup2']},
   boukiIji1: {id:'boukiIji1', name:'防壁維持のソウルⅠ', category:4, cost:2, icon:'🧱', desc:'ターン開始時のシールド減少量が40%になる（通常は50%）'},
   boukiIji2: {id:'boukiIji2', name:'防壁維持のソウルⅡ', category:4, cost:3, icon:'🧱', desc:'ターン開始時のシールド減少量が30%になる（通常は50%）'},
   manaAmp: {id:'manaAmp', name:'マナ増幅のソウル', category:4, cost:3, icon:'💠', desc:'ステージ中の最大マナ数が1増える'},
@@ -3192,7 +3195,7 @@ function initGame(){
      absorbShieldPending:false, absorbShieldAccum:0,
      absorbHealPending:false, absorbHealAccum:0,
      doubleNextCard:false, miniComboBuff:0, holdCharge:false, holdChargePartial:false, chargeEffectActive:false,
-     nextTurnAtkBuff:0, nextTurnHealDraw:0, nextTurnAtkCostDown:false, nextDmgHalf:false,
+     nextTurnAtkBuff:0, nextTurnHealDraw:0, nextTurnAtkCostDown:false, nextDmgHalf:false, nextDmgPercent:0,
      turnStartShieldBonus:0, initHandBonus:_soulInitHand, fullChargeStart:false, nextDmgHalfTurns:0,
      permAtkBuff2:0, gotPermAtkBuff2:false, gotHandPlus:_soulInitHand>0, gotFullCharge:false,
      gotChargeHelper:false, chargeHelperBonus:0, permAtkCount:0, permAtkBuff2Count:0, turnStartShieldCount:0,
@@ -3286,7 +3289,7 @@ function _startStageBattle(){
   // 前ステージの敵行動テキストをクリア
   const _intentEl=document.getElementById('enemy-intent');
   if(_intentEl) _intentEl.textContent='';
-  G.nextTurnAtkBuff=0; G.nextTurnHealDraw=0; G.nextTurnAtkCostDown=false; G.nextDmgHalf=false;
+  G.nextTurnAtkBuff=0; G.nextTurnHealDraw=0; G.nextTurnAtkCostDown=false; G.nextDmgHalf=false; G.nextDmgPercent=0;
   G.furyDanceBonus=0; G.furyDanceUsedThisTurn=false; G.soulEaterActive=false; G.soulEaterDmgThisTurn=0; G.turnLastUsedCardId=null;
   G.freeNextCard=false; G.freePassUsedThisTurn=false; G.swiftBladeActive=false; G.freePassManaAtUse=0;
   G.hakiZeroCostCards=null; G.hakiZeroCostCardIds=null; G.hakiZeroCostTarget=null;
@@ -5117,6 +5120,12 @@ function enemyTurn(){
     if(G.invincibleTurns>0) G.invincibleTurns--;
     if(G.halfShieldLossTurns>0) G.halfShieldLossTurns--;
     if(G.nextDmgHalfTurns>0) G.nextDmgHalfTurns--;
+    // 守護者チャージ：敵が攻撃してこなくても、次の敵ターンが終わったら軽減効果は切れる
+    if(G.nextDmgPercent>0){
+      G.nextDmgPercent=0;
+      addLog('🛡️ 守護者: 軽減効果が（未使用のまま）切れた','sys');
+      updateGaugeLamps();
+    }
     if(G.weakenTurns>0){G.weakenTurns--;if(G.weakenTurns<=0){G.enemyAtkDebuff=0;addLog('ATKデバフが切れた','sys');}}
     if(G.weakenHalfTurns>0){G.weakenHalfTurns--;if(G.weakenHalfTurns<=0){G.weakenHalf=false;addLog('鈍化が切れた','sys');}}
     // 憤怒の盾：敵ターン中に減った盾分のダメージを与える
@@ -5270,6 +5279,15 @@ function healPlayer(amount, label){
 function dealToPlayer(dmg,lbl){
   if(G.weakenHalf) dmg=Math.max(1,Math.floor(dmg/2));
 
+  // 守護者チャージ：次のダメージをX%軽減（小数点以下切り捨て）
+  if(G.nextDmgPercent){
+    const _pct=G.nextDmgPercent;
+    G.nextDmgPercent=0;
+    G.chargeEffectActive=false; // 守護者効果消費で発動中解除
+    dmg=Math.max(1,Math.floor(dmg*(100-_pct)/100));
+    addLog('🛡️ 守護者: ダメージ'+_pct+'%軽減！','sys');
+    updateGaugeLamps();
+  }
   // 守護者チャージ：次のダメージ半減
   if(G.nextDmgHalf){
     G.nextDmgHalf=false;
@@ -5371,6 +5389,7 @@ function dealDirectToPlayer(dmg,lbl){
   if(G.invincibleTurns>0){addLog('🌟 無敵: '+lbl+' 無効！','sys');return;}
   if(G.soulCurseReduce){ dmg=Math.max(0,dmg-G.soulCurseReduce); addLog('💠 不屈のソウル発動: 呪いダメージ-'+G.soulCurseReduce,'sys'); _showSoulEffectToast('💠 不屈のソウル発動！\n呪いダメージ -'+G.soulCurseReduce); }
   if(G.nextDmgNull){G.nextDmgNull=false;addLog('🛡️ 守護者(旧): '+lbl+' 無効！','sys');updateGaugeLamps();return;}
+  if(G.nextDmgPercent){const _pct2=G.nextDmgPercent;G.nextDmgPercent=0;dmg=Math.max(1,Math.floor(dmg*(100-_pct2)/100));addLog('🛡️ 守護者: ダメージ'+_pct2+'%軽減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalf){G.nextDmgHalf=false;dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 守護者: 半減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalfTurns>0){dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 神盾: 半減！','sys');}
   G.playerHp=Math.max(0,G.playerHp-dmg);
@@ -6740,11 +6759,15 @@ function showChargeSelect(){
           const _soulPoisonReduce2=(_equippedSoulsNow2.includes('taidoku')?8:0)+(_equippedSoulsNow2.includes('taidoku2')?16:0)+(_equippedSoulsNow2.includes('taidoku3')?24:0);
           const _soulCurseReduce2=(_equippedSoulsNow2.includes('fukutsu')?5:0)+(_equippedSoulsNow2.includes('fukutsu2')?10:0)+(_equippedSoulsNow2.includes('fukutsu3')?15:0);
           const _soulManaBonus2=_equippedSoulsNow2.includes('manaAmp')?1:0;
+          const _soulFirstMana2=_equippedSoulsNow2.includes('hatsuMana')?1:0;
+          const _soulInitHand2=_equippedSoulsNow2.includes('hatsuFuda')?1:0;
           G.playerMaxHp=20+_soulHpBonus2; G.playerHp=20+_soulHpBonus2;
           G.initShieldBonus=_soulShieldBonus2;
           G.soulPoisonReduce=_soulPoisonReduce2;
           G.soulCurseReduce=_soulCurseReduce2;
           G.manaRegen=3+_soulManaBonus2; G.mana=3+_soulManaBonus2;
+          G.firstTurnManaBonus=_soulFirstMana2; G.gotFirstTurnMana=_soulFirstMana2>0;
+          G.initHandBonus=_soulInitHand2; G.gotHandPlus=_soulInitHand2>0;
           G.permAtkBonus=(G.permAtkBonus||0)+(_equippedSoulsNow2.includes('joukou')?1:0);
           G.permAtkBuff2=(G.permAtkBuff2||0)+(_equippedSoulsNow2.includes('shogeki')?3:0);
         }
@@ -6802,6 +6825,8 @@ function showSpringEvent(){
   rewardArea.style.display='none';
   rewardList.innerHTML='';
   document.getElementById('spring-sub').textContent='渡すカードを選んでください';
+  const _springCancelBtn=document.getElementById('spring-cancel');
+  if(_springCancelBtn) _springCancelBtn.style.display='';
 
   // デッキのカードを種類ごとに表示
   const cnt={};
@@ -6840,7 +6865,7 @@ function showSpringEvent(){
       const i=G.deck.indexOf(id);
       if(i>=0) G.deck.splice(i,1);
       addLog('💧「'+c.name+'」を泉に渡した','sys');
-      showSpringRewards(c.rarity, list, rewardArea, rewardList);
+      showSpringRewards(c.rarity, list, rewardArea, rewardList, id);
     };
     // 直接タップ（二重confirm防止のためbindCardTouchは使わない）
     let _sMoved=false,_sSY=0,_sSX=0;
@@ -6853,12 +6878,15 @@ function showSpringEvent(){
   showOv('ov-spring');
 }
 
-function showSpringRewards(rarity, list, rewardArea, rewardList){
+function showSpringRewards(rarity, list, rewardArea, rewardList, givenCardId){
   list.style.display='none';
   rewardArea.style.display='';
   rewardList.innerHTML='';
   rewardList.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:100%;';
   document.getElementById('spring-sub').textContent='獲得するカードを選んでください（同レアリティ以下）';
+  // カードは既にデッキから渡し済みのため、ここで戻るボタンを出すとカードが失われてしまう。選択完了までは戻れないようにする。
+  const _springCancelBtn2=document.getElementById('spring-cancel');
+  if(_springCancelBtn2) _springCancelBtn2.style.display='none';
 
   // レアリティ順序（低→高）
   const RARITY_ORDER=['common','uncommon','rare','epic','legendary'];
@@ -6879,7 +6907,11 @@ function showSpringRewards(rarity, list, rewardArea, rewardList){
   // 同レアリティが足りない場合も別レアリティは出さない（重複で補充）
   let picks=[];
   if(pool.length===0){
-    addLog('💧 同レアリティのカードが見つかりません','sys');
+    addLog('💧 同レアリティのカードが見つかりません（渡したカードを返却します）','sys');
+    if(givenCardId) G.deck.push(givenCardId);
+    hideOv('ov-spring');
+    showEventSelection();
+    return;
   } else {
     const shuffled=[...pool].sort(()=>Math.random()-.5);
     for(let i=0;i<3;i++) picks.push(shuffled[i%shuffled.length]);
@@ -7492,6 +7524,7 @@ function updateUI(){
   if(G.hakiStageDiscount>0) pParts.push('<span style="color:#e07030;">💪全カードコスト-'+G.hakiStageDiscount+'</span>');
   if(G.soulEaterActive) pParts.push('<span style="color:#bb8fce;">💀魂食らい中</span>');
   if(G.nextDmgHalf) pParts.push('<span style="color:#2980b9;">🛡️半減待機</span>');
+  if(G.nextDmgPercent>0) pParts.push('<span style="color:#2980b9;">🛡️'+G.nextDmgPercent+'%軽減待機</span>');
   // チャージ満タン待機中（発動タイミングを待っている状態）
   if(G.chargeType&&G.chargeCount>0){
     const _ctDisp=curCT();
@@ -7843,6 +7876,7 @@ function showStatusDetail(target){
     if(G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.length>0) lines.push('💪 手札コスト0 ('+G.hakiZeroCostCardIds.length+'枚)\n対象の手札カードが今だけコスト0で使用できる');
     if(G.hakiStageDiscount>0) lines.push('💪 全カードコスト-'+G.hakiStageDiscount+'\nこのステージ中、デッキに含まれる全カードのコストが-'+G.hakiStageDiscount+'（0未満にはならない）');
     if(G.nextDmgHalf) lines.push('🛡️ 半減待機\n次に受けるダメージを半減する（発動待ち）');
+    if(G.nextDmgPercent>0) lines.push('🛡️ '+G.nextDmgPercent+'%軽減待機\n次に受けるダメージを'+G.nextDmgPercent+'%軽減する（発動待ち・小数点以下切り捨て）');
     if(G.chargeType&&G.chargeCount>0){
       const _ctDisp=curCT();
       if(_ctDisp&&G.chargeCount>=_ctDisp.maxCount) lines.push('⚡ '+_ctDisp.name+'待機\nチャージが満タンになり、発動を待っている状態');
@@ -9042,8 +9076,8 @@ function updateGaugeLamps(){
     if(chargeUsed){
       statusLabel.textContent='使用済';
       statusLabel.style.cssText='height:10px;font-size:6px;font-family:Cinzel,serif;letter-spacing:0.5px;line-height:1;margin-top:1px;text-align:center;color:#e74c3c;animation:none;';
-    } else if(ct&&ct.id==='teppeki'&&G.nextDmgNull){
-      statusLabel.textContent='無効中';
+    } else if(ct&&ct.id==='teppeki'&&G.nextDmgPercent>0){
+      statusLabel.textContent=G.nextDmgPercent+'%軽減待機';
       statusLabel.style.cssText='height:10px;font-size:6px;font-family:Cinzel,serif;letter-spacing:0.5px;line-height:1;margin-top:1px;text-align:center;color:#5dade2;animation:none;';
     } else if(isFull2&&!hakiMax2&&!isEffActive2){
       statusLabel.textContent='TAP で発動';
@@ -9931,6 +9965,8 @@ let _opAudio=null; // OP用（タイトル画面専用）
 
 function playOpBgm(){
   if(_opAudio) return;
+  if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;_currentBgm=null;}
+  if(_eventAudio) stopEventBgm();
   try{
     _opAudio=new Audio('op.mp3');
     _opAudio.loop=true;
@@ -9949,6 +9985,7 @@ function stopOpBgm(){
 let _eventAudio=null;
 function playEventBgm(){
   if(_eventAudio) return; // すでに再生中なら継続
+  stopOpBgm();
   if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;_currentBgm=null;}
   try{
     _eventAudio=new Audio('event.mp3');
@@ -9967,6 +10004,7 @@ function stopEventBgm(){
 }
 function playBgm(file){
   if(_currentBgm===file) return;
+  stopOpBgm(); // OP用BGMも止める
   stopEventBgm(); // イベントBGMも止める
   if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;}
   _currentBgm=file;
@@ -9980,6 +10018,7 @@ function playBgm(file){
 }
 // ループさせず一度だけ再生し、終わったらonEndedを呼ぶ（メインテーマ曲プレビュー用）
 function playBgmOnce(file, onEnded){
+  stopOpBgm();
   stopEventBgm();
   if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;}
   _currentBgm=file;
@@ -10340,21 +10379,9 @@ function executeChargeEffect(){
     if(ct.draw>0) queueEffect(()=>{flashDrawCard(ct.draw);setTimeout(()=>{drawCards(ct.draw);renderHand();},500);}, 800);
     G.chargeEffectActive=false;
     updateUI();
-  } else if(ct.effectType==='nextDmgNull'){
-    G.nextDmgNull=true;
-    const _mb=ct.manaBonus||0;
-    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
-    addLog('🛡️ 守護者: 次の被ダメを無効！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
-  } else if(ct.effectType==='nextDmgHalf'){
-    G.nextDmgHalf=true;
-    const _mb=ct.manaBonus||0;
-    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
-    addLog('🛡️ 守護者: 次の被ダメを半減（切り捨て）！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
-  } else if(ct.effectType==='nextAttackFullNull'){
-    G.nextAttackFullNull=true;
-    const _mb=ct.manaBonus||0;
-    if(_mb>0) G.mana=Math.min(G.manaMax,G.mana+_mb);
-    addLog('🛡️ 守護者: 次の敵攻撃と状態異常・追加効果を全て無効化！'+(_mb>0?' + マナ+'+_mb:''),'sys'); updateUI();
+  } else if(ct.effectType==='nextDmgPercent'){
+    G.nextDmgPercent=ct.percent||0;
+    addLog('🛡️ 守護者: 次の被ダメージを'+G.nextDmgPercent+'%軽減！','sys'); updateUI();
   } else if(ct.effectType==='dokushiPoisonDouble'){
     G.dokushiPoisonDouble=true;
     G.dokushiPoisonMult=ct.poisonMultiplier||2;
@@ -10364,15 +10391,10 @@ function executeChargeEffect(){
     G.chargeEffectActive=false;
     updateUI(); renderHand();
   } else if(ct.effectType==='inoriDeckCopy'){
-    // マナ+3は共通効果として先に付与（レベル4はマナボーナスなし）
-    if(!ct.noManaBonus) G.mana=Math.min(G.manaMax,G.mana+3);
-    const _drawExtra=ct.drawExtra||0;
-    if(_drawExtra>0){ flashDrawCard(_drawExtra); drawCards(_drawExtra); }
-    addLog('🙏 祈祷師: '+(ct.noManaBonus?'':'マナ+3')+(_drawExtra>0?(' + ドロー'+_drawExtra):'')+'！','sys');
-    updateUI(); renderHand();
-    // デッキからカード1枚を選んでコストなしで使用
-    const deckUniq=[...new Set(G.deck)].filter(id=>DB[id]&&DB[id].type!=='bougai');
-    if(deckUniq.length===0){addLog('🙏 祈祷師: デッキにカードがありません','sys');G.chargeEffectActive=false;updateUI();return;}
+    // デッキからカード1枚を選んでコストなしで使用（レベルごとにcostMaxで選択可能なコストを制限）
+    const _costMax=ct.costMax;
+    const deckUniq=[...new Set(G.deck)].filter(id=>DB[id]&&DB[id].type!=='bougai'&&(_costMax==null||DB[id].cost<=_costMax));
+    if(deckUniq.length===0){addLog('🙏 祈祷師: 条件に合うカードがデッキにありません','sys');G.chargeEffectActive=false;updateUI();return;}
     // 選択オーバーレイを表示
     const ov=document.createElement('div');
     ov.style.cssText='position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;';
@@ -10457,11 +10479,12 @@ function executeChargeEffect(){
     ov.appendChild(ttl);ov.appendChild(sub);ov.appendChild(grid);ov.appendChild(cancel);
     appendToApp(ov);
   } else if(ct.effectType==='hakiZeroCost'){
-    G.hakiZeroCostCards=new Set(G.hand.map((_,i)=>i));
-    G.hakiZeroCostCardIds=G.hand.map(id=>id);
+    const _hakiTargetIds=ct.attackOnly?G.hand.filter(id=>DB[id]&&DB[id].type==='attack'):G.hand.slice();
+    G.hakiZeroCostCards=new Set(_hakiTargetIds.map((_,i)=>i));
+    G.hakiZeroCostCardIds=_hakiTargetIds;
     G.hakiZeroCostTarget=(ct.costTarget!=null?ct.costTarget:0);
     const _mbpa=ct.manaBonusPerActivation||0;
-    let _logMsg='💪 狂戦士: 手札全コスト'+G.hakiZeroCostTarget+'！';
+    let _logMsg='💪 狂戦士: '+(ct.attackOnly?'手札の攻撃カード':'手札全カード')+'コスト'+G.hakiZeroCostTarget+'！';
     if(_mbpa>0){
       // ステージ中累積マナボーナス（毎ターン開始時マナ+1）
       G.berserkManaBonus=(G.berserkManaBonus||0)+_mbpa;
@@ -11508,7 +11531,7 @@ const SHOP_ITEMS=[
   {id:'buy_autoHealSoul2', cat:'soul', icon:'🌱', name:'自動回復のソウルⅡ', desc:'④特殊効果付与系 コスト2・自分ターン終了時、HP+5回復する', price:50, currency:'crystal', unlockArea:null, unlockClearCount:3, requireSouls:['autoHealSoul'], oneTime:true, soulId:'autoHealSoul2'},
   {id:'buy_chargeup1', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅠ',  desc:'④特殊効果付与系 コスト1・チャージのレベルを1つ上げる', costs:[{currency:'crystal',amount:10}], unlockArea:null, unlockClearCount:2, oneTime:true, soulId:'chargeup1'},
   {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'crystal',amount:20}], unlockArea:null, unlockClearCount:4, oneTime:true, soulId:'chargeup2'},
-  {id:'buy_chargeup3', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅢ（変質）', desc:'④特殊効果付与系 コスト2・チャージのレベルをさらに1つ上げ、より特化した効果になる（Ⅰ・Ⅱ装備時のみ装備可）', costs:[{currency:'crystal',amount:100}], unlockArea:null, unlockClearCount:6, requireSouls:['chargeup1','chargeup2'], oneTime:true, soulId:'chargeup3'},
+  {id:'buy_chargeup3', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅢ', desc:'④特殊効果付与系 コスト2・チャージのレベルをさらに1つ上げ、より特化した効果になる（Ⅰ・Ⅱ装備時のみ装備可）', costs:[{currency:'crystal',amount:100}], unlockArea:null, unlockClearCount:6, requireSouls:['chargeup1','chargeup2'], oneTime:true, soulId:'chargeup3'},
   {id:'buy_boukiIji1', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅠ', desc:'④特殊効果付与系 コスト2・ターン開始時のシールド減少量が40％になる', price:100, currency:'crystal', unlockArea:null, requireSouls:['teppeki','kekkai','kinkyu'], oneTime:true, soulId:'boukiIji1'},
   {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト1・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
   {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト1・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
@@ -11710,6 +11733,14 @@ function renderShopContent(){
 
   Object.keys(CAT_LABEL).forEach(cat=>{
     const list=byCat[cat]; if(!list||list.length===0) return;
+    if(cat==='soul'){
+      // ソウルの①〜④の系統番号でグループ化して表示するため、配列内の並び順に関係なく系統順に安定ソートする
+      list.sort((a,b)=>{
+        const ca=(SOULS[a.soulId]&&SOULS[a.soulId].category)||0;
+        const cb=(SOULS[b.soulId]&&SOULS[b.soulId].category)||0;
+        return ca-cb;
+      });
+    }
     const sec=document.createElement('div');
     sec.style.cssText='width:100%;';
     if(!(cat==='soul' && _shopActiveSoulCat)){
