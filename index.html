@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver369</title>
+<title>DUNGEON WALKER DWCver375</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -3455,6 +3455,7 @@ function drawCards(n, isTurnStart=false){
   // 新規ドローカードのインデックスを記録
   const handBefore=G.hand.length-newCards.length;
   G._lastDrawnIndices=newCards.map((_,i)=>handBefore+i);
+  G._lastDrawnGen=(G._lastDrawnGen||0)+1; // 描画アニメ用の世代トークン（renderHandの遅延クリアが新しいドローを誤って消さないようにする）
   // 炎上コストペナルティ：ドロー時に積まれたペナルティを新規ドローカードに適用
   if(isTurnStart&&(G.igniteCostPenalties||[]).length>0&&newCards.length>0){
     G.ignitedCards=G.ignitedCards||{};
@@ -3559,6 +3560,8 @@ function playCard(idx, _isChain){
   const cid = c ? c.id : null;
   if(!c||!cid)return;
   if(G.phase!=='player')return;
+  // 連鎖起動後：スキルカードは実行そのものをブロックする（UI層のグレーアウトだけに依存しない保険）
+  if(!_isChain && G.chainNoSkill && c.type==='skill'){ dwRejectFeedback(document.getElementById('hand-cards')); return; }
   // チュートリアル：UI層（canUse）の判定を経由しない呼び出しに対する保険。対象外の操作は実行しない。
   if(!_isChain && G.areaId===7){
     const _tutAction=tutorialCurrentAction();
@@ -3683,11 +3686,13 @@ function playCard(idx, _isChain){
     if(G.paralyzeNextCard){
       G.paralyzeNextCard=false;
       addLog('⚡ 麻痺の影響で「'+c.name+'」の効果が発動しなかった！','enemy');
+      spawnDmgNum('⚡無効化','player-guard');
+      flashScreen('flash-red');
+      sfxCard();
       if(getEquippedSouls().includes('taiden')){
         G.mana+=actualCost; G.stageManaSpent=Math.max(0,(G.stageManaSpent||0)-actualCost);
         addLog('💠 耐電のソウル: コストが消費されなかった（マナ+'+actualCost+'）','sys');
       }
-      sfxCard();
       updateUI(); renderHand();
       return;
     }
@@ -3751,7 +3756,7 @@ function playCard(idx, _isChain){
     // 反射チェック
     if(G.enemy.reflectActive){
       G.enemy.reflectActive=false;
-      const reflDmg=ef.atk*t;
+      const reflDmg=(ef.atk+G.atkBuff+miniBonus)*t;
       G.playerHp=Math.max(0,G.playerHp-reflDmg);
       addLog('🔄 反射！攻撃が'+reflDmg+'ダメージで返ってきた！','enemy');
       queueEffect(()=>{spawnDmgNum('-'+reflDmg,'player-dmg');shakePlayerArea();flashScreen('flash-red');sfxDamage();}, 800);
@@ -3784,7 +3789,7 @@ function playCard(idx, _isChain){
     // 不具合を防ぐ（表示は常に単調減少、実際の回復時のみ allowIncrease で上昇を許可）。
     if(t>1){
       queueEffect(()=>{
-        _renderEnemyHpDisplay(_hpBefore);
+        _renderEnemyHpDisplay(_hpBefore, true);
       }, 0);
     }
     _hpPerHit.forEach(function(hit, hitIdx){
@@ -3966,11 +3971,12 @@ function playCard(idx, _isChain){
       if(pef.atk){
         const t=pef.times||1;
         if(pef.shieldBreak){echoMsgs.push('盾-'+pef.shieldBreak);G.enemyShield=Math.max(0,G.enemyShield-pef.shieldBreak);}
+        if(pef.shieldFirstBreak){const _sfb=Math.min(G.enemyShield,pef.shieldFirstBreak);G.enemyShield=Math.max(0,G.enemyShield-pef.shieldFirstBreak);echoMsgs.push('盾-'+pef.shieldFirstBreak+(_sfb>0?' ('+_sfb+'減少)':'(効果なし)'));}
         if(pef.pierceBreak&&G.enemyShield>0){echoMsgs.push('敵盾破壊');G.enemyShield=0;}
         for(let i=0;i<t;i++){
           let d=(pef.atk+G.atkBuff)*(G.doubleNext&&i===0?2:1);
           if(G.doubleNext&&i===0) G.doubleNext=false;
-          if(!pef.pierceBreak&&G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
+          if(!pef.ignoreShield&&!pef.pierceBreak&&G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
           G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
           if(G.soulEaterActive && d>0){const _seH=Math.floor(d/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');queueEffect(()=>{spawnDmgNum('+'+_seH,'heal');sfxHeal();flashHealEffect(_seH);}, 1200);}}
           G.totalDmgDealt=(G.totalDmgDealt||0)+d;
@@ -3996,6 +4002,7 @@ function playCard(idx, _isChain){
       if(pef.poison){G.enemyPoison=(G.enemyPoison||0)+pef.poison;echoMsgs.push('毒'+pef.poison);}
       if(pef.breakShield){G.enemyShield=0;echoMsgs.push('敵盾0に');}
       if(pef.buff==='atk'){G.atkBuff+=pef.val;echoMsgs.push('攻撃+'+pef.val);queueEffect(()=>showEffectPopup('Ekougeki.png','攻撃力+'+pef.val,'#ff6b35'), 800);}
+      if(echoMsgs.length===0){ echoMsgs.push('この効果は再現できません'); }
       addLog('👥 '+echoMsgs.join(' / '),'player');
       updateUI();
       checkEnemyDeath(); // HP0でもここではreturnしない（後続の効果ブロックを継続処理。最終判定は関数末尾）
@@ -4064,8 +4071,9 @@ function playCard(idx, _isChain){
   }
   if(ef.shieldAtk){
     const sd=G.shield;
-    const remain=ef.shieldRemain||0;
-    G.shield=remain;
+    const shieldBonus=ef.shieldBonus||0;
+    const _floor=getShieldFloor();
+    G.shield=_floor+shieldBonus; // 盾を使い切った後の下限（結界のソウル等）を尊重した上で、強化分を加算する
     const doubleApplied=G.doubleNext; if(doubleApplied) G.doubleNext=false;
     const finalDmg=doubleApplied?sd*2:sd;
     if(sd>0){
@@ -4074,7 +4082,7 @@ function playCard(idx, _isChain){
       G.enemy.curHp=Math.max(0,G.enemy.curHp-dmgLeft);
       if(G.soulEaterActive && dmgLeft>0){const _seH=Math.floor(dmgLeft/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');queueEffect(()=>{spawnDmgNum('+'+_seH,'heal');sfxHeal();flashHealEffect(_seH);}, 1200);}}
       G.totalDmgDealt=(G.totalDmgDealt||0)+dmgLeft;
-      msgs.push('盾の一撃: '+(doubleApplied?sd+'×2=':'')+finalDmg+'ダメ 盾'+(remain>0?remain+'に':'0に'));
+      msgs.push('盾の一撃: '+(doubleApplied?sd+'×2=':'')+finalDmg+'ダメ 盾'+(G.shield>0?G.shield+'に':'0に'));
       queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+finalDmg,'enemy-dmg'); shakeEnemyArea(); flashScreen('flash-gold'); sfxDamage();}, 800);
     } else {
       msgs.push('盾の一撃: 盾なし (0ダメ)');
@@ -4753,7 +4761,7 @@ function enemyTurn(){
       summon:'🌑 召喚',quake:'🌍 地響き '+ea,seal:'🔒 封印 '+ea,poisonfang:'☠️ 猛毒牙 '+ea,
       burn:'🔥 火傷 '+ea,ignite:'🔥 炎上 '+ea,bigignite:'🔥 大炎上 '+ea,superignite:'🔥 超炎上 '+ea,weaken_e:'💀 衰弱 '+ea,judgment:'⚖️ 裁き '+ea,heavywound:'💔 重傷 '+ea,
       soulcrush:'💀 魂砕き '+ea,curse_bind:'⛓️ 呪縛 '+ea,despair:'😈 絶望 '+ea,
-      enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,paralyze:'⚡ 麻痺',
+      enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,paralyze:'⚡ 麻痺 '+ea,
     };
     const _actionBox=document.getElementById('enemy-action-box');
     if(_actionBox){
@@ -5315,7 +5323,8 @@ function dealToPlayer(dmg,lbl){
     G.enemy.curHp=Math.max(0,G.enemy.curHp-dmg);
     addLog('🪞 魔鏡: '+dmg+'ダメ反射！','player');
     queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+dmg,'enemy-dmg'); shakeEnemyArea(); flashScreen('flash-gold');}, 800);
-    updateUI(); if(checkEnemyDeath()) return 0;
+    updateUI(); checkEnemyDeath();
+    return 0; // 反射済みのため、プレイヤー自身はこの攻撃のダメージを受けない
   }
   let d=dmg;
   // 虚弱D：手札にある間、受けるダメージ+20
@@ -5434,6 +5443,7 @@ function updateIntent(){
     despair:  '😈 絶望 '+ea,
     enervate: '😩 脱力 '+ea,
     reflect_e:'🔄 反射準備 '+ea,
+    paralyze: '⚡ 麻痺 '+ea,
   };
   // 詳細テキスト（ポップアップ用）
   const detail={
@@ -5466,13 +5476,14 @@ function updateIntent(){
     despair:  '😈 絶望\nダメージ: '+ea+'\n足枷Dカード×3をデッキに追加（使用時マナ-1）',
     enervate: '😩 脱力\nダメージ: '+ea+'\n脱力Dカード×2をデッキに追加（手札にある間マナ最大値-2）',
     reflect_e:'🔄 反射準備\nダメージ: '+ea+'\n次に受けるプレイヤーの攻撃を反射してダメージを与える',
+    paralyze: '⚡ 麻痺\nダメージ: '+ea+'\n次にプレイヤーが使用するカード1枚の効果を無効化する（カードの使用自体・コスト消費は通常通り）',
   };
   let intentText='次: '+(short[next]||('??? ('+next+')'));
   if(G.enemy&&G.enemy.reflectActive) intentText+=' 🔄';
   const intentEl=document.getElementById('enemy-intent');
   if(intentEl){
     // 行動種別で色分け
-    const _yellow=['atk','poisonatk','curse','drain','summon','iceshot'];
+    const _yellow=['atk','poisonatk','curse','drain','summon','iceshot','paralyze'];
     const _red=['big','bigcurse','moudokuatk'];
     const _blue=['def','bigdef','superbigdef'];
     const _green=['heal','bigheal'];
@@ -6082,7 +6093,7 @@ function showSpringOrSmithChoice(){
 // 鍛冶屋：カード強化定義テーブル
 const SMITH_UPGRADES = {
   konshin:      {beforeDesc:'攻撃25 / 次ターン開始ドロー-2',    afterDesc:'攻撃30 / 次ターン開始ドロー-2',      apply:(c)=>{c.desc='攻撃30 / 次ターン開始ドロー-2';c.shortDesc='攻30/次Tドロー-2';c.effect={atk:30,nextDrawMinus:2};}},
-  shieldBash:   {beforeDesc:'自分のシールド値分ダメージ + シールドを0に',afterDesc:'自分のシールド値分ダメージ + シールドを3に',apply:(c)=>{c.desc='自分のシールド値分ダメージ + シールドを3に';c.shortDesc='盾の値ダメ+盾3残す';c.effect={shieldAtk:true,shieldRemain:3};}},
+  shieldBash:   {beforeDesc:'自分のシールド値分ダメージ + シールドを0に',afterDesc:'自分のシールド値分ダメージ + シールド+3',apply:(c)=>{c.desc='自分のシールド値分ダメージ + シールド+3';c.shortDesc='盾の値ダメ+盾+3';c.effect={shieldAtk:true,shieldBonus:3};}},
   composure:    {beforeDesc:'HP満タン時：攻撃10 / 通常時：攻撃5', afterDesc:'HP満タン時：攻撃12 / 通常時：攻撃6',   apply:(c)=>{c.desc='HP満タン時：攻撃12 / 通常時：攻撃6';c.shortDesc='満タン:12/通:6';c.effect={atkFullHp:12,atkNormal:6};}},
   comboHeal:    {beforeDesc:'このターン攻撃カードを使用するたびHP+3',afterDesc:'このターン攻撃カードを使用するたびHP+4',apply:(c)=>{c.desc='このターン攻撃カードを使用するたびHP+4';c.shortDesc='攻カード使用毎HP+4';c.effect={comboHealOn:true,comboHealVal:4};}},
   bindingChain: {beforeDesc:'敵の次の行動を1つ前に戻す',          afterDesc:'敵の次の行動を1つ前に戻す / +1ターン敵のATK-5',apply:(c)=>{c.desc='敵の次の行動を1つ前に戻す / +1ターン敵のATK-5';c.shortDesc='敵行動戻す+ATK-5';c.effect={rewindPattern:true,enemyAtkDebuff:5};}},
@@ -7503,6 +7514,7 @@ function updateUI(){
   if(G.enemyAtkDebuff>0) statusParts.push('⬇️ATK-'+G.enemyAtkDebuff+'('+G.weakenTurns+'T)');
   if(G.weakenHalf) statusParts.push('🐌半減('+G.weakenHalfTurns+'T)');
   if(G.enemyFrozen) statusParts.push('🧊凍結');
+  if(G.enemy&&G.enemy.reflectActive) statusParts.push('🔄反射中');
   const _sbText=statusParts.join('  ');
   if(statusParts.length>0){
     if(sb.textContent!==_sbText) sb.textContent=_sbText;
@@ -8042,7 +8054,8 @@ function renderHand(){
   if(G._cardTestMode) restoreCardTestHand();
   clampPage();
   const el=document.getElementById('hand-cards');el.innerHTML='';
-  setTimeout(()=>{G._lastDrawnIndices=[];}, 700);
+  const _genAtRender=G._lastDrawnGen||0;
+  setTimeout(()=>{ if((G._lastDrawnGen||0)===_genAtRender) G._lastDrawnIndices=[]; }, 700);
   
   const start=handPage*CARDS_PER_PAGE;
   const pageCards=G.hand.slice(start,start+CARDS_PER_PAGE);
@@ -8133,8 +8146,9 @@ function renderHand(){
           return 'HP-'+sd+' + 攻'+_hi(dmgBp);
         }
         case 'shieldBash':{
-          const remain=c.effect.shieldRemain||0;
-          return '攻'+_hi(_d(G.shield))+'（盾→'+remain+'）';
+          const bonus=c.effect.shieldBonus||0;
+          const resultShield=getShieldFloor()+bonus;
+          return '攻'+_hi(_d(G.shield))+'（盾→'+resultShield+'）';
         }
         case 'composure':{
           const full=G.playerHp>=G.playerMaxHp;
@@ -9296,7 +9310,7 @@ function runEffectQueue(){
     // 【バグ対策】演出処理中に例外が発生してもキュー処理を止めない（操作不能バグ防止）
     console.error('[DWC] effectQueue内でエラーが発生しました。処理を継続します:', err);
   }
-  setTimeout(runEffectQueue, delay||800);
+  setTimeout(runEffectQueue, (delay!=null?delay:800));
 }
 // 【バグ対策】演出ロックが異常に長時間（8秒）続いた場合、強制的にUIロックを解除する安全弁
 setInterval(()=>{
