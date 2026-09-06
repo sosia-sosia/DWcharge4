@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver375</title>
+<title>DUNGEON WALKER DWCver379</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -1477,7 +1477,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div>ステージ数: <span id="acp-stages" style="color:#fff;font-weight:bold;"></span></div>
       </div>
       <div id="acp-desc" style="font-size:12px;color:#ccc;text-align:center;line-height:1.6;"></div>
-      <div id="acp-effect-wrap" style="display:none;width:100%;background:rgba(224,112,48,.1);border:1px solid rgba(224,112,48,.5);border-radius:8px;padding:8px 12px;">
+      <div id="acp-effect-wrap" style="display:none;width:100%;background:rgba(20,10,4,.9);border:1px solid rgba(224,112,48,.6);border-radius:8px;padding:8px 12px;">
         <div style="font-size:9px;color:#e07030;font-family:'Cinzel',serif;letter-spacing:1px;margin-bottom:4px;">⚠️ エリア効果</div>
         <div id="acp-effect-name" style="font-size:11px;color:#ffaa44;font-weight:bold;font-family:sans-serif;margin-bottom:2px;"></div>
         <div id="acp-effect-desc" style="font-size:10px;color:#ccc;font-family:sans-serif;line-height:1.5;"></div>
@@ -2472,6 +2472,15 @@ const CARD_POOL_LATE = {
 // 狂戦士シールドロック判定（全経路共通）
 
 // 特定チャージ専用カード（DB[id].onlyCharge）を、現在選択中のチャージに応じて除外する
+// チャージのアイコンを表示するための共通ヘルパー：charge_[id].png があれば画像、読み込み失敗時のみ絵文字にフォールバック
+function chargeIconHtml(ct, size){
+  size=size||24;
+  const fontSize=Math.round(size*0.72);
+  return '<span style="display:inline-flex;width:'+size+'px;height:'+size+'px;align-items:center;justify-content:center;vertical-align:middle;flex-shrink:0;">'
+    +'<img src="charge_'+ct.id+'.png" style="width:'+size+'px;height:'+size+'px;object-fit:contain;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'inline-block\';">'
+    +'<span style="display:none;font-size:'+fontSize+'px;line-height:1;">'+ct.icon+'</span>'
+    +'</span>';
+}
 function filterChargeRestricted(ids){
   return ids.filter(id=>{
     const c=DB[id];
@@ -6726,14 +6735,9 @@ function showChargeSelect(){
     let lamps='';
     for(let i=0;i<ct.maxCount;i++) lamps+='<div style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid '+ct.color+';display:inline-block;margin-right:2px;"></div>';
     const trait=CHARGE_TRAITS[ct.id]||'';
-    // アイコン：charge_[id].pngがあれば画像、なければ絵文字
-    const chargeIconHtml='<div style="width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'
-      +'<img src="charge_'+ct.id+'.png" style="width:32px;height:32px;object-fit:contain;" '
-      +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
-      +'onload="this.nextSibling.style.display=\'none\';">'
-      +'<span style="display:block;font-size:24px;line-height:1;">'+ct.icon+'</span>'
-      +'</div>';
-    d.innerHTML=chargeIconHtml+`
+    // アイコン：共通ヘルパーで画像優先表示（エラー時のみ絵文字）
+    const chargeIconHtml_=chargeIconHtml(ct,32);
+    d.innerHTML=chargeIconHtml_+`
       <div style="flex:1;">
         <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
           <span style="font-family:'Cinzel',serif;font-size:14px;color:${ct.color};font-weight:bold;letter-spacing:1px;">${ct.name}</span>
@@ -7537,6 +7541,7 @@ function updateUI(){
   if(G.soulEaterActive) pParts.push('<span style="color:#bb8fce;">💀魂食らい中</span>');
   if(G.nextDmgHalf) pParts.push('<span style="color:#2980b9;">🛡️半減待機</span>');
   if(G.nextDmgPercent>0) pParts.push('<span style="color:#2980b9;">🛡️'+G.nextDmgPercent+'%軽減待機</span>');
+  if(G.paralyzeNextCard) pParts.push('<span style="color:#f4d03f;animation:boss-warn-blink 1s infinite;">⚡麻痺中（次のカード無効）</span>');
   // チャージ満タン待機中（発動タイミングを待っている状態）
   if(G.chargeType&&G.chargeCount>0){
     const _ctDisp=curCT();
@@ -8823,7 +8828,7 @@ function buildDeckBuildHTML(){
     html+='<div>';
     html+='<div style="font-family:\'Cinzel\',serif;font-size:11px;color:#c9a84c;margin-bottom:5px;">⚡ チャージ</div>';
     html+='<div style="background:rgba(0,0,0,.5);border:1px solid '+ct.color+'55;border-radius:6px;padding:6px 8px;">';
-    html+='<div style="font-size:12px;color:'+ct.color+';font-weight:bold;margin-bottom:3px;">'+ct.icon+' '+ct.name+'</div>';
+    html+='<div style="font-size:12px;color:'+ct.color+';font-weight:bold;margin-bottom:3px;">'+chargeIconHtml(ct,16)+' '+ct.name+'</div>';
     html+='<div style="font-size:9px;color:#bbb;line-height:1.5;">'+ct.desc+'</div>';
     html+='</div></div>';
   }
@@ -10309,7 +10314,7 @@ function openChargeInfo(){
 
   if(el&&ct){
     el.innerHTML='<div style="background:rgba(0,0,0,.6);border:2px solid '+ct.color+';border-radius:10px;padding:14px 16px;font-family:sans-serif;">'
-      +'<div style="font-size:28px;margin-bottom:8px;">'+ct.icon+'</div>'
+      +'<div style="margin-bottom:8px;">'+chargeIconHtml(ct,32)+'</div>'
       +'<div style="font-family:\'Cinzel\',serif;font-size:15px;color:'+ct.color+';font-weight:bold;margin-bottom:6px;">'+ct.name+' <span style="font-size:10px;color:#f0d47a;">Lv.'+ct.level+'</span></div>'
       +'<div style="font-size:11px;color:#ccc;line-height:1.8;">'+ct.desc+'</div>'
       +'<div style="margin-top:10px;font-size:10px;color:#888;">カウント: '+G.chargeCount+' / '+ct.maxCount+(isFull?'　<span style="color:#e74c3c;font-weight:bold;">発動可能！</span>':'')+'</div>'
@@ -11052,7 +11057,7 @@ bind('btn-deck-view',()=>{
       ca.style.cssText='width:100%;background:rgba(0,0,0,.6);border:1px solid '+ct.color+'55;border-radius:10px;padding:8px 10px;margin-top:4px;';
       ca.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;letter-spacing:1px;">⚡ チャージ</div>'+
         '<div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 9px;">'+
-          '<span style="font-size:13px;">'+ct.icon+'</span>'+
+          chargeIconHtml(ct,16)+
           '<div>'+
             '<div style="font-size:11px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</div>'+
             '<div style="font-size:9px;color:#bbb;line-height:1.4;">'+ct.desc+'</div>'+
@@ -12523,8 +12528,8 @@ function renderDeckEditChargeTabs(){
     const active=(ct.id===_deckEditChargeId);
     const d=document.createElement('div');
     d.dataset.chargeId=ct.id;
-    d.style.cssText='flex:1;text-align:center;font-size:9px;color:'+(active?'#fff':ct.color)+';background:'+(active?ct.color+'55':'rgba(0,0,0,.4)')+';border:1px solid '+ct.color+(active?'':'88')+';border-radius:5px;padding:5px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;font-weight:'+(active?'bold':'normal')+';';
-    d.innerHTML='<div style="font-size:14px;">'+ct.icon+'</div>'+ct.name;
+    d.style.cssText='flex:1;text-align:center;font-size:9px;color:'+(active?'#fff':ct.color)+';background:'+(active?ct.color+'e6':'rgba(0,0,0,.8)')+';border:1px solid '+ct.color+(active?'':'88')+';border-radius:5px;padding:5px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;font-weight:'+(active?'bold':'normal')+';';
+    d.innerHTML='<div style="margin-bottom:2px;">'+chargeIconHtml(ct,18)+'</div>'+ct.name;
     bindTapSwipe(d,()=>{ if(ct.id!==_deckEditChargeId){ sfxSelect(); openDeckEditFor(ct.id); } });
     tabs.appendChild(d);
   });
@@ -12631,7 +12636,7 @@ function renderDeckEditPanel(){
   const disposableCount=_deckEditWorkingDeck.filter(entry=>{const c=DB[entry.id];return c&&c._gachaGenerated;}).length;
   const header=document.getElementById('deckedit-header');
   header.innerHTML=
-    '<div><span style="font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.icon+' '+ct.name+'</span></div>'
+    '<div><span style="font-size:13px;color:'+ct.color+';font-weight:bold;">'+chargeIconHtml(ct,16)+' '+ct.name+'</span></div>'
     +'<div style="text-align:right;font-size:10px;color:#ccc;">'
     +'<div>枚数 <b style="color:'+(_deckEditWorkingDeck.length===preset.length?'#7ed6a0':'#ff8888')+';">'+_deckEditWorkingDeck.length+' / '+preset.length+'</b></div>'
     +'<div>入れ替え <b style="color:'+(swapsUsed>=swapLimit?'#ff8888':'#7ed6a0')+';">'+swapsUsed+' / '+swapLimit+'</b></div>'
@@ -12734,8 +12739,8 @@ function renderSoulSetupChargeTabs(){
     const active=(ct.id===_soulSetupChargeId);
     const d=document.createElement('div');
     d.dataset.chargeId=ct.id;
-    d.style.cssText='flex:1;text-align:center;font-size:9px;color:'+(active?'#fff':ct.color)+';background:'+(active?ct.color+'55':'rgba(0,0,0,.4)')+';border:1px solid '+ct.color+(active?'':'88')+';border-radius:5px;padding:5px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;font-weight:'+(active?'bold':'normal')+';';
-    d.innerHTML='<div style="font-size:14px;">'+ct.icon+'</div>'+ct.name;
+    d.style.cssText='flex:1;text-align:center;font-size:9px;color:'+(active?'#fff':ct.color)+';background:'+(active?ct.color+'e6':'rgba(0,0,0,.8)')+';border:1px solid '+ct.color+(active?'':'88')+';border-radius:5px;padding:5px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;font-weight:'+(active?'bold':'normal')+';';
+    d.innerHTML='<div style="margin-bottom:2px;">'+chargeIconHtml(ct,18)+'</div>'+ct.name;
     bindTapSwipe(d,()=>{ if(ct.id!==_soulSetupChargeId){ sfxSelect(); openSoulSetupFor(ct.id); } });
     tabs.appendChild(d);
   });
@@ -12755,7 +12760,7 @@ function renderSoulSetupContent(){
   let html='';
   if(ct){
     html+='<div style="width:100%;background:rgba(0,0,0,.6);border:1px solid '+ct.color+'55;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;font-family:sans-serif;">'
-      +'<span style="font-size:18px;">'+ct.icon+'</span>'
+      +chargeIconHtml(ct,20)
       +'<span style="font-size:13px;color:'+ct.color+';font-weight:bold;">'+ct.name+'</span>'
       +'<span style="font-size:9px;color:#999;">のソウル編集</span>'
       +'</div>';
@@ -12864,9 +12869,9 @@ function renderAchievementsContent(){
       const ci=chargeIds.indexOf(cid);
       const got=ci>=0&&!!ccArr[ci];
       const ct=CHARGE_TYPES[cid];
-      return '<span title="'+ct.name+'" style="display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;font-size:10px;margin-right:2px;'
+      return '<span title="'+ct.name+'" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;margin-right:2px;'
         +(got?'background:rgba(138,184,216,.25);border:1px solid #8ab8d8;':'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);opacity:.4;')
-        +'">'+ct.icon+'</span>';
+        +'">'+chargeIconHtml(ct,14)+'</span>';
     }).join('');
     const rewardTxt=(g,s)=>'💰'+g+(s>0?' ／ 💎'+s:'');
     let noConLine;
