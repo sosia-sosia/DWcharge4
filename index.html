@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver379</title>
+<title>DUNGEON WALKER DWCver383</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -1530,6 +1530,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div class="overlay" id="ov-statup" style="gap:10px;background-image:url(sabhaikei.png);background-size:cover;background-position:center;background-color:#07050e;">
     <div class="ov-title" style="font-size:16px;">⬆️ ステータス強化</div>
     <div class="ov-sub" style="color:#fff;font-weight:bold;font-style:normal;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.5);border-radius:8px;padding:5px 16px;letter-spacing:1px;">1つ選んで永続強化を得よう</div>
+    <div id="statup-acquired-btn" style="display:none;width:100%;max-width:260px;text-align:center;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.4);border-radius:6px;padding:5px 0;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">📋 これまで獲得した強化を確認</div>
     <div id="statup-list" style="display:flex;flex-direction:column;gap:10px;width:100%;overflow-y:auto;max-height:65vh;"></div>
   </div>
 
@@ -2481,6 +2482,17 @@ function chargeIconHtml(ct, size){
     +'<span style="display:none;font-size:'+fontSize+'px;line-height:1;">'+ct.icon+'</span>'
     +'</span>';
 }
+// 手札のカードの「現在の実際のコスト」を計算（狂戦士0コスト・炎上ペナルティ・魂砕き・雷鳴などを考慮）
+// 封印の対象選定など、表示上のコストと一致させたい箇所で使用する
+function getHandCardActualCost(idx){
+  const id=G.hand[idx]; const c=DB[id]; if(!c) return 0;
+  const isFreePass=G.freeNextCard&&id!=='freePass';
+  const isHakiZeroPlay=G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.includes(id)&&G.hand.includes(id);
+  const soulcrushCount=G.hand.filter(hid=>hid==='bougai_soulcrush').length;
+  const costAdd=soulcrushCount>0?soulcrushCount:0;
+  const _ignitePenalty=(G.ignitedCards&&G.ignitedCards[idx])||0;
+  return isFreePass?0:(isHakiZeroPlay?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)-(G.hakiStageDiscount||0))));
+}
 function filterChargeRestricted(ids){
   return ids.filter(id=>{
     const c=DB[id];
@@ -2951,12 +2963,12 @@ const SOULS={
   seimei:  {id:'seimei',  name:'生命のソウル', category:1, cost:1, icon:'❤️', desc:'最大HP+10'},
   seimei2: {id:'seimei2', name:'生命のソウルⅡ', category:1, cost:2, icon:'❤️', desc:'最大HP+20'},
   seimei3: {id:'seimei3', name:'生命のソウルⅢ', category:1, cost:3, icon:'❤️', desc:'最大HP+40'},
-  teppeki: {id:'teppeki', name:'鉄壁のソウル', category:1, cost:1, icon:'🛡️', desc:'ステージ開始時シールド+5'},
-  teppeki2:{id:'teppeki2', name:'鉄壁Ⅱ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
+  teppeki: {id:'teppeki', name:'鉄壁のソウルⅠ', category:1, cost:1, icon:'🛡️', desc:'ステージ開始時シールド+5'},
+  teppeki2:{id:'teppeki2', name:'鉄壁のソウルⅡ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
   kekkai:  {id:'kekkai',  name:'障壁のソウルⅠ', category:1, cost:3, icon:'🔷', desc:'シールドの最低値が0ではなく5になり、5以下に減少しなくなる'},
   kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+3する'},
-  joukou:  {id:'joukou',  name:'常攻のソウルⅠ', category:1, cost:1, icon:'⚔️', desc:'常時攻撃力+1（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
-  shogeki: {id:'shogeki', name:'初撃のソウルⅠ', category:1, cost:1, icon:'💥', desc:'最初の一撃攻撃力+3（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  joukou:  {id:'joukou',  name:'常攻のソウルⅠ', category:1, cost:2, icon:'⚔️', desc:'常時攻撃力+1（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  shogeki: {id:'shogeki', name:'初撃のソウルⅠ', category:1, cost:2, icon:'💥', desc:'最初の一撃攻撃力+3（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
   hatsuMana: {id:'hatsuMana', name:'初マナのソウル', category:1, cost:1, icon:'💎', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初ターンマナ+1を獲得する'},
   hatsuFuda: {id:'hatsuFuda', name:'初札のソウル', category:1, cost:1, icon:'🃏', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初期手札+1を獲得する'},
   taidoku: {id:'taidoku', name:'耐毒のソウルⅠ', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-8（0未満にはならない）'},
@@ -3292,7 +3304,7 @@ function _startStageBattle(){
   }
   G.hakiCountThisStage=0; G.enemyFrozen=false; G.turnAtkCardCount=0; G.turnCostSum=0; G.stageManaSpent=0; G.stageHealSum=0; G.skipNextDraw=false; G.nextDrawMinus=0;
   G.hakiStageDiscount=0; // 狂戦士レベル4のコスト-2効果もステージごとにリセット
-  G.poisonAddBonus=0; G.endTurnShieldVal=0; G.endTurnShieldTurns=0; G.nextAtkBuffVal=0; G.enemyDmgReduce=0; G.enemyDmgReduceTurns=0; G.chargeEffectActive=false; G.turnCardsUsed=0;
+  G.poisonAddBonus=0; G.stanceEffects=[]; G.nextAtkBuffVal=0; G.enemyDmgReduce=0; G.enemyDmgReduceTurns=0; G.chargeEffectActive=false; G.turnCardsUsed=0;
   G.absorbShieldPending=false; G.absorbShieldAccum=0; G.absorbHealPending=false; G.absorbHealAccum=0;
   G.doubleNextCard=false; G.miniComboBuff=0; G.holdCharge=false;
   // 前ステージの敵行動テキストをクリア
@@ -3482,10 +3494,13 @@ function drawCards(n, isTurnStart=false){
   // 封印：ドロー後に最高コストカードを封印
   if(isTurnStart && G.sealThisTurn){
     G.sealThisTurn=false;
-    const nonBougai=G.hand.filter(id=>DB[id]&&DB[id].type!=='bougai');
-    if(nonBougai.length>0){
-      let maxCost=-1,maxId=null;
-      nonBougai.forEach(id=>{if(DB[id].cost>maxCost){maxCost=DB[id].cost;maxId=id;}});
+    const nonBougaiIdx=G.hand.map((id,i)=>i).filter(i=>DB[G.hand[i]]&&DB[G.hand[i]].type!=='bougai');
+    if(nonBougaiIdx.length>0){
+      let maxCost=-1;
+      nonBougaiIdx.forEach(i=>{const ac=getHandCardActualCost(i);if(ac>maxCost)maxCost=ac;});
+      // 同じ（実際の）コストが複数ある場合はランダムに1種類を選ぶ
+      const tiedIds=[...new Set(nonBougaiIdx.filter(i=>getHandCardActualCost(i)===maxCost).map(i=>G.hand[i]))];
+      const maxId=tiedIds[Math.floor(Math.random()*tiedIds.length)];
       if(maxId){G.sealedCardId=maxId;addLog('🔒 封印: 「'+DB[maxId].name+'」は使用不可！','enemy');}
     }
   }
@@ -3565,6 +3580,7 @@ function checkEnemyDeath(){
 
 function playCard(idx, _isChain){
   // _isChain=true: 連鎖起動による再発動（マナ消費・手札操作なし）
+  if(!_isChain) G._cardPending=false;
   const c = (typeof idx==='object') ? idx : DB[G.hand[idx]];
   const cid = c ? c.id : null;
   if(!c||!cid)return;
@@ -4213,11 +4229,18 @@ function playCard(idx, _isChain){
     queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
     checkEnemyDeath(); // HP0でもここではreturnしない（後続の効果ブロックを継続処理。最終判定は関数末尾）
   }
-  // 二段構え・三段構え：ターン終了時に盾付与（重ねて使用した場合は蓄積する）
+  // 二段構え・三段構え：ターン終了時に盾付与
+  // 同じカードを重ねた場合はターン数のみ延長（値は変わらない）。異なる構えカード同士は別々の効果として両方が加算される。
   if(ef.endTurnShield){
-    G.endTurnShieldVal=(G.endTurnShieldVal||0)+ef.endTurnShield+(G.shieldBuff||0);
-    G.endTurnShieldTurns=(G.endTurnShieldTurns||0)+(ef.endTurnShieldTurns||2);
-    msgs.push(ef.endTurnShieldTurns+'ターン終了時 盾+'+(ef.endTurnShield+(G.shieldBuff||0)));
+    G.stanceEffects=G.stanceEffects||[];
+    const existing=G.stanceEffects.find(s=>s.cid===cid);
+    if(existing){
+      existing.turns+=(ef.endTurnShieldTurns||2);
+      msgs.push(ef.endTurnShieldTurns+'ターン延長（合計'+existing.turns+'T） ターン終了時 盾+'+ef.endTurnShield);
+    } else {
+      G.stanceEffects.push({cid:cid, val:ef.endTurnShield, turns:(ef.endTurnShieldTurns||2)});
+      msgs.push(ef.endTurnShieldTurns+'ターン ターン終了時 盾+'+ef.endTurnShield);
+    }
     queueEffect(()=>showEffectPopup('Etate.png','構え：終了時盾+'+ef.endTurnShield,'#5dade2','player'),800);
   }
   // 断捨離：1枚捨てて1枚ドロー
@@ -4252,6 +4275,8 @@ function playCard(idx, _isChain){
         const di=G.discard.indexOf(selId);
         if(di>=0) G.discard.splice(di,1);
         G.hand.push(selId);
+        G._lastDrawnIndices=[G.hand.length-1];
+        G._lastDrawnGen=(G._lastDrawnGen||0)+1;
         addLog('🔄 再利用: 「'+DB[selId].name+'」を手札へ','sys');
         updateUI(); renderHand();
       });
@@ -4615,16 +4640,17 @@ function processPlayerTurnEnd(onDone){
     });
   }
 
-  // 二段構え・三段構え：ターン終了時盾付与
-  if(G.endTurnShieldTurns>0){
+  // 二段構え・三段構え：ターン終了時盾付与（有効な構え全ての合計値を付与し、それぞれ独立して残りターンを消化する）
+  if(G.stanceEffects && G.stanceEffects.length>0){
     addStep((next)=>{
-      const val=(G.endTurnShieldVal||0)+(G.shieldBuff||0);
+      const total=G.stanceEffects.reduce((s,e)=>s+e.val,0);
+      const val=total+(G.shieldBuff||0);
       G.shield+=val;
       queueEffect(()=>{flashShield();flashShieldAdd('player',val);sfxShield();}, 800);
       if(G.chargeType==='teppeki') addCharge(1);
       addLog('🛡️ 構え: ターン終了時 盾+'+val,'sys');
-      G.endTurnShieldTurns--;
-      if(G.endTurnShieldTurns<=0){ G.endTurnShieldVal=0; }
+      G.stanceEffects.forEach(e=>{e.turns--;});
+      G.stanceEffects=G.stanceEffects.filter(e=>e.turns>0);
       updateUI();
       setTimeout(next,300);
     });
@@ -5555,8 +5581,8 @@ function victory(){
   addLog('✨ '+G.enemy.name+'を倒した！','sys');
   G.totalDmgDealt=(G.totalDmgDealt||0);
 
-  // ステージ9（index8=SHADOW LORD）撃破後の異世界演出（炎の神殿ではスキップ）
-  if(G.stage===8 && G.areaId!==2){
+  // ステージ9（index8=SHADOW LORD）撃破後の異世界演出（忘却の遺跡専用）
+  if(G.stage===8 && G.areaId===1){
     // ボスのスプライトをフェードアウト（2秒停止）
     const sp=document.getElementById('enemy-sprite');
     if(sp){sp.style.transition='opacity 0.8s';sp.style.opacity='0';}
@@ -5920,58 +5946,31 @@ function closeReward(){
 
   // ===== 始まりの洞窟 専用イベント =====
   if(G.areaId===0){
-    if(G.stage===1||G.stage===3){
-      // STAGE1後・STAGE3後：鍛冶屋のみ（ステータス強化は廃止）
-      showSmithEvent();
+    if(G.stage===1){
+      showStatUpEvent(true); // Stage1後：初期ステータス強化
     } else if(G.stage===2||G.stage===4){
-      // STAGE2後・STAGE4後：強化のみ
-      showCaveStatUpEvent();
+      showSmithEvent(); // Stage2・4後：鍛冶屋
+    } else if(G.stage===3){
+      showCaveStatUpEvent(); // Stage3後：ステータス強化
     } else {
       startStage();
     }
     return;
   }
 
-  // ===== 炎の神殿 専用イベント =====
-  if(G.areaId===2){
+  // ===== 10ステージ構成（炎の神殿・雷鳴の高原・氷壁の迷宮）共通イベント =====
+  if(G.areaId===2||G.areaId===3||G.areaId===6){
     if(G.stage===1){
       showStatUpEvent(true); // Stage1後：初期強化
-    } else if(G.stage===2||G.stage===5){
-      showStatUpEvent(false); // Stage2・5後：通常強化
+    } else if(G.stage===2||G.stage===4||G.stage===5){
+      showStatUpEvent(false); // Stage2・4・5後：ステータス強化
     } else if(G.stage===3||G.stage===6){
       G._postEventStatUp=true;
       showSpringOrSmithChoice(); // Stage3・6後：泉 or 鍛冶屋
-    } else if(G.stage===4){
-      G._postEventStatUp=true;
-      showBanishEvent(); // Stage4後：廃棄
     } else if(G.stage===7||G.stage===8){
       showSuperStatUpEvent(); // Stage7・8後：超強化
     } else if(G.stage===9){
-      showAltarBeforeEnding(showSuperStatUpEvent); // Stage9後：祭壇→超強化（ラスボス前）
-    } else if(G.stage===10){
-      showClearStats(); // ラスボス撃破後：クリア画面
-    } else {
-      startStage();
-    }
-    return;
-  }
-
-  // ===== 雷鳴の高原 専用イベント =====
-  if(G.areaId===3){
-    if(G.stage===1){
-      showStatUpEvent(true); // Stage1後：初期強化
-    } else if(G.stage===2||G.stage===5){
-      showStatUpEvent(false); // Stage2・5後：通常強化
-    } else if(G.stage===3||G.stage===6){
-      G._postEventStatUp=true;
-      showSpringOrSmithChoice(); // Stage3・6後：泉 or 鍛冶屋
-    } else if(G.stage===4){
-      G._postEventStatUp=true;
-      showBanishEvent(); // Stage4後：廃棄
-    } else if(G.stage===7||G.stage===8){
-      showSuperStatUpEvent(); // Stage7・8後：超強化
-    } else if(G.stage===9){
-      showAltarBeforeEnding(showSuperStatUpEvent); // Stage9後：祭壇→超強化（ボス前）
+      showAltarBeforeEnding(showSuperStatUpEvent); // Stage9後：呪いの祭壇→超強化（ボス前）
     } else if(G.stage===10){
       showClearStats(); // ボス撃破後：クリア画面
     } else {
@@ -5980,50 +5979,20 @@ function closeReward(){
     return;
   }
 
-  // ===== 毒の沼地 専用イベント（洞窟と同じ頻度・強化プールを7ステージに引き延ばし） =====
-  if(G.areaId===4){
-    if(G.stage===1||G.stage===3||G.stage===5){
-      // Stage1・3・5後：鍛冶屋のみ（ステータス強化は廃止）
-      showSmithEvent();
-    } else if(G.stage===2||G.stage===4||G.stage===6){
-      // Stage2・4・6後：強化のみ
-      showCaveStatUpEvent();
+  // ===== 7ステージ構成（毒の沼地・鉄壁の砦）共通イベント =====
+  if(G.areaId===4||G.areaId===5){
+    if(G.stage===1||G.stage===3){
+      showSmithEvent(); // Stage1・3後：鍛冶屋
+    } else if(G.stage===2||G.stage===4||G.stage===5||G.stage===6){
+      showCaveStatUpEvent(); // Stage2・4・5・6後：ステータス強化
     } else {
       startStage();
     }
     return;
   }
 
-  // ===== 鉄壁の砦 専用イベント（洞窟と同じ頻度・強化プールを7ステージに引き延ばし） =====
-  if(G.areaId===5){
-    if(G.stage===1||G.stage===3||G.stage===5){
-      // Stage1・3・5後：鍛冶屋のみ（ステータス強化は廃止）
-      showSmithEvent();
-    } else if(G.stage===2||G.stage===4||G.stage===6){
-      // Stage2・4・6後：強化のみ
-      showCaveStatUpEvent();
-    } else {
-      startStage();
-    }
-    return;
-  }
-
-  // ===== 氷壁の迷宮 専用イベント（洞窟と同じ頻度・強化プールを10ステージに引き延ばし） =====
-  if(G.areaId===6){
-    if(G.stage===1||G.stage===3||G.stage===5||G.stage===7||G.stage===9){
-      // 奇数ステージ後：鍛冶屋のみ
-      showSmithEvent();
-    } else if(G.stage===2||G.stage===4||G.stage===6||G.stage===8){
-      // 偶数ステージ後：強化のみ
-      showCaveStatUpEvent();
-    } else {
-      startStage();
-    }
-    return;
-  }
-
-  // ===== 呪いの廃墟 専用イベント（洞窟と同じ5ステージ構成） =====
-  if(G.areaId===8){
+  // ===== 5ステージ構成（呪いの廃墟・帰らずの森）共通イベント =====
+  if(G.areaId===8||G.areaId===9){
     if(G.stage===1||G.stage===3){
       // STAGE1後・STAGE3後：鍛冶屋のみ
       showSmithEvent();
@@ -6039,7 +6008,7 @@ function closeReward(){
   // ===== 忘却の遺跡 既存イベント =====
   if(G.stage===1){
     showStatUpEvent(true);
-  } else if(G.stage===2||G.stage===4||G.stage===7){
+  } else if(G.stage===2||G.stage===4||G.stage===6||G.stage===7){
     showStatUpEvent(false);
   } else if(G.stage===3||G.stage===8||G.stage===10){
     G._postEventStatUp=true;
@@ -6047,9 +6016,6 @@ function closeReward(){
   } else if(G.stage===5){
     G._postEventStatUp=true;
     showStage5Choice();
-  } else if(G.stage===6){
-    G._postEventStatUp=true;
-    showBanishEvent();
   } else if(G.stage===9||G.stage===11){
     showSuperStatUpEvent();
   } else if(G.stage===12){
@@ -6401,6 +6367,7 @@ function showCaveStatUpEvent(){
 function _showStatUpUI(opts, onDone){
   const ov=document.getElementById('ov-statup');
   if(ov._smithBg){ restoreSmithBg(); }
+  const abtn=document.getElementById('statup-acquired-btn'); if(abtn) abtn.style.display='none';
   const list=document.getElementById('statup-list');
   list.innerHTML='';
   list.style.cssText='display:flex;flex-direction:column;gap:10px;width:100%;overflow-y:auto;max-height:65vh;';
@@ -7067,6 +7034,7 @@ function showStatUpEvent(stage2Only, onDone){
     else { startStage(); }
     return;
   }
+  _setupStatupAcquiredBtn();
   showOv('ov-statup');
 }
 
@@ -7157,9 +7125,60 @@ function _doSuperStatUp(){
       </div>`;
     list.appendChild(d);
   });
+  _setupStatupAcquiredBtn();
   if(!ov.classList.contains('show')) showOv('ov-statup');
 }
 // 強化オプションリストを構築する共通関数
+// 現在獲得済みのステータス強化を確認するボタン・ポップアップ
+function _acquiredStatUpList(){
+  const all=_buildStatOptions();
+  const rows=[];
+  const findOpt=id=>all.find(o=>o.id===id);
+  // 一度のみ系
+  [['chargeHelper',G.gotChargeHelper],['firstMana',G.gotFirstTurnMana],['handPlus',G.gotHandPlus],
+   ['turnHeal',G.gotTurnStartHeal],['manaPlus',G.gotManaPlus],['handPlusKai',G.gotHandPlusKai],
+   ['fullCharge',G.fullChargeStart],['manaPlus2',G.gotManaPlus2],['drawPlus2',G.gotDrawPlus2]
+  ].forEach(([id,got])=>{ if(got){const o=findOpt(id); if(o) rows.push({icon:o.icon,name:o.name,detail:''});} });
+  // 累積系（現在の取得回数・合計値も表示）
+  if((G.permAtkCount||0)>0){const o=findOpt('permAtk');rows.push({icon:o.icon,name:o.name,detail:(G.permAtkCount)+'回・合計+'+(G.permAtkBonus||0)});}
+  if((G.permAtkBuff2Count||0)>0){const o=findOpt('permAtk2');rows.push({icon:o.icon,name:o.name,detail:(G.permAtkBuff2Count)+'回・合計+'+(G.permAtkBuff2||0)});}
+  if((G.healBuffCount||0)>0){const o=findOpt('healBuff');rows.push({icon:o.icon,name:o.name,detail:(G.healBuffCount)+'回・合計+'+(G.healBuff||0)});}
+  if((G.shieldBuffCount||0)>0){const o=findOpt('shieldCardBuff');rows.push({icon:o.icon,name:o.name,detail:(G.shieldBuffCount)+'回・合計+'+(G.shieldBuff||0)});}
+  if((G.turnStartShieldCount||0)>0){const o=findOpt('turnShield');rows.push({icon:o.icon,name:o.name,detail:(G.turnStartShieldCount)+'回・合計+'+(G.turnStartShieldBonus||0)});}
+  return rows;
+}
+function _setupStatupAcquiredBtn(){
+  const btn=document.getElementById('statup-acquired-btn');
+  if(!btn) return;
+  const rows=_acquiredStatUpList();
+  if(rows.length===0){ btn.style.display='none'; return; }
+  btn.style.display='block';
+  const openPopup=(e)=>{
+    if(e&&e.type==='touchend') e.preventDefault();
+    sfxSelect();
+    const popup=document.createElement('div');
+    popup.style.cssText='position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:manipulation;padding:16px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:rgba(10,6,4,.95);border:2px solid rgba(201,168,76,.6);border-radius:12px;padding:16px;width:100%;max-width:300px;max-height:70vh;overflow-y:auto;';
+    box.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#c9a84c;font-weight:bold;margin-bottom:10px;text-align:center;">📋 獲得済みステータス強化</div>'
+      +'<div style="display:flex;flex-direction:column;gap:8px;">'
+      +rows.map(r=>'<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border-radius:8px;padding:6px 10px;">'
+        +'<div style="font-size:20px;flex-shrink:0;">'+r.icon+'</div>'
+        +'<div style="flex:1;"><div style="font-size:11px;color:#fff;font-family:sans-serif;font-weight:bold;">'+r.name+'</div>'
+        +(r.detail?'<div style="font-size:9px;color:#aaa;font-family:sans-serif;">'+r.detail+'</div>':'')
+        +'</div></div>').join('')
+      +'</div>';
+    const closeBtn=document.createElement('div');
+    closeBtn.style.cssText='background:rgba(60,60,60,.8);border:2px solid #888;border-radius:7px;padding:9px 0;text-align:center;font-family:\'Cinzel\',serif;font-size:11px;color:#eee;cursor:pointer;touch-action:manipulation;width:100%;max-width:300px;letter-spacing:1px;';
+    closeBtn.textContent='閉じる';
+    const close=()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);};
+    closeBtn.addEventListener('click',close); closeBtn.addEventListener('touchend',(ev)=>{ev.preventDefault();close();});
+    popup.addEventListener('click',(ev)=>{if(ev.target===popup)close();});
+    popup.appendChild(box); popup.appendChild(closeBtn);
+    appendToApp(popup);
+  };
+  btn.onclick=openPopup; btn.ontouchend=openPopup;
+}
 function _buildStatOptions(){
   return [
     {id:'chargeHelper',stage2only:true, icon:'⚡', name:'チャージヘルパー',  desc:'ステージ開始時チャージ+1（一度のみ）',                                                                      available:!G.gotChargeHelper,        apply:()=>{G.chargeHelperBonus=1;G.gotChargeHelper=true;addLog('⚡ チャージヘルパーを得た！','sys');}},
@@ -7560,7 +7579,7 @@ function updateUI(){
   if(G.mirrorActive) pParts.push('<span style="color:#bb8fce;">🪞魔鏡</span>');
   if(G.doubleNext) pParts.push('<span style="color:#f39c12;">🐉2倍</span>');
   if(G.halfShieldLossTurns>0) pParts.push('<span style="color:#aab7b8;">🪨剛体'+G.halfShieldLossTurns+'T</span>');
-  if(G.endTurnShieldTurns>0) pParts.push('<span style="color:#5dade2;">🛡️構え'+G.endTurnShieldTurns+'T(+'+G.endTurnShieldVal+')</span>');
+  if(G.stanceEffects&&G.stanceEffects.length>0) pParts.push('<span style="color:#5dade2;">🛡️構え'+G.stanceEffects.map(e=>e.turns+'T(+'+e.val+')').join('/')+'</span>');
   if(G.comboHealActive) pParts.push('<span style="color:#52be80;">💚連撃回復+'+G.comboHealVal+'</span>');
   if(G.drawBonusPerTurn>0) pParts.push('<span style="color:#a8d8ea;">🃏毎T+'+G.drawBonusPerTurn+'ドロー</span>');
   if(G.poisonDoubleTurn) pParts.push('<span style="color:#9b59b6;">☠️毒2倍</span>');
@@ -7909,7 +7928,7 @@ function showStatusDetail(target){
     if(G.mirrorActive) lines.push('🪞 魔鏡\n次に受けるダメージを敵に反射');
     if(G.doubleNext) lines.push('🐉 龍神化 2倍\n次の攻撃の最初の一撃が2倍');
     if(G.halfShieldLossTurns>0) lines.push('🪨 剛体 '+G.halfShieldLossTurns+'T\nシールド減少量が半分になる');
-    if(G.endTurnShieldTurns>0) lines.push('🛡️ 構え '+G.endTurnShieldTurns+'T (+'+G.endTurnShieldVal+')\nこのターンを含め、残りターンの終了時にシールド+'+G.endTurnShieldVal+'を得る');
+    if(G.stanceEffects&&G.stanceEffects.length>0) G.stanceEffects.forEach(e=>{lines.push('🛡️ 構え('+DB[e.cid].name+') '+e.turns+'T (+'+e.val+')\n残りターンの終了時にシールド+'+e.val+'を得る');});
     if(G.soulEaterActive) lines.push('💀 魂食らい\nこのターン攻撃ダメージの半分HP回復');
     if(G.comboHealActive) lines.push('💗 連撃回復 +'+G.comboHealVal+'\n攻撃カード使用ごとHP+'+G.comboHealVal+'回復');
     if(G.poisonDoubleTurn) lines.push('☠️ 毒2倍\nこのターン、付与する毒の効果が2倍になる');
@@ -8124,6 +8143,13 @@ function renderHand(){
     d.className='card '+c.rarity+' '+(canUse?'playable':'unplayable')+(isSelected?' selected-card':'')+(isNewCard?' card-slide-in':'')+(isTutorialTarget?' tutorial-target-card':'');
     if(isPoisonKillLocked||isLastStandLocked||isSwiftLocked||isEchoLocked||isFreePassLocked||isFreePassCostLocked||isChainNoSkillLocked||isAfterForceLocked||isSealLocked||isQuakeLocked||isBougaiLocked||isExorciseLocked||isHalfHpLocked||isTutorialCardLocked) d.style.filter='grayscale(100%)';
     else d.style.filter='';
+    // 麻痺中：次に使うカードが無効化されることが分かるよう、手札全体を黄色く色付けする
+    if(G.paralyzeNextCard){
+      d.style.filter=(d.style.filter?d.style.filter+' ':'')+'sepia(1) saturate(4) hue-rotate(-18deg) brightness(1.05)';
+      d.style.boxShadow='0 0 6px 2px rgba(244,208,63,.55)';
+    } else {
+      d.style.boxShadow='';
+    }
     const corner = {common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️'}[c.rarity]||'◆';
     // 妨害カードはframe_bougai.pngを使用
     const frameImg=c.rarity==='bougai'?'frame_bougai.png':(FRAME_IMGS[c.rarity]||'');
@@ -8459,6 +8485,8 @@ function renderHand(){
     const tapHandler=(ev)=>{
       if(ev.type==='touchend') ev.preventDefault();
       if(G.phase!=='player') return;
+      // 使用確定後、実際にplayCard()が呼ばれるまでの間（飛行演出の500ms）は再タップを無視する
+      if(G._cardPending){ dwRejectFeedback(d); return; }
       // 押せないカード（マナ不足・条件未達など）をタップした場合は、状態を変えずに軽く反応だけ返す
       if(!canUse) dwRejectFeedback(d);
       // リップルエフェクト
@@ -8556,6 +8584,8 @@ function showCardUsePopup(c,idx,canUse){
     const doUse=(e)=>{
       e.stopPropagation();
       if(e.type==='touchend') e.preventDefault();
+      if(G._cardPending) return; // 二重確定防止
+      G._cardPending=true;
       sfxConfirm();
       playCardFlyAnimation(cardDiv, c.type);
       if(popup.parentNode) popup.parentNode.removeChild(popup);
@@ -11552,8 +11582,8 @@ const SHOP_ITEMS=[
   {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'crystal',amount:20}], unlockArea:null, unlockClearCount:4, oneTime:true, soulId:'chargeup2'},
   {id:'buy_chargeup3', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅢ', desc:'④特殊効果付与系 コスト2・チャージのレベルをさらに1つ上げ、より特化した効果になる（Ⅰ・Ⅱ装備時のみ装備可）', costs:[{currency:'crystal',amount:100}], unlockArea:null, unlockClearCount:6, requireSouls:['chargeup1','chargeup2'], oneTime:true, soulId:'chargeup3'},
   {id:'buy_boukiIji1', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅠ', desc:'④特殊効果付与系 コスト2・ターン開始時のシールド減少量が40％になる', price:100, currency:'crystal', unlockArea:null, requireSouls:['teppeki','kekkai','kinkyu'], oneTime:true, soulId:'boukiIji1'},
-  {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト1・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
-  {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト1・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
+  {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト2・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
+  {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト2・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
   {id:'buy_hatsuMana', cat:'soul', icon:'💎', name:'初マナのソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初ターンマナ+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuMana'},
   {id:'buy_hatsuFuda', cat:'soul', icon:'🃏', name:'初札のソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初期手札+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuFuda'},
   {id:'buy_boukiIji2', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅡ', desc:'④特殊効果付与系 コスト3・ターン開始時のシールド減少量が30％になる', price:200, currency:'crystal', unlockArea:null, requireSouls:['boukiIji1'], oneTime:true, soulId:'boukiIji2'},
