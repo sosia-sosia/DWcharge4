@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver384</title>
+<title>DUNGEON WALKER DWCver385</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -632,6 +632,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card-type-skill{color:#ffaa33;border:1.5px solid rgba(230,126,34,.7);}
 .card-type-curse{color:#cc77ff;border:1.5px solid rgba(155,89,182,.7);}
 .card-type-bougai{color:#ff4040;border:1.5px solid rgba(231,76,60,.7);}
+.card-type-another{color:#c084fc;border:1.5px solid rgba(168,85,247,.8);}
 /* HPバー低下点滅（30%以下） */
 .hp-bar.player.low-hp{animation:hp-low-blink 1.2s ease-in-out infinite;}
 @keyframes hp-low-blink{0%,100%{background:linear-gradient(180deg,#ff5a5a,#c0392b);box-shadow:0 0 8px rgba(200,40,40,.4)}50%{background:linear-gradient(180deg,#ff2020,#900);box-shadow:0 0 18px rgba(255,0,0,.8)}}
@@ -1939,13 +1940,23 @@ const STARTER=['strike','strike','strike','guard','guard','heal','manaDrain'];
 
 // チャージ別初期デッキ
 const CHARGE_DECKS = {
-  renGeki:    ['strike','strike','guard','guard','guard','heal','karuren','karuren','punch','punch','punch','comboHeal','sokudoHenkan','fudaShuriken'],
-  tameAtk:    ['bash','bash','bash','bash','guard','guard','guard','heal','heal','konshin','chikara','chikara','kougekiHenkan','bakuretsuzan'],
-  jikoSaisei: ['shinsei','shinsei','guard','guard','heal','heal','heal','composure','composure','composure','sanctuary','healReserve','seiryokuHenkan','chiyuHanten'],
-  teppeki:    ['strike','strike','strike','guard','guard','guard','guard','heal','heal','accumulate','accumulate','shieldBash','shubiHenkan','boueiIji'],
-  dokushi:    ['poisonNeedle','poisonNeedle','poison','poison','guard','guard','guard','heal','heal','expPoison','ragePoison','ragePoison','dokubutsuHenkan','gekidokuBari'],
-  inori:      ['strike','strike','strike','guard','guard','guard','heal','heal','furyDance','furyDance','furyDance','bindingChain','sokusekiNoInori','chiisanaKago'],
-  haki:       ['strike','strike','soulEater','soulEater','heal','heal','slow','slow','slow','bloodPact','kyougeki','kyougeki','sokusekiNoIkari','gekikou'],
+  renGeki:    ['strike','strike','guard','guard','guard','heal','karuren','karuren','punch','punch','punch','comboHeal'],
+  tameAtk:    ['bash','bash','bash','bash','guard','guard','guard','heal','heal','konshin','chikara','chikara'],
+  jikoSaisei: ['shinsei','shinsei','guard','guard','heal','heal','heal','composure','composure','composure','sanctuary','healReserve'],
+  teppeki:    ['strike','strike','strike','guard','guard','guard','guard','heal','heal','accumulate','accumulate','shieldBash'],
+  dokushi:    ['poisonNeedle','poisonNeedle','poison','poison','guard','guard','guard','heal','heal','expPoison','ragePoison','ragePoison'],
+  inori:      ['strike','strike','strike','guard','guard','guard','heal','heal','furyDance','furyDance','furyDance','bindingChain'],
+  haki:       ['strike','strike','soulEater','soulEater','heal','heal','slow','slow','slow','bloodPact','kyougeki','kyougeki'],
+};
+// チャージ別「サイドデッキ」専用カード：初期デッキには含まれず、デッキ編集画面の入れ替え候補（サイドデッキ）に最初から置かれる（DP0で自由に入れ替え可能）
+const CHARGE_SIDE_DECKS = {
+  renGeki:    ['sokudoHenkan','fudaShuriken'],
+  tameAtk:    ['kougekiHenkan','bakuretsuzan'],
+  jikoSaisei: ['seiryokuHenkan','chiyuHanten'],
+  teppeki:    ['shubiHenkan','boueiIji'],
+  dokushi:    ['dokubutsuHenkan','gekidokuBari'],
+  inori:      ['sokusekiNoInori','chiisanaKago'],
+  haki:       ['sokusekiNoIkari','gekikou'],
 };
 
 // チャージ別の「実際に使用するデッキ」を取得（編集済みならそちらを、無ければ初期デッキを返す）
@@ -5860,7 +5871,7 @@ function _doVictoryReward(){
     const rCorner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(rFrameImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -6986,7 +6997,7 @@ function showSpringEvent(){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
@@ -7064,7 +7075,7 @@ function showSpringRewards(rarity, list, rewardArea, rewardList, givenCardId){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -7370,7 +7381,7 @@ function showBanishEvent(){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
@@ -7861,7 +7872,7 @@ function showHandSelectOverlay(title, onSelect){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -7904,7 +7915,7 @@ function showDiscardSelectOverlay(title, onSelect){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -8308,7 +8319,10 @@ function renderHand(){
     const corner = c.type==='another'?'異':({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️',G:'◈',A:'異'}[c.rarity]||'◆');
     // 妨害カードはframe_bougai.pngを使用
     const frameImg=c.rarity==='bougai'?'frame_bougai.png':(FRAME_IMGS[c.rarity]||'');
-    const frameBg=frameImg?`url(${frameImg})`:'none';
+    // アナザーカードはフレーム画像に紫寄りのティントを重ねる
+    const frameBg=c.type==='another'
+      ? (frameImg?`linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35)),url(${frameImg})`:'linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35))')
+      : (frameImg?`url(${frameImg})`:'none');
     d.style.backgroundImage=frameBg;
     d.style.backgroundSize='100% 100%';
     d.style.backgroundRepeat='no-repeat';
@@ -8611,7 +8625,7 @@ function renderHand(){
     d.innerHTML=
       '<div class="card-band" style="'+(frameImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">'+reducedCost+'</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -8620,7 +8634,8 @@ function renderHand(){
         '<div class="rarity-dot '+c.rarity+'">'+RL[c.rarity]+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
-      '<div class="card-corner br">'+corner+'</div>';
+      '<div class="card-corner br">'+corner+'</div>'+
+      (c.type==='another'?'<div style="position:absolute;top:4px;right:4px;background:#a855f7;color:#fff;font-size:10px;font-weight:bold;line-height:1;padding:2px 5px;border-radius:5px;box-shadow:0 0 6px rgba(168,85,247,.8);z-index:2;">異</div>':'');
     // 踏み倒し：コスト表示を元コスト↔0で交互切り替え
   if(G.freeNextCard){
     if(window._freePassTimer) clearInterval(window._freePassTimer);
@@ -8716,7 +8731,7 @@ function showCardUsePopup(c,idx,canUse){
   cardDiv.innerHTML=
     '<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
-      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
       '<div class="card-cost '+c.rarity+'" style="width:32px;height:32px;font-size:18px;top:6px;left:4px;">'+c.cost+'</div>'+
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
@@ -8793,7 +8808,7 @@ function showCardDetail(c){
   inner.innerHTML=
     '<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
-      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
       '<div class="card-cost '+c.rarity+'" style="width:32px;height:32px;font-size:18px;top:6px;left:4px;">'+c.cost+'</div>'+
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
@@ -8831,7 +8846,7 @@ function showDiscardPile(){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
@@ -8879,7 +8894,7 @@ function showDuplicateEvent(){
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
@@ -8940,7 +8955,7 @@ function showAltarBeforeEnding(nextFn){
     if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost legendary">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
@@ -10034,7 +10049,7 @@ function showCardDetailWithConfirm(c, onConfirm, appendToBody){
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
   d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
-      '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
       '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
       cardIconHtml(c)+
       '<div class="card-name" style="font-size:14px;">'+c.name+'</div>'+
@@ -11221,7 +11236,7 @@ bind('btn-deck-view',()=>{
     const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
     d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
-        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+        '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
         '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+(n>1?' ×'+n:'')+'</div>'+
@@ -12724,7 +12739,7 @@ function renderDeckEditChargeTabs(){
 }
 // 保存済み(またはプリセット)のフラットなid配列から、{id,origin}の作業用配列とサイドデッキ配列を復元する
 function _deckEditInitState(chargeId){
-  const preset=CHARGE_DECKS[chargeId]||STARTER;
+  const preset=[...(CHARGE_DECKS[chargeId]||STARTER), ...(CHARGE_SIDE_DECKS[chargeId]||[])];
   const presetCount={};preset.forEach(id=>presetCount[id]=(presetCount[id]||0)+1);
   const savedFlat=getEffectiveDeck(chargeId);
   const usedSoFar={};
@@ -12733,7 +12748,7 @@ function _deckEditInitState(chargeId){
     usedSoFar[id]=(usedSoFar[id]||0)+1;
     return {id, origin:(usedSoFar[id]<=cap?'preset':'pool')};
   });
-  // プリセット由来で今のデッキに残っていない分がサイドデッキ
+  // プリセット由来（サイドデッキ専用カードも含む）で今のデッキに残っていない分がサイドデッキ
   const presetTagCount={};
   workingDeck.forEach(o=>{ if(o.origin==='preset') presetTagCount[o.id]=(presetTagCount[o.id]||0)+1; });
   const sideDeckArr=[];
@@ -12763,9 +12778,10 @@ function openDeckEditFor(chargeId){
     bindTapSwipe(resetBtn,()=>{
       sfxSelect();
       const preset=CHARGE_DECKS[_deckEditChargeId]||STARTER;
-      showSimpleConfirm('初期デッキに戻しますか？','編集中の内容は破棄され、'+preset.length+'枚の初期デッキ構成に戻ります（購入したカードは入れ替え候補に残ります）',()=>{
+      const sidePreset=CHARGE_SIDE_DECKS[_deckEditChargeId]||[];
+      showSimpleConfirm('初期デッキに戻しますか？','編集中の内容は破棄され、'+preset.length+'枚の初期デッキ構成に戻ります（購入したカード・サイドデッキ専用カードは入れ替え候補に残ります）',()=>{
         _deckEditWorkingDeck=preset.map(id=>({id, origin:'preset'}));
-        _deckEditSideDeckArr=[];
+        _deckEditSideDeckArr=[...sidePreset];
         _deckEditAutoSave();
         _deckEditShowMsg('↺ 初期デッキに戻しました',true);
         renderDeckEditPanel();
@@ -12787,19 +12803,22 @@ function _deckEditPoolRemaining(){
 function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
   const d=document.createElement('div');
   const fImg=FRAME_IMGS[c.rarity]||'';
-  if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
+  if(c.type==='another'){
+    d.style.backgroundImage=fImg?`linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35)),url(${fImg})`:'linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35))';
+    d.style.backgroundSize='100% 100%';
+  } else if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
   d.className='card '+c.rarity;
   if(dim) d.style.opacity='.45';
   // ガチャ生成カード（使い捨てカード）でも、右上バッジは通常の入れ替えバッジ表示のみとする（「使い捨て」表示は行わない）
   const effBadge=badgeText;
   const badgeColor='rgba(0,0,0,.75)';
-  const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️'}[c.rarity]||'◆';
+  const corner=c.type==='another'?'異':({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',G:'◈'}[c.rarity]||'◆');
   const nameSuffix=(count>1)?(' ×'+count):'';
   // 初期デッキ由来のカードはデッキポイントを消費しないため0固定。同名でも入れ替え候補（購入品）は別扱いで実際のDPを表示する
   const _dpVal=isPreset?0:getCardDeckPoint(c.id);
   d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
-      '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
       '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
       cardIconHtml(c)+
       '<div class="card-name" style="font-size:'+_cardNameSize(c.name+nameSuffix)+'px;">'+c.name+nameSuffix+'</div>'+
@@ -12808,6 +12827,7 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
     '<div class="card-corner br">'+corner+'</div>'+
+    (c.type==='another'?'<div style="position:absolute;top:4px;left:4px;background:#a855f7;color:#fff;font-size:9px;font-weight:bold;line-height:1;padding:2px 4px;border-radius:5px;box-shadow:0 0 6px rgba(168,85,247,.8);z-index:2;">異</div>':'')+
     (effBadge?('<div style="position:absolute;top:2px;right:2px;background:'+badgeColor+';color:#fff;font-size:9px;font-weight:bold;padding:1px 5px;border-radius:8px;">'+effBadge+'</div>'):'')+
     '<div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.8);border:1px solid rgba(201,168,76,.7);color:#f0d47a;font-size:9px;font-weight:bold;padding:1px 5px;border-radius:8px;">DP'+_dpVal+'</div>'+
     (c._gachaGenerated?'<div style="position:absolute;bottom:2px;left:2px;background:rgba(160,40,40,.55);border-radius:4px;font-size:6.5px;color:#ffe0e0;text-align:center;line-height:1.3;padding:1px 2px;max-width:60%;">エリア退出で消滅</div>':'');
@@ -12817,7 +12837,7 @@ function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
 function renderDeckEditPanel(){
   const ct=getChargeTypeAtLevel(_deckEditChargeId, getChargeLevel(_deckEditChargeId));
   const preset=CHARGE_DECKS[_deckEditChargeId]||STARTER;
-  const swapsUsed=_deckEditSideDeckArr.length;
+  const swapsUsed=_deckEditWorkingDeck.filter(o=>o.origin==='pool').length;
   const swapLimit=SAVE.deckSwapLimit||0;
   const pointsUsed=_deckEditPointsUsed();
   const pointLimit=SAVE.deckPointLimit||0;
@@ -12841,10 +12861,10 @@ function renderDeckEditPanel(){
     _deckEditWorkingDeck.forEach((entry)=>{
       const c=DB[entry.id]; if(!c) return;
       const isPoolOrigin=entry.origin==='pool';
-      const canRemove=isPoolOrigin || (_deckEditSideDeckArr.length<swapLimit);
+      const canRemove=isPoolOrigin || (swapsUsed<swapLimit);
       const badge=isPoolOrigin?'入替':'';
       const el=_buildDeckEditCardEl(c, ()=>{
-        if(!canRemove){ _deckEditShowWarning('⚠️ 入れ替え上限に達しています（入れ替え '+_deckEditSideDeckArr.length+' / '+(SAVE.deckSwapLimit||0)+'）。これ以上プリセットのカードは外せません'); return; }
+        if(!canRemove){ _deckEditShowWarning('⚠️ 入れ替え上限に達しています（入れ替え '+swapsUsed+' / '+(SAVE.deckSwapLimit||0)+'）。これ以上プリセットのカードは外せません'); return; }
         const i=_deckEditWorkingDeck.indexOf(entry);
         if(i<0) return;
         _deckEditWorkingDeck.splice(i,1);
@@ -13297,7 +13317,7 @@ function showZukanCardDetail(c){
   cardDiv.innerHTML=
     '<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
-      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨'}[c.type]||'')+'</div>'+
+      '<div class="card-type-label card-type-'+c.type+'" style="width:32px;height:32px;font-size:16px;top:6px;right:4px;">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
       '<div class="card-cost '+c.rarity+'" style="width:32px;height:32px;font-size:18px;top:6px;left:4px;">'+c.cost+'</div>'+
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
