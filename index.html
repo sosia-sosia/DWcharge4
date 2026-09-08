@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver383</title>
+<title>DUNGEON WALKER DWCver384</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -264,6 +264,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card.rare    .card-corner{color:var(--rare);}
 .card.epic    .card-corner{color:var(--epic);}
 .card.legendary .card-corner{color:var(--legendary);}
+.card.G  .card-corner{color:#f0c040;}
+.card.A  .card-corner{color:#a855f7;}
+.card.G  .card-icon-wrap{background:radial-gradient(circle,rgba(240,192,64,.2),transparent);border:2px solid rgba(240,192,64,.65);}
+.card.A  .card-icon-wrap{background:radial-gradient(circle,rgba(168,85,247,.2),transparent);border:2px solid rgba(168,85,247,.65);}
 
 /* マナコスト（左上のジェム） */
 .card-cost{
@@ -1781,6 +1785,31 @@ const AREA_HINTS={
 const DB={
   // 攻撃
   strike:      {id:'strike',      name:'斬撃',    icon:'⚔️', type:'attack',  rarity:'common',   cost:1, desc:'攻撃 6',shortDesc:"攻撃 6",                    effect:{atk:6}},
+  lifeFist:    {id:'lifeFist',    name:'生命の拳',   icon:'👊', type:'attack',  rarity:'common',   cost:1, desc:'攻撃力5 + 最大HP10ごとに+1',shortDesc:"攻5+HP10毎+1",       effect:{atk:5,hpScaleUnit:10,hpScaleBonus:1}},
+  lifeIronFist:{id:'lifeIronFist',name:'生命の鉄拳', icon:'👊', type:'attack',  rarity:'common',   cost:2, desc:'攻撃力10 + 最大HP10ごとに+2',shortDesc:"攻10+HP10毎+2",       effect:{atk:10,hpScaleUnit:10,hpScaleBonus:2}},
+
+  // ===== アナザーカード＆Gカード（各チャージ専用・初期デッキに1枚ずつ同梱） =====
+  renTotsu:        {id:'renTotsu',        name:'連突',     icon:'👊', type:'attack', rarity:'common', cost:0, desc:'攻撃1×3（合計3）', shortDesc:'攻1×3', effect:{atk:1,times:3}, vanishAtTurnEnd:true},
+  sokudoHenkan:    {id:'sokudoHenkan',    name:'速度変換', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:3, chargeConsume:3, onlyCharge:'renGeki', desc:'チャージ3消費：「連突」を手札に1枚加える（ターン終了時消滅）', shortDesc:'連突を手札に', effect:{addTempCard:'renTotsu'}},
+  fudaShuriken:    {id:'fudaShuriken',    name:'札手裏剣', icon:'🎴', type:'attack',  rarity:'G', cost:1, onlyCharge:'renGeki', desc:'このターン使用したカードの枚数×2の攻撃', shortDesc:'使用枚数×2攻撃', effect:{turnCardCountAtk:2}},
+
+  kougekiHenkan:   {id:'kougekiHenkan',   name:'攻撃変換', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:2, chargeConsume:2, onlyCharge:'tameAtk', desc:'チャージ2消費：次に与えたダメージ分のシールドを得る（防がれた分は含まない）', shortDesc:'次ダメ分盾', effect:{nextDmgToShield:true}},
+  bakuretsuzan:    {id:'bakuretsuzan',    name:'爆裂斬',   icon:'💥', type:'attack',  rarity:'G', cost:5, onlyCharge:'tameAtk', desc:'攻撃40', shortDesc:'攻40', effect:{atk:40}},
+
+  seiryokuHenkan:  {id:'seiryokuHenkan',  name:'聖力変換', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:3, chargeConsume:3, onlyCharge:'jikoSaisei', desc:'チャージ3消費：次の1度だけ攻撃力+10（このターン中のみ）', shortDesc:'次攻+10(このT)', effect:{nextAtkBuff:10,thisTurnOnly:true}},
+  chiyuHanten:     {id:'chiyuHanten',     name:'治癒反転', icon:'💊', type:'skill',   rarity:'G', cost:1, onlyCharge:'jikoSaisei', desc:'このターン中、回復で最大HPを超えた分を敵にダメージとして与える', shortDesc:'超過回復→ダメへ', effect:{healOverflowToDmg:true}},
+
+  shubiHenkan:     {id:'shubiHenkan',     name:'守備変換', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:3, chargeConsume:3, onlyCharge:'teppeki', desc:'チャージ3消費：次の敵の行動によるダメージ以外の効果を無効にする', shortDesc:'次の追加効果無効', effect:{nextEnemyEffectNull:true}},
+  boueiIji:        {id:'boueiIji',        name:'防衛維持', icon:'🧱', type:'skill',   rarity:'G', cost:1, onlyCharge:'teppeki', desc:'次のターン開始時のシールド減少をスキップする', shortDesc:'次T盾減少無効', effect:{skipNextShieldDecay:true}},
+
+  dokubutsuHenkan: {id:'dokubutsuHenkan', name:'毒物変換', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:2, chargeConsume:2, onlyCharge:'dokushi', desc:'チャージ2消費：このステージ中、攻撃力+2', shortDesc:'このステージ攻+2', effect:{stageAtkBonus:2}},
+  gekidokuBari:    {id:'gekidokuBari',    name:'劇毒針',   icon:'🧪', type:'attack',  rarity:'G', cost:2, onlyCharge:'dokushi', desc:'攻撃6 + 与えたダメージ分の毒付与', shortDesc:'攻6+毒(ダメ分)', effect:{atk:6,poisonFromDmg:true}},
+
+  sokusekiNoInori: {id:'sokusekiNoInori', name:'即席の祈り', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:2, chargeConsume:1, onlyCharge:'inori', desc:'チャージ2以上のとき1消費して発動：カードを2枚ドロー', shortDesc:'チャージ1消費 2ドロー', effect:{draw:2}},
+  chiisanaKago:    {id:'chiisanaKago',    name:'小さな加護', icon:'🙏', type:'skill', rarity:'G', cost:0, onlyCharge:'inori', desc:'手札のカードを1枚選ぶ。選んだカードは次に捨てられるはずのとき、代わりに手札に残る', shortDesc:'選択カードを捨て札から保護', effect:{protectCardChoice:true}},
+
+  sokusekiNoIkari: {id:'sokusekiNoIkari', name:'即席の怒り', icon:'💫', type:'another', rarity:'A', cost:0, chargeRequire:2, chargeConsume:1, onlyCharge:'haki', desc:'チャージ2以上のとき1消費して発動：このターン中、次に発動するカードのコストが0になる', shortDesc:'チャージ1消費 次無料', effect:{freeNextCard:true}},
+  gekikou:         {id:'gekikou',         name:'激昂',     icon:'😡', type:'skill',   rarity:'G', cost:1, onlyCharge:'haki', desc:'自分のHPを1にする。減少したHP10につき攻撃力+1（このステージ中のみ）', shortDesc:'HP1化+減少分攻撃UP', effect:{hpToOneForAtk:true}},
   poisonNeedle:{id:'poisonNeedle',name:'毒針',    icon:'🪡', type:'attack',  rarity:'common',    cost:1, desc:'攻撃3 + 与えたダメージ分の毒を付与',shortDesc:"攻撃3+与ダメ分毒",        effect:{atk:3,poisonFromDmg:true}},
   bash:        {id:'bash',        name:'強撃',    icon:'🪓', type:'attack',  rarity:'common',    cost:2, desc:'攻撃 15',shortDesc:"攻撃 15",                   effect:{atk:15}},
   heavy:       {id:'heavy',       name:'大振り',  icon:'💥', type:'attack',  rarity:'uncommon',  cost:3, desc:'攻撃 20',shortDesc:"攻撃 20",                   effect:{atk:20}},
@@ -1910,13 +1939,13 @@ const STARTER=['strike','strike','strike','guard','guard','heal','manaDrain'];
 
 // チャージ別初期デッキ
 const CHARGE_DECKS = {
-  renGeki:    ['strike','strike','guard','guard','guard','heal','karuren','karuren','punch','punch','punch','comboHeal'],
-  tameAtk:    ['bash','bash','bash','bash','guard','guard','guard','heal','heal','konshin','chikara','chikara'],
-  jikoSaisei: ['shinsei','shinsei','guard','guard','heal','heal','heal','composure','composure','composure','sanctuary','healReserve'],
-  teppeki:    ['strike','strike','strike','guard','guard','guard','guard','heal','heal','accumulate','accumulate','shieldBash'],
-  dokushi:    ['poisonNeedle','poisonNeedle','poison','poison','guard','guard','guard','heal','heal','expPoison','ragePoison','ragePoison'],
-  inori:      ['strike','strike','strike','guard','guard','guard','heal','heal','furyDance','furyDance','furyDance','bindingChain'],
-  haki:       ['strike','strike','soulEater','soulEater','heal','heal','slow','slow','slow','bloodPact','kyougeki','kyougeki'],
+  renGeki:    ['strike','strike','guard','guard','guard','heal','karuren','karuren','punch','punch','punch','comboHeal','sokudoHenkan','fudaShuriken'],
+  tameAtk:    ['bash','bash','bash','bash','guard','guard','guard','heal','heal','konshin','chikara','chikara','kougekiHenkan','bakuretsuzan'],
+  jikoSaisei: ['shinsei','shinsei','guard','guard','heal','heal','heal','composure','composure','composure','sanctuary','healReserve','seiryokuHenkan','chiyuHanten'],
+  teppeki:    ['strike','strike','strike','guard','guard','guard','guard','heal','heal','accumulate','accumulate','shieldBash','shubiHenkan','boueiIji'],
+  dokushi:    ['poisonNeedle','poisonNeedle','poison','poison','guard','guard','guard','heal','heal','expPoison','ragePoison','ragePoison','dokubutsuHenkan','gekidokuBari'],
+  inori:      ['strike','strike','strike','guard','guard','guard','heal','heal','furyDance','furyDance','furyDance','bindingChain','sokusekiNoInori','chiisanaKago'],
+  haki:       ['strike','strike','soulEater','soulEater','heal','heal','slow','slow','slow','bloodPact','kyougeki','kyougeki','sokusekiNoIkari','gekikou'],
 };
 
 // チャージ別の「実際に使用するデッキ」を取得（編集済みならそちらを、無ければ初期デッキを返す）
@@ -1962,7 +1991,7 @@ function getBgImg(stage){
 }
 
 const ENEMY_IMGS=['enemy1.png','enemy2.png','enemy3.png','enemy4.png','enemy5.png','enemy6.png','enemy7.png','enemy8.png','enemy9.png','enemy10.png','enemy11.png','enemy12.png','enemy13.png','enemy14.png','enemy15.png'];
-const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png'};
+const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png',G:'frame_epic.png',A:'frame_epic.png'};
 const ENEMIES=[
   {name:'ゴブリン',      icon:'👹',hp:60,  atk:8,  shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
   {name:'コボルト',      icon:'🐲',hp:70,  atk:10, shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
@@ -2384,7 +2413,7 @@ function tutorialComplete(){
   if(_okBtn) bind('tutorial-complete-ok', _goToTitle);
 }
 const CARD_POOL = {
-  common:    ['heal','teate','kyougeki','anger','manaDrain','strike2','slash2','poisonNeedle','bash','twin','allIn','poison','afterForce','punch','guideStrike','swiftBlade','armorPierce','smallShield'],
+  common:    ['heal','teate','kyougeki','anger','manaDrain','strike2','slash2','poisonNeedle','bash','twin','allIn','poison','afterForce','punch','guideStrike','swiftBlade','armorPierce','smallShield','lifeFist','lifeIronFist'],
   uncommon:  ['fortify','dodge','rage','redraw','stumble','chainBlast','twoStance','sanctuary','battleReady','heavy','combo','fortress','discard1','miniCombo','reflect','cleanse'],
   rare:      ['pierce','studyGuard','firstAid','threeStance','superMana','superHeal2','desperate','muboAtk','chainPoison','slow'],
   epic:      ['destroy','lifesteal','superdodge','chainStart','curseBurst','stormSlash','weaken','manaRelease','lastStand','freeze','recycle','swift','poisonKill','soulPact'],
@@ -2499,6 +2528,16 @@ function filterChargeRestricted(ids){
     return !c || !c.onlyCharge || c.onlyCharge===G.chargeType;
   });
 }
+// レジェンドカード抽選：まだ一枚もレジェンドを持っていない場合、チャージ専用レジェンドを2倍の重みで抽選する（1枚持ったら通常確率に戻る）
+function _weightedPickLegendary(pool){
+  const gotLegendary=G.deck.some(id=>DB[id]&&DB[id].rarity==='legendary');
+  if(gotLegendary) return pool[Math.floor(Math.random()*pool.length)];
+  const weights=pool.map(id=>(DB[id]&&DB[id].onlyCharge)?2:1);
+  const total=weights.reduce((a,b)=>a+b,0);
+  let r=Math.random()*total;
+  for(let i=0;i<pool.length;i++){ r-=weights[i]; if(r<=0) return pool[i]; }
+  return pool[pool.length-1];
+}
 function pickCard(stage, exclude=[]){
   const rarity=pickRarity(stage);
   const poolKey=rarity;
@@ -2513,6 +2552,7 @@ function pickCard(stage, exclude=[]){
   if(!pool.length) pool=filterChargeRestricted((CARD_POOL[rarity]||CARD_POOL.rare).filter(id=>!exclude.includes(id)));
   if(!pool.length) pool=filterChargeRestricted(CARD_POOL.rare);
   if(!pool.length) pool=CARD_POOL.rare;
+  if(rarity==='legendary') return _weightedPickLegendary(pool);
   return pool[Math.floor(Math.random()*pool.length)];
 }
 function getRewards(stage){
@@ -2967,8 +3007,10 @@ const SOULS={
   teppeki2:{id:'teppeki2', name:'鉄壁のソウルⅡ', category:1, cost:2, icon:'🛡️', desc:'ステージ開始時シールド+10'},
   kekkai:  {id:'kekkai',  name:'障壁のソウルⅠ', category:1, cost:3, icon:'🔷', desc:'シールドの最低値が0ではなく5になり、5以下に減少しなくなる'},
   kinkyu:  {id:'kinkyu',  name:'緊急防壁のソウルⅠ', category:1, cost:1, icon:'🚨', desc:'シールド無しでターンを終了した場合、シールド+3する'},
-  joukou:  {id:'joukou',  name:'常攻のソウルⅠ', category:1, cost:2, icon:'⚔️', desc:'常時攻撃力+1（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
-  shogeki: {id:'shogeki', name:'初撃のソウルⅠ', category:1, cost:2, icon:'💥', desc:'最初の一撃攻撃力+3（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  joukou:  {id:'joukou',  name:'常攻のソウルⅠ', category:1, cost:1, icon:'⚔️', desc:'常時攻撃力+1（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  shogeki: {id:'shogeki', name:'初撃のソウルⅠ', category:1, cost:1, icon:'💥', desc:'最初の一撃攻撃力+3（ステータス強化と同じ能力。ステージ中はステータス強化と合計して表示される）'},
+  kaifukuKyoka: {id:'kaifukuKyoka', name:'回復強化のソウルⅠ', category:1, cost:1, icon:'💗', desc:'ステージ開始時、ステータス強化の「回復強化」を1回分得る（ステータス強化と合算表示）'},
+  tateKyoka: {id:'tateKyoka', name:'盾強化のソウルⅠ', category:1, cost:1, icon:'🛡️', desc:'ステージ開始時、ステータス強化の「盾強化」を1回分得る（ステータス強化と合算表示）'},
   hatsuMana: {id:'hatsuMana', name:'初マナのソウル', category:1, cost:1, icon:'💎', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初ターンマナ+1を獲得する'},
   hatsuFuda: {id:'hatsuFuda', name:'初札のソウル', category:1, cost:1, icon:'🃏', desc:'エリア選択後ステージ1を開始する前に、ステータス強化の初期手札+1を獲得する'},
   taidoku: {id:'taidoku', name:'耐毒のソウルⅠ', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-8（0未満にはならない）'},
@@ -3259,6 +3301,7 @@ function startStage(){
 function _startStageBattle(){
   _inBattle=true;
   clearEffectQueue(); // 前ステージの残留エフェクトロックをリセット
+  G.stageAtkBonus=0; // 毒物変換・激昂などステージ限定の攻撃力ボーナスをリセット
   stopCurseOrbs();
   stopOpBgm();    // タイトル(OP)BGMを止めてから
   stopEventBgm();
@@ -3304,7 +3347,7 @@ function _startStageBattle(){
   }
   G.hakiCountThisStage=0; G.enemyFrozen=false; G.turnAtkCardCount=0; G.turnCostSum=0; G.stageManaSpent=0; G.stageHealSum=0; G.skipNextDraw=false; G.nextDrawMinus=0;
   G.hakiStageDiscount=0; // 狂戦士レベル4のコスト-2効果もステージごとにリセット
-  G.poisonAddBonus=0; G.stanceEffects=[]; G.nextAtkBuffVal=0; G.enemyDmgReduce=0; G.enemyDmgReduceTurns=0; G.chargeEffectActive=false; G.turnCardsUsed=0;
+  G.poisonAddBonus=0; G.stanceEffects=[]; G.nextAtkBuffVal=0; G.enemyDmgReduce=0; G.enemyDmgReduceTurns=0; G.chargeEffectActive=false; G.turnCardsUsed=0; G.healOverflowToDmg=false; G.nextEnemyEffectNull=false;
   G.absorbShieldPending=false; G.absorbShieldAccum=0; G.absorbHealPending=false; G.absorbHealAccum=0;
   G.doubleNextCard=false; G.miniComboBuff=0; G.holdCharge=false;
   // 前ステージの敵行動テキストをクリア
@@ -3653,6 +3696,13 @@ function playCard(idx, _isChain){
       }
       return; // その他の妨害カードは直接使用不可
     }
+    // アナザーカード：マナではなくチャージのカウントを消費して発動する
+    if(c.type==='another'){
+      const req=c.chargeRequire||0;
+      if((G.chargeCount||0)<req){
+        addLog('⚡ チャージが'+req+'必要です！','sys'); return;
+      }
+    }
     // 魂砕きD：手札にある間、全コスト+1
     const soulcrushCount=G.hand.filter(id=>id==='bougai_soulcrush').length;
     const costAdd=soulcrushCount>0?soulcrushCount:0;
@@ -3660,9 +3710,14 @@ function playCard(idx, _isChain){
     const datsuryo=G.hand.some(id=>id==='bougai_datsuryo');
     // 炎上コストペナルティ
     const _ignitePenalty=(G.ignitedCards&&G.ignitedCards[idx])||0;
-    const _reducedCost=isFreePass?0:(isHakiZeroPlay?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)-(G.hakiStageDiscount||0))));
+    const _reducedCost=c.type==='another'?0:(isFreePass?0:(isHakiZeroPlay?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)-(G.hakiStageDiscount||0)))));
     if(G.mana<_reducedCost){addLog('💎 マナ不足！','sys');return;}
     const actualCost=_reducedCost;
+    if(c.type==='another'){
+      const consume=(c.chargeConsume!=null)?c.chargeConsume:(c.chargeRequire||0);
+      G.chargeCount=Math.max(0,(G.chargeCount||0)-consume);
+      updateGaugeLamps();
+    }
     G.mana-=actualCost; G.stageManaSpent=(G.stageManaSpent||0)+actualCost;
     // 妨害カード：除外系の処理（邪悪な連撃/呪いの盾/呪詛食い/呪詛返し/解呪）
     const _cef=c.effect||{};const bougaiNeeded=_cef.bougaiExile_atk||_cef.bougaiExile_shield||_cef.bougaiExile_heal||_cef.bougaiExile_curse||_cef.bougaiExile_or_draw;
@@ -3794,12 +3849,19 @@ function playCard(idx, _isChain){
     for(let i=0;i<t;i++){
       const _mult=(G.doubleNext&&i===0)?(G.doubleMultiplier||2):1;
       if(G.doubleNext&&i===0){G.doubleNext=false;G.doubleMultiplier=1;}
-      let baseAtk=(ef.atk+G.atkBuff+miniBonus+(i===0?firstAtkBonus+nextAtkBonus:0)+getSoulCardAtkBonus(c._baseId||c.id));
+      let baseAtk=(ef.atk+G.atkBuff+miniBonus+(i===0?firstAtkBonus+nextAtkBonus:0)+getSoulCardAtkBonus(c._baseId||c.id)+(ef.hpScaleUnit?Math.floor(G.playerMaxHp/ef.hpScaleUnit)*ef.hpScaleBonus:0)+(G.stageAtkBonus||0));
       if(G._datsuryo_this_card) baseAtk=Math.max(1,Math.floor(baseAtk*0.5));
       let d=baseAtk*_mult;
       const shieldAbs=G.enemyShield>0?Math.min(G.enemyShield,d):0;
       if(!ef.pierceBreak&&G.enemyShield>0){const a=shieldAbs;G.enemyShield-=a;d-=a;if(a){msgs.push('シールド'+a+'吸収');sfxShield();flashShieldBlock('enemy');}}
       G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
+      // 攻撃変換：防がれた分を除く、実際に与えたダメージ分だけ盾を得る（一度きり）
+      if(G.nextDmgToShield && d>0){
+        G.nextDmgToShield=false;
+        G.shield+=d;
+        msgs.push('攻撃変換: 盾+'+d);
+        queueEffect(()=>{flashShield();flashShieldAdd('player',d);sfxShield();}, 850);
+      }
       _hpPerHit.push({dmg:d, hp:G.enemy.curHp});
       G.totalDmgDealt=(G.totalDmgDealt||0)+d;
       // 魂喰らい：回復量を記録しておき演出はヒットアニメ内で行う
@@ -3919,7 +3981,14 @@ function playCard(idx, _isChain){
     queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
   }
   if(ef.discardAllDmg){
-    const n=G.hand.length; G.discard.push(...G.hand); G.hand=[];
+    let _toDiscard=G.hand;
+    if(G.protectedCardId && G.hand.includes(G.protectedCardId)){
+      _toDiscard=G.hand.filter(id=>id!==G.protectedCardId);
+      G.hand=[G.protectedCardId];
+      msgs.push('小さな加護: 「'+DB[G.protectedCardId].name+'」を保護');
+      G.protectedCardId=null;
+    } else { G.hand=[]; }
+    const n=_toDiscard.length; G.discard.push(..._toDiscard);
     const baseDmg=n*ef.discardAllDmg;
     const d=(baseDmg+G.atkBuff)*(G.doubleNext?2:1);
     if(G.doubleNext) G.doubleNext=false;
@@ -3932,7 +4001,14 @@ function playCard(idx, _isChain){
     clampPage();
   }
   if(ef.discardAllShield){
-    const n=G.hand.length; G.discard.push(...G.hand); G.hand=[];
+    let _toDiscard2=G.hand;
+    if(G.protectedCardId && G.hand.includes(G.protectedCardId)){
+      _toDiscard2=G.hand.filter(id=>id!==G.protectedCardId);
+      G.hand=[G.protectedCardId];
+      msgs.push('小さな加護: 「'+DB[G.protectedCardId].name+'」を保護');
+      G.protectedCardId=null;
+    } else { G.hand=[]; }
+    const n=_toDiscard2.length; G.discard.push(..._toDiscard2);
     const s=n*ef.discardAllShield; G.shield+=s;
     msgs.push('大盤振る舞い: '+n+'枚捨て×2=盾+'+s);
     queueEffect(()=>{flashShield();flashShieldAdd('player',s);sfxShield();}, 800);
@@ -3999,7 +4075,7 @@ function playCard(idx, _isChain){
         if(pef.shieldFirstBreak){const _sfb=Math.min(G.enemyShield,pef.shieldFirstBreak);G.enemyShield=Math.max(0,G.enemyShield-pef.shieldFirstBreak);echoMsgs.push('盾-'+pef.shieldFirstBreak+(_sfb>0?' ('+_sfb+'減少)':'(効果なし)'));}
         if(pef.pierceBreak&&G.enemyShield>0){echoMsgs.push('敵盾破壊');G.enemyShield=0;}
         for(let i=0;i<t;i++){
-          let d=(pef.atk+G.atkBuff)*(G.doubleNext&&i===0?2:1);
+          let d=(pef.atk+G.atkBuff+(G.stageAtkBonus||0))*(G.doubleNext&&i===0?2:1);
           if(G.doubleNext&&i===0) G.doubleNext=false;
           if(!pef.ignoreShield&&!pef.pierceBreak&&G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
           G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4050,6 +4126,57 @@ function playCard(idx, _isChain){
     }
   }
   if(ef.draw){msgs.push(ef.draw+'枚ドロー');queueEffect(()=>{flashDrawCard(ef.draw);setTimeout(()=>{drawCards(ef.draw);renderHand();},500);}, 800);}
+  // 速度変換：一時カードを手札に加える（ターン終了時消滅）
+  if(ef.addTempCard){
+    G.hand.push(ef.addTempCard);
+    G._lastDrawnIndices=[G.hand.length-1]; G._lastDrawnGen=(G._lastDrawnGen||0)+1;
+    msgs.push('「'+DB[ef.addTempCard].name+'」を手札に加えた（このターン限り）');
+    queueEffect(()=>{renderHand();},400);
+  }
+  // 札手裏剣：このターン使用したカードの枚数×倍率の攻撃
+  if(ef.turnCardCountAtk){
+    const _cnt=(G.turnCardsUsed||0);
+    const d=Math.max(1,_cnt*ef.turnCardCountAtk+G.atkBuff)*(G.doubleNext?2:1);
+    if(G.doubleNext) G.doubleNext=false;
+    let dLeft=d;
+    if(G.enemyShield>0){const a=Math.min(G.enemyShield,dLeft);G.enemyShield-=a;dLeft-=a;}
+    G.enemy.curHp=Math.max(0,G.enemy.curHp-dLeft);
+    G.totalDmgDealt=(G.totalDmgDealt||0)+dLeft;
+    msgs.push('札手裏剣: 使用'+_cnt+'枚×'+ef.turnCardCountAtk+'='+d+'ダメ');
+    queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+d,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 800);
+  }
+  // 攻撃変換：次に与えたダメージ（防がれた分を除く）分のシールドを得る
+  if(ef.nextDmgToShield){ G.nextDmgToShield=true; msgs.push('次に与えたダメージ分、盾を得る'); }
+  // 治癒反転：このターン、回復の超過分を敵ダメージに変換
+  if(ef.healOverflowToDmg){ G.healOverflowToDmg=true; msgs.push('このターン、回復の超過分を敵にダメージ'); }
+  // 守備変換：次の敵の行動によるダメージ以外の効果を無効化
+  if(ef.nextEnemyEffectNull){ G.nextEnemyEffectNull=true; msgs.push('次の敵の追加効果を無効化'); }
+  // 防衛維持：次のターン開始時のシールド減少をスキップ
+  if(ef.skipNextShieldDecay){ G.skipNextShieldDecay=true; msgs.push('次のターン開始時のシールド減少を無効化'); }
+  // 毒物変換：このステージ中、攻撃力+2（累積）
+  if(ef.stageAtkBonus){ G.stageAtkBonus=(G.stageAtkBonus||0)+ef.stageAtkBonus; msgs.push('このステージ中 攻撃力+'+ef.stageAtkBonus+'（合計+'+G.stageAtkBonus+'）'); }
+  // 小さな加護：手札のカードを1枚選び、次に捨てられるはずのとき保護する
+  if(ef.protectCardChoice){
+    if(G.hand.length>0){
+      showHandSelectOverlay('保護するカードを選んでください',(selIdx)=>{
+        if(selIdx!==-1){
+          G.protectedCardId=G.hand[selIdx];
+          addLog('🙏 小さな加護: 「'+DB[G.protectedCardId].name+'」を保護した','sys');
+        }
+        updateUI(); renderHand();
+      });
+    } else { msgs.push('手札なし'); }
+  }
+  // 激昂：HPを1にし、減少分10につき攻撃力+1（このステージ中のみ）
+  if(ef.hpToOneForAtk){
+    const lost=Math.max(0,G.playerHp-1);
+    G.playerHp=1;
+    const gain=Math.floor(lost/10);
+    G.stageAtkBonus=(G.stageAtkBonus||0)+gain;
+    msgs.push('HPを1に（-'+lost+'） このステージ中 攻撃力+'+gain);
+    updateUI();
+    queueEffect(()=>{spawnDmgNum('-'+lost,'player-dmg');shakePlayerArea();flashScreen('flash-red');}, 800);
+  }
   if(ef.mana){G.mana=Math.min(G.manaMax,G.mana+ef.mana);msgs.push('マナ+'+ef.mana);}
   if(ef.nextMana){G.nextManaBonus=(G.nextManaBonus||0)+ef.nextMana;msgs.push('次ターンマナ+'+ef.nextMana);}
   if(ef.buff==='atk'){G.atkBuff=G.atkBuff+ef.val;msgs.push('攻撃+'+(ef.val)+'(このターン中)');queueEffect(()=>showEffectPopup('Ekougeki.png','攻撃力+'+ef.val,'#ff6b35'), 800);}
@@ -4075,6 +4202,16 @@ function playCard(idx, _isChain){
     const _ha=healPlayer(Math.max(1,Math.floor(healBase*healMult)));
     msgs.push('HP+'+_ha+(G.heavyWoundTurns>0?' (重傷半減)':'')+(G.healBuff>0?' (+'+G.healBuff+'強化)':''));
     queueEffect(()=>{sfxHeal();spawnDmgNum('+'+_ha,'heal');flashHealEffect(_ha);}, 800);
+    // 治癒反転：このターン中、回復の超過分を敵にダメージとして与える
+    if(G.healOverflowToDmg && G._lastHealOverflow>0){
+      const _ov=G._lastHealOverflow;
+      let ovLeft=_ov;
+      if(G.enemyShield>0){const a=Math.min(G.enemyShield,ovLeft);G.enemyShield-=a;ovLeft-=a;}
+      G.enemy.curHp=Math.max(0,G.enemy.curHp-ovLeft);
+      G.totalDmgDealt=(G.totalDmgDealt||0)+ovLeft;
+      msgs.push('治癒反転: 超過'+_ov+'分を敵に'+ovLeft+'ダメ');
+      queueEffect(()=>{_updEnemyHpBar();spawnDmgNum('-'+ovLeft,'enemy-dmg');shakeEnemyArea();flashScreen('flash-gold');sfxDamage();}, 850);
+    }
   }
   // 回復カードタイプ全般で僧侶チャージ（ef.healだけでなくregenTurns等も含む）
   if(ct_now&&ct_now.triggerType==='healCard'&&c.type==='heal') addCharge(1);
@@ -4382,7 +4519,7 @@ function playCard(idx, _isChain){
   // 鎧抜き：敵シールドを無視して攻撃
   if(ef.ignoreShield&&ef.atk){
     const _mult=(G.doubleNext)?(G.doubleMultiplier||2):1;if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
-    let d=(ef.atk+G.atkBuff)*_mult;
+    let d=(ef.atk+G.atkBuff+(G.stageAtkBonus||0))*_mult;
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
     if(G.soulEaterActive && d>0){const _seH=Math.floor(d/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');queueEffect(()=>{spawnDmgNum('+'+_seH,'heal');sfxHeal();flashHealEffect(_seH);}, 1200);}}
     G.totalDmgDealt=(G.totalDmgDealt||0)+d;
@@ -4436,7 +4573,7 @@ function playCard(idx, _isChain){
     const t2=ef.times||4;
     for(let i=0;i<t2;i++){
       const _mult=(G.doubleNext&&i===0)?(G.doubleMultiplier||2):1;if(G.doubleNext&&i===0){G.doubleNext=false;G.doubleMultiplier=1;}
-      let d=(ef.atk+G.atkBuff)*_mult;
+      let d=(ef.atk+G.atkBuff+(G.stageAtkBonus||0))*_mult;
       if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
       G.enemy.curHp=Math.max(0,G.enemy.curHp-d);G.totalDmgDealt=(G.totalDmgDealt||0)+d;
       if(G.soulEaterActive && d>0){const _seH=Math.floor(d/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');queueEffect(()=>{spawnDmgNum('+'+_seH,'heal');sfxHeal();flashHealEffect(_seH);}, 1200);}}
@@ -4621,6 +4758,17 @@ function processPlayerTurnEnd(onDone){
   let si=0;
   const next=()=>{ if(si<steps.length){ const f=steps[si++]; f(next); } else { onDone(); } };
 
+  // 速度変換で加えた「連突」など、ターン終了時消滅カードを手札・捨て札から完全に除去する
+  const _vanishIds=Object.keys(DB).filter(id=>DB[id].vanishAtTurnEnd);
+  if(_vanishIds.length>0){
+    const _hadVanish=G.hand.some(id=>_vanishIds.includes(id))||G.discard.some(id=>_vanishIds.includes(id));
+    if(_hadVanish){
+      G.hand=G.hand.filter(id=>!_vanishIds.includes(id));
+      G.discard=G.discard.filter(id=>!_vanishIds.includes(id));
+      clampPage();
+    }
+  }
+
   // エリア効果：灼熱の刻印（炎の神殿）ターン終了時カウント分ダメージ
   if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'&&(G.heatCount||0)>0){
     addStep((next)=>{
@@ -4799,6 +4947,7 @@ function enemyTurn(){
       enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,paralyze:'⚡ 麻痺 '+ea,
     };
     const _actionBox=document.getElementById('enemy-action-box');
+    if(G.nextEnemyEffectNull){ addLog('🛡️ 守備変換: 追加効果を無効化中！','sys'); }
     if(_actionBox){
       _actionBox.textContent=(actionLabels[act]||act);
       _actionBox.style.display='block';
@@ -4814,7 +4963,7 @@ function enemyTurn(){
       } else {
         enemySpriteAttack();
         const _dealtDmg=dealToPlayer(ea,e.name+'の毒攻撃☠️')||0;
-        if(G.playerHp>0){
+        if(G.playerHp>0 && !G.nextEnemyEffectNull){
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
           if(G.soulPoisonReduce>0){
             addLog('💠 耐毒のソウル発動: 毒付与-'+G.soulPoisonReduce,'sys');
@@ -4836,7 +4985,7 @@ function enemyTurn(){
       } else {
         enemySpriteAttack();
         const _dealtDmg=dealToPlayer(Math.floor(ea*2),e.name+'の猛毒攻撃☠️💥')||0;
-        if(G.playerHp>0){
+        if(G.playerHp>0 && !G.nextEnemyEffectNull){
           // 実際に与えたダメージ分そのまま毒カウントを付与（シールド等での減少後の実ダメージ基準）
           const _poisonAdd=Math.max(0, _dealtDmg-(G.soulPoisonReduce||0));
           if(G.soulPoisonReduce>0){
@@ -4860,7 +5009,7 @@ function enemyTurn(){
       } else {
         enemySpriteAttack();
         dealToPlayer(ea,e.name+'の氷雪弾❄️');
-        if(G.playerHp>0){
+        if(G.playerHp>0 && !G.nextEnemyEffectNull){
           const _taihyouEquipped=getEquippedSouls().includes('taihyou');
           G.cardPlayLimitNextTurn=_taihyouEquipped?3:2;
           if(_taihyouEquipped) addLog('💠 耐氷のソウル発動: 制限枚数+1','sys');
@@ -4926,7 +5075,7 @@ function enemyTurn(){
       // 地響き：ATK + 次のプレイヤーターン中コスト1カード使用不可
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の地響き🌍');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.quakeTurns=2; // 2にすることで「次ターン開始時に1減→ターン中は1残り有効→ターン終了で0」
         addLog('🌍 地響き！次のターン、コスト1のカードが使用不可！','enemy');
         updateUI();
@@ -4936,7 +5085,7 @@ function enemyTurn(){
       // 封印：ATK + 次のターン最も高コストのカードが使用不可
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の封印🔒');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.sealNextTurn=true;
         addLog('🔒 封印！次ターン、最もコストの高いカードが使用不可！','enemy');
         updateUI();
@@ -4946,7 +5095,7 @@ function enemyTurn(){
       // 猛毒牙：ATK + デッキに猛毒牙Dカードが2枚追加
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の猛毒牙☠️');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         addBougaiCards('bougai_poisonfang','bougai_poisonfang');
         addLog('☠️ 猛毒牙D×2がデッキに追加された！','enemy');
         updateUI();
@@ -4958,7 +5107,7 @@ function enemyTurn(){
       // 火傷：ATK + デッキに火傷Dカードが3枚追加
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の火傷🔥');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         addBougaiCards('bougai_burn','bougai_burn','bougai_burn');
         addLog('🔥 火傷D×3がデッキに追加された！','enemy');
         updateUI();
@@ -4971,7 +5120,7 @@ function enemyTurn(){
       enemySpriteAttack();
       const _ignLabel=act==='superignite'?'超炎上':act==='bigignite'?'大炎上':'炎上';
       dealToPlayer(ea,e.name+'の'+_ignLabel+'🔥');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         // コスト増加量・枚数の設定
         const _taikaEquipped=getEquippedSouls().includes('taika');
         const _costAdd=Math.max(0, (act==='ignite'?1:2) - (_taikaEquipped?1:0)); // 炎上+1、大炎上/超炎上+2（耐炎のソウルⅠで-1、0未満にはならない）
@@ -4989,7 +5138,7 @@ function enemyTurn(){
       // 衰弱：ATK + 2ターン間、ターン開始時にシールドを0にする（フロア値まで）
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の衰弱💀');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.shieldWeakenTurns=2;
         addLog('💀 衰弱！2ターン間、ターン開始時シールドが0になる！','enemy');
         updateUI();
@@ -4999,7 +5148,7 @@ function enemyTurn(){
       // 裁き：ATK + 次の開始時マナ-1
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の裁き⚖️');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.manaRegenPenaltyNext=(G.manaRegenPenaltyNext||0)+1;
         addLog('⚖️ 裁き！次のターン開始時マナが-1！','enemy');
         updateUI();
@@ -5009,7 +5158,7 @@ function enemyTurn(){
       // 重傷：ATK + 回復カードの効果が3ターン半減
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の重傷💔');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.heavyWoundTurns=3;
         addLog('💔 重傷！3ターン間回復効果が半減！','enemy');
         updateUI();
@@ -5019,7 +5168,7 @@ function enemyTurn(){
       // 魂砕き：ATK + デッキに魂砕きDカード1枚追加
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の魂砕き💀');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         addBougaiCards('bougai_soulcrush');
         addLog('💀 魂砕きD×1がデッキに追加された！','enemy');
         updateUI();
@@ -5031,7 +5180,7 @@ function enemyTurn(){
       // 呪縛：ATK + 次のターン開始時のマナ回復-2
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の呪縛⛓️');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.manaRegenPenaltyNext=(G.manaRegenPenaltyNext||0)+2;
         addLog('⛓️ 呪縛！次ターン開始マナ-2！','enemy');
         updateUI();
@@ -5041,7 +5190,7 @@ function enemyTurn(){
       // 絶望：ATK + デッキに足枷Dカード3枚追加
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の絶望😈');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         addBougaiCards('bougai_ashikase','bougai_ashikase','bougai_ashikase');
         addLog('⛓️ 足枷D×3がデッキに追加された！','enemy');
         updateUI();
@@ -5053,7 +5202,7 @@ function enemyTurn(){
       // 脱力：ATK + デッキに脱力Dカード2枚追加
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の脱力😩');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         addBougaiCards('bougai_datsuryo','bougai_datsuryo');
         addLog('😩 脱力D×2がデッキに追加された！','enemy');
         updateUI();
@@ -5065,7 +5214,7 @@ function enemyTurn(){
       // 反射：ATK + 次の攻撃のダメージが反射する
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の反射🔄');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.enemy.reflectActive=true;
         addLog('🔄 反射！次の攻撃は反射される！','enemy');
         updateUI();
@@ -5075,7 +5224,7 @@ function enemyTurn(){
       // 麻痺：ATK + 次ターン最初に使用したカードの効果が無効
       enemySpriteAttack();
       dealToPlayer(ea,e.name+'の麻痺攻撃⚡');
-      if(G.playerHp>0){
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
         G.paralyzeNextCard=true;
         addLog('⚡ 麻痺！次に使うカードの効果が無効になる！','enemy');
         updateUI();
@@ -5205,7 +5354,10 @@ function enemyTurn(){
     // ※防壁維持のソウルⅠ/Ⅱを装着中は基準を40%/30%に上書き（Ⅱの方が強力なので優先）
     // ※剛体中は基準レートをさらに半分にする
     // ※衰弱中は「%減少」ではなく、ターン開始時にシールドがフロア値まで完全に失われる（攻撃とセットで敵から付与される状態異常）
-    if(G.shieldWeakenTurns>0){
+    if(G.skipNextShieldDecay){
+      G.skipNextShieldDecay=false;
+      addLog('🧱 防衛維持: シールド減少をスキップした','sys');
+    } else if(G.shieldWeakenTurns>0){
       if(G.shield>getShieldFloor()){
         const _lostAmt=G.shield-getShieldFloor();
         G.shield=getShieldFloor();
@@ -5316,6 +5468,7 @@ function healPlayer(amount, label){
   const before=G.playerHp;
   G.playerHp=Math.min(G.playerMaxHp, G.playerHp+amount);
   const actual=G.playerHp-before;
+  G._lastHealOverflow=Math.max(0,amount-actual);
   if(actual>0) G.stageHealSum=(G.stageHealSum||0)+actual;
   return actual;
 }
@@ -6752,6 +6905,8 @@ function showChargeSelect(){
           G.initHandBonus=_soulInitHand2; G.gotHandPlus=_soulInitHand2>0;
           G.permAtkBonus=(G.permAtkBonus||0)+(_equippedSoulsNow2.includes('joukou')?1:0);
           G.permAtkBuff2=(G.permAtkBuff2||0)+(_equippedSoulsNow2.includes('shogeki')?3:0);
+          if(_equippedSoulsNow2.includes('kaifukuKyoka')){ G.healBuff=1; G.healBuffCount=1; }
+          if(_equippedSoulsNow2.includes('tateKyoka')){ G.shieldBuff=1; G.shieldBuffCount=1; }
         }
         // このエリアに使い捨て(ガチャ生成)カードを持ち込んだかどうかを記録。
         // メモリ上のフラグだけだとアプリ強制終了時に消えてしまうため、SAVEにも即座に永続化しておく。
@@ -8103,7 +8258,7 @@ function renderHand(){
     if(c.type==='bougai'){
       bougaiUsable=G.mana>=effectiveCost;
     }
-    const ok=(G.mana>=effectiveCost&&G.phase==='player'&&bougaiUsable);
+    const ok=(c.type==='another'?((G.chargeCount||0)>=(c.chargeRequire||0)):(G.mana>=effectiveCost))&&G.phase==='player'&&bougaiUsable;
     const d=document.createElement('div');
     const isSelected=(selectedCardIdx===i);
     const isPoisonKillLocked = c.id==='poisonKill' && (!G.enemy || G.enemyPoison<10);
@@ -8150,7 +8305,7 @@ function renderHand(){
     } else {
       d.style.boxShadow='';
     }
-    const corner = {common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️'}[c.rarity]||'◆';
+    const corner = c.type==='another'?'異':({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️',G:'◈',A:'異'}[c.rarity]||'◆');
     // 妨害カードはframe_bougai.pngを使用
     const frameImg=c.rarity==='bougai'?'frame_bougai.png':(FRAME_IMGS[c.rarity]||'');
     const frameBg=frameImg?`url(${frameImg})`:'none';
@@ -11582,8 +11737,10 @@ const SHOP_ITEMS=[
   {id:'buy_chargeup2', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅡ', desc:'④特殊効果付与系 コスト1・チャージのレベルをさらに1つ上げる', costs:[{currency:'crystal',amount:20}], unlockArea:null, unlockClearCount:4, oneTime:true, soulId:'chargeup2'},
   {id:'buy_chargeup3', cat:'soul', icon:'⚡', name:'チャージUPのソウルⅢ', desc:'④特殊効果付与系 コスト2・チャージのレベルをさらに1つ上げ、より特化した効果になる（Ⅰ・Ⅱ装備時のみ装備可）', costs:[{currency:'crystal',amount:100}], unlockArea:null, unlockClearCount:6, requireSouls:['chargeup1','chargeup2'], oneTime:true, soulId:'chargeup3'},
   {id:'buy_boukiIji1', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅠ', desc:'④特殊効果付与系 コスト2・ターン開始時のシールド減少量が40％になる', price:100, currency:'crystal', unlockArea:null, requireSouls:['teppeki','kekkai','kinkyu'], oneTime:true, soulId:'boukiIji1'},
-  {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト2・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
-  {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト2・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
+  {id:'buy_joukou',  cat:'soul', icon:'⚔️', name:'常攻のソウルⅠ', desc:'①ステータスアップ系 コスト1・常時攻撃力+1（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'joukou'},
+  {id:'buy_shogeki', cat:'soul', icon:'💥', name:'初撃のソウルⅠ', desc:'①ステータスアップ系 コスト1・最初の一撃攻撃力+3（ステータス強化と合算表示）', price:50, currency:'crystal', unlockArea:null, unlockClearCount:5, oneTime:true, soulId:'shogeki'},
+  {id:'buy_kaifukuKyoka', cat:'soul', icon:'💗', name:'回復強化のソウルⅠ', desc:'①ステータスアップ系 コスト1・ステージ開始時に「回復強化」を1回分得る', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kaifukuKyoka'},
+  {id:'buy_tateKyoka', cat:'soul', icon:'🛡️', name:'盾強化のソウルⅠ', desc:'①ステータスアップ系 コスト1・ステージ開始時に「盾強化」を1回分得る', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'tateKyoka'},
   {id:'buy_hatsuMana', cat:'soul', icon:'💎', name:'初マナのソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初ターンマナ+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuMana'},
   {id:'buy_hatsuFuda', cat:'soul', icon:'🃏', name:'初札のソウル', desc:'①ステータスアップ系 コスト1・エリア選択後ステージ1開始前に、ステータス強化の初期手札+1を獲得する', price:100, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, soulId:'hatsuFuda'},
   {id:'buy_boukiIji2', cat:'soul', icon:'🧱', name:'防壁維持のソウルⅡ', desc:'④特殊効果付与系 コスト3・ターン開始時のシールド減少量が30％になる', price:200, currency:'crystal', unlockArea:null, requireSouls:['boukiIji1'], oneTime:true, soulId:'boukiIji2'},
@@ -11608,20 +11765,21 @@ const SHOP_ITEMS=[
   {id:'buy_guideStrike',cat:'card', icon:'✨', name:'導きの一撃',   desc:'カードポイント10のカードをデッキ編集の入れ替え候補に追加', price:60, currency:'gold', unlockArea:'始まりの洞窟', oneTime:true, cardId:'guideStrike'},
   // ===== エリア解放（初期は選択画面に出ず、購入で追加される） =====
   {id:'buy_area_ruins', cat:'area', icon:'🗺️', name:'忘却の遺跡', desc:'エリア選択に「忘却の遺跡」が追加される', price:100, currency:'gold', unlockArea:null, oneTime:true, areaId:1},
-  // ===== キャパシティアップ（すべて1度のみ購入） =====
-  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:20, currency:'crystal', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
-  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:20, currency:'crystal', unlockArea:null, unlockClearCount:3, oneTime:true, capType:'swap', amount:1},
-  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:20, currency:'crystal', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:1},
-  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:20, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
-  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:20, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:3},
-  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:20, currency:'crystal', unlockArea:'鉄壁の砦', oneTime:true, capType:'soulcat', category:4},
-  // ===== キャパシティアップ（最初から販売・1度のみ購入） =====
-  {id:'buy_cardpoint5_early', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'point', amount:5},
-  {id:'buy_swap1_early',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'swap', amount:1},
-  {id:'buy_soulcap1_early',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:1},
-  {id:'buy_soulcap2_early',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:10, currency:'crystal', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
-  {id:'buy_soulcap3_early',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:3},
-  {id:'buy_soulcap4_early',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:10, currency:'crystal', unlockArea:null, oneTime:true, capType:'soulcat', category:4},
+  // ===== キャパシティアップ（すべて1度のみ購入・条件解放は100ゴールド） =====
+  {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:100, currency:'gold', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
+  {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:100, currency:'gold', unlockArea:null, unlockClearCount:3, oneTime:true, capType:'swap', amount:1},
+  {id:'buy_soulcap1',   cat:'cap', icon:'❤️', name:'ソウルアップ・命', desc:'①ステータスアップ系の枠上限+1', price:100, currency:'gold', unlockArea:'雷鳴の高原', oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap2',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:100, currency:'gold', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
+  {id:'buy_soulcap3',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:100, currency:'gold', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:3},
+  {id:'buy_soulcap4',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:100, currency:'gold', unlockArea:'鉄壁の砦', oneTime:true, capType:'soulcat', category:4},
+  {id:'buy_soulcap2_early',   cat:'cap', icon:'☠️', name:'ソウルアップ・抗', desc:'②状態異常軽減系の枠上限+1', price:100, currency:'gold', unlockArea:null, unlockClearCount:2, oneTime:true, capType:'soulcat', category:2},
+  // ===== キャパシティアップ（最初から販売・条件なしは50ゴールド） =====
+  {id:'buy_cardpoint5_early', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'point', amount:5},
+  {id:'buy_swap1_early',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'swap', amount:1},
+  {id:'buy_soulcap1_early',   cat:'cap', icon:'❤️', name:'ソウルアップ・命①', desc:'①ステータスアップ系の枠上限+1', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap1_early2',  cat:'cap', icon:'❤️', name:'ソウルアップ・命②', desc:'①ステータスアップ系の枠上限+1', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'soulcat', category:1},
+  {id:'buy_soulcap3_early',   cat:'cap', icon:'⚔️', name:'ソウルアップ・札', desc:'③カード強化系の枠上限+1', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'soulcat', category:3},
+  {id:'buy_soulcap4_early',   cat:'cap', icon:'✨', name:'ソウルアップ・特', desc:'④特殊効果付与系の枠上限+1', price:50, currency:'gold', unlockArea:null, oneTime:true, capType:'soulcat', category:4},
 ];
 function _shopUnlockedItems(){
   // 常時販売品＋クリア済みエリアに紐づく追加販売品＋特定ソウル所持が条件の追加販売品のみを対象にする
@@ -12513,7 +12671,7 @@ let _deckEditChargeId=null;
 let _deckEditWorkingDeck=[]; // 編集中のデッキ：[{id,origin:'preset'|'pool'}, ...]（入れ替えのたびに即座にSAVEへ反映される）
 let _deckEditSideDeckArr=[]; // サイドデッキ：外したプリセット由来カードのidの配列
 // デッキポイント制：ショップで購入できるカードには、レアリティに応じたデッキポイントが設定されている
-const RARITY_DECK_POINTS={common:1, uncommon:2, rare:3, epic:4, legendary:5, gauge:3, bougai:2};
+const RARITY_DECK_POINTS={common:1, uncommon:2, rare:3, epic:4, legendary:5, gauge:3, bougai:2, A:0, G:0};
 // ショップで販売するカードなど、個別にカードポイントを設定したいものはここで上書きする
 const CARD_POINT_OVERRIDES={
   teate:5, smallShield:5, strike2:5, allIn:5, afterForce:5, poison:5, swiftBlade:5,
