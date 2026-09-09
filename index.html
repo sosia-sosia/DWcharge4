@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver385</title>
+<title>DUNGEON WALKER DWCver386</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -4716,6 +4716,14 @@ function endTurn(){
     dwRejectFeedback(document.getElementById('btn-end'));
     return;
   }
+  // 不動の構え：カードもマナも使わずターンを終了した瞬間に発動（他のターン終了時効果より先）
+  if(G.gotFudouKamae && (G.turnCardsUsed||0)===0){
+    const _fkHeal=healPlayer(5);
+    G.shield+=5;
+    addLog('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','sys');
+    showTurnSlide('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','#a855f7');
+    updateUI();
+  }
   G.phase='enemy';
   // エリア効果：冷気（氷壁の迷宮）マナを使い切らずにターン終了した場合、次のターン開始時のマナ-1
   {
@@ -4778,6 +4786,63 @@ function processPlayerTurnEnd(onDone){
       G.discard=G.discard.filter(id=>!_vanishIds.includes(id));
       clampPage();
     }
+  }
+
+  // 新規ステータス強化のターン終了時効果（判定は元々の手札枚数のスナップショットを使用し、互いの連鎖発動を防ぐ）
+  const _handSnapshotAtTurnEnd=G.hand.length;
+  if(G.gotOnehand && _handSnapshotAtTurnEnd===1){
+    addStep((next)=>{
+      const oneId=G.hand[0];
+      const oneC=DB[oneId];
+      if(oneC){
+        addLog('🃏 ワンハンド発動！「'+oneC.name+'」を自動発動','sys');
+        showTurnSlide('🃏 ワンハンド発動！「'+oneC.name+'」','#f0c040');
+        G.freeNextCard=true; G.freePassUsedThisTurn=true; G.freePassManaAtUse=-1;
+        playCard(0);
+      }
+      setTimeout(next,300);
+    });
+  }
+  if(G.gotHandless && _handSnapshotAtTurnEnd===0){
+    addStep((next)=>{
+      const _hlHeal=healPlayer(5);
+      addLog('❤️ ハンドレス発動！ HP+'+_hlHeal,'sys');
+      showTurnSlide('❤️ ハンドレス発動！ HP+'+_hlHeal,'#e74c3c');
+      spawnDmgNum('+'+_hlHeal,'heal'); updateUI();
+      setTimeout(next,300);
+    });
+  }
+  if(G.gotCardBarrier){
+    addStep((next)=>{
+      const _cbCards=G.hand.slice();
+      if(_cbCards.length>0){
+        G.discard.push(..._cbCards); G.hand=[]; clampPage();
+        const _cbShield=_cbCards.length*3;
+        G.shield+=_cbShield;
+        addLog('🛡️ カードバリア発動！ 手札'+_cbCards.length+'枚→盾+'+_cbShield,'sys');
+        showTurnSlide('🛡️ カードバリア発動！ 盾+'+_cbShield,'#3498db');
+        updateUI(); renderHand();
+      }
+      setTimeout(next,300);
+    });
+  }
+  if(G.gotManaStrike){
+    addStep((next)=>{
+      const _msMana=G.mana;
+      if(_msMana>0){
+        G.mana=0;
+        const _msDmg=_msMana*3;
+        let dLeft=_msDmg;
+        if(G.enemyShield>0){const a=Math.min(G.enemyShield,dLeft);G.enemyShield-=a;dLeft-=a;}
+        G.enemy.curHp=Math.max(0,G.enemy.curHp-dLeft);
+        G.totalDmgDealt=(G.totalDmgDealt||0)+dLeft;
+        addLog('💥 マナストライク発動！ マナ'+_msMana+'消費→'+dLeft+'ダメ','sys');
+        showTurnSlide('💥 マナストライク発動！ '+dLeft+'ダメージ！','#f39c12');
+        spawnDmgNum('-'+dLeft,'enemy-dmg'); shakeEnemyArea(); flashScreen('flash-gold'); sfxDamage();
+        updateUI(); checkEnemyDeath();
+      }
+      setTimeout(next,300);
+    });
   }
 
   // エリア効果：灼熱の刻印（炎の神殿）ターン終了時カウント分ダメージ
@@ -7362,6 +7427,11 @@ function _buildStatOptions(){
     {id:'fullCharge', stage2only:false,icon:'⚡', name:'フルチャージ',        desc:'ステージ開始時フルチャージ状態（前提：チャージヘルパー済み）',hint:'チャージヘルパー取得後に解放',            available:!G.fullChargeStart&&G.gotChargeHelper, apply:()=>{G.fullChargeStart=true;addLog('⚡ フルチャージを得た！','sys');}},
     {id:'manaPlus2',  stage2only:false,icon:'💎💎',name:'全ターンマナ+2',    desc:'マナ+1を削除してマナ+2に（前提：マナプラス済み・一度のみ）',hint:'Stage9以降・マナプラス取得後に解放',       available:G.stage>=9&&G.gotManaPlus&&!G.gotManaPlus2, apply:()=>{G.manaRegen=(G.manaRegen||4)+1;G.gotManaPlus2=true;addLog('💎💎 全ターンマナ+2！','sys');}},
     {id:'drawPlus2',  stage2only:false,icon:'🃏🃏',name:'全ターンドロー+2',  desc:'ドロー+1を削除してドロー+2に（前提：ハンドプラス改済み・一度のみ）',hint:'Stage9以降・手札強化改取得後に解放', available:G.stage>=9&&G.gotHandPlusKai&&!G.gotDrawPlus2, apply:()=>{G.drawBonusPerTurn=Math.max(0,(G.drawBonusPerTurn||1))-1;G.drawBonusPerTurn=(G.drawBonusPerTurn||0)+2;G.gotDrawPlus2=true;addLog('🃏🃏 全ターンドロー+2！','sys');}},
+    {id:'manaStrike', stage2only:false,icon:'💥', name:'マナストライク',     desc:'ターン終了時、余っているマナを全て消費し、消費マナ×3の攻撃を与える（一度のみ）', available:!G.gotManaStrike, apply:()=>{G.gotManaStrike=true;addLog('💥 マナストライクを得た！','sys');}},
+    {id:'cardBarrier',stage2only:false,icon:'🛡️', name:'カードバリア',       desc:'ターン終了時、余っている手札を捨て札にし、捨てた枚数×3のシールドを得る（一度のみ）', available:!G.gotCardBarrier, apply:()=>{G.gotCardBarrier=true;addLog('🛡️ カードバリアを得た！','sys');}},
+    {id:'handless',   stage2only:false,icon:'❤️', name:'ハンドレス',         desc:'ターン終了時、手札が0枚ならHP+5回復する（一度のみ）', available:!G.gotHandless, apply:()=>{G.gotHandless=true;addLog('❤️ ハンドレスを得た！','sys');}},
+    {id:'onehand',    stage2only:false,icon:'🃏', name:'ワンハンド',         desc:'ターン終了時、手札が1枚ならそのカードの効果を発動して捨て札にする（一度のみ）', available:!G.gotOnehand, apply:()=>{G.gotOnehand=true;addLog('🃏 ワンハンドを得た！','sys');}},
+    {id:'fudouKamae', stage2only:false,icon:'🧘', name:'不動の構え',         desc:'カードもマナも使わずターンを終了した時、HP+5・盾+5を得る（一度のみ）', available:!G.gotFudouKamae, apply:()=>{G.gotFudouKamae=true;addLog('🧘 不動の構えを得た！','sys');}},
   ];
 }
 
@@ -8221,10 +8291,21 @@ function playCardFlyAnimation(sourceEl, cardType){
   }catch(err){ /* 演出失敗時はゲーム進行に影響させない */ }
 }
 
+const CARD_ICON_OVERRIDE={
+  lifeFist:'card_seimeikobusi.png', lifeIronFist:'card_seimeiteltuken.png',
+  sokudoHenkan:'card_sokuhen.png', fudaShuriken:'card_hudasyuri.png',
+  kougekiHenkan:'card_kouhen.png', bakuretsuzan:'card_bakuretuzan.png',
+  seiryokuHenkan:'card_seihanten.png', chiyuHanten:'card_tiyuhan.png',
+  shubiHenkan:'card_syubihen.png', boueiIji:'card_bouiji.png',
+  dokubutsuHenkan:'card_dokuhen.png', gekidokuBari:'card_gekidoku.png',
+  sokusekiNoInori:'card_sokuinori.png', chiisanaKago:'card_tiisanainori.png',
+  sokusekiNoIkari:'card_sokuikari.png', gekikou:'card_geltukou.png',
+};
 function cardIconHtml(c){
   const imgId=c._baseId||c.id;
+  const imgSrc=CARD_ICON_OVERRIDE[imgId]||('card_'+imgId+'.png');
   return '<div class="card-icon-wrap">'
-    +'<img src="card_'+imgId+'.png" style="width:100%;height:100%;object-fit:contain;border-radius:4px;" '
+    +'<img src="'+imgSrc+'" style="width:100%;height:100%;object-fit:contain;border-radius:4px;" '
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';">'
     +'<div class="card-icon" style="display:none;">'+c.icon+'</div>'
     +'</div>';
@@ -8316,13 +8397,10 @@ function renderHand(){
     } else {
       d.style.boxShadow='';
     }
-    const corner = c.type==='another'?'異':({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️',G:'◈',A:'異'}[c.rarity]||'◆');
-    // 妨害カードはframe_bougai.pngを使用
-    const frameImg=c.rarity==='bougai'?'frame_bougai.png':(FRAME_IMGS[c.rarity]||'');
-    // アナザーカードはフレーム画像に紫寄りのティントを重ねる
-    const frameBg=c.type==='another'
-      ? (frameImg?`linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35)),url(${frameImg})`:'linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35))')
-      : (frameImg?`url(${frameImg})`:'none');
+    const corner = ({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',bougai:'☠️',G:'◈'}[c.rarity]||'◆');
+    // 妨害カードはframe_bougai.png、アナザーカードはframe_anaza.pngを使用
+    const frameImg=c.type==='another'?'frame_anaza.png':(c.rarity==='bougai'?'frame_bougai.png':(FRAME_IMGS[c.rarity]||''));
+    const frameBg=frameImg?`url(${frameImg})`:'none';
     d.style.backgroundImage=frameBg;
     d.style.backgroundSize='100% 100%';
     d.style.backgroundRepeat='no-repeat';
@@ -8626,7 +8704,7 @@ function renderHand(){
       '<div class="card-band" style="'+(frameImg?'display:none':'')+'""></div>'+
       '<div class="card-inner">'+
         '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
-        '<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">'+reducedCost+'</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>'+
+        (c.type==='another'?'':'<div class="card-cost '+c.rarity+'">'+(isHakiZero?'<span style="color:#f0c040">'+reducedCost+'</span>':isFreePassTarget?'<span class="freepass-cost-blink" data-orig="'+reducedCost+'">0</span>':ignitePenalty>0?'<span style="color:#e74c3c;font-weight:bold;">'+reducedCost+'</span>':reducedCost)+'</div>')+
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
@@ -8635,7 +8713,7 @@ function renderHand(){
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
       '<div class="card-corner br">'+corner+'</div>'+
-      (c.type==='another'?'<div style="position:absolute;top:4px;right:4px;background:#a855f7;color:#fff;font-size:10px;font-weight:bold;line-height:1;padding:2px 5px;border-radius:5px;box-shadow:0 0 6px rgba(168,85,247,.8);z-index:2;">異</div>':'');
+      (c.type==='another'?'<div style="position:absolute;top:4px;left:4px;background:#a855f7;color:#fff;font-size:10px;font-weight:bold;line-height:1;padding:2px 5px;border-radius:5px;box-shadow:0 0 6px rgba(168,85,247,.8);z-index:2;">異</div>':'');
     // 踏み倒し：コスト表示を元コスト↔0で交互切り替え
   if(G.freeNextCard){
     if(window._freePassTimer) clearInterval(window._freePassTimer);
@@ -12802,24 +12880,21 @@ function _deckEditPoolRemaining(){
 // ミニカード表示要素を作成（タップで拡大詳細＋決定/キャンセルのアクション確認）
 function _buildDeckEditCardEl(c, tapFn, badgeText, dim, count, isPreset){
   const d=document.createElement('div');
-  const fImg=FRAME_IMGS[c.rarity]||'';
-  if(c.type==='another'){
-    d.style.backgroundImage=fImg?`linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35)),url(${fImg})`:'linear-gradient(160deg,rgba(120,30,200,.45),rgba(80,10,150,.35))';
-    d.style.backgroundSize='100% 100%';
-  } else if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
+  const fImg=c.type==='another'?'frame_anaza.png':(FRAME_IMGS[c.rarity]||'');
+  if(fImg){d.style.backgroundImage='url('+fImg+')';d.style.backgroundSize='100% 100%';}
   d.className='card '+c.rarity;
   if(dim) d.style.opacity='.45';
   // ガチャ生成カード（使い捨てカード）でも、右上バッジは通常の入れ替えバッジ表示のみとする（「使い捨て」表示は行わない）
   const effBadge=badgeText;
   const badgeColor='rgba(0,0,0,.75)';
-  const corner=c.type==='another'?'異':({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',G:'◈'}[c.rarity]||'◆');
+  const corner=({common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',G:'◈'}[c.rarity]||'◆');
   const nameSuffix=(count>1)?(' ×'+count):'';
   // 初期デッキ由来のカードはデッキポイントを消費しないため0固定。同名でも入れ替え候補（購入品）は別扱いで実際のDPを表示する
   const _dpVal=isPreset?0:getCardDeckPoint(c.id);
   d.innerHTML='<div class="card-band" style="'+(fImg?'display:none':'')+'""></div>'+
     '<div class="card-inner">'+
       '<div class="card-type-label card-type-'+c.type+'">'+({attack:'攻',shield:'防',heal:'回',skill:'技',curse:'呪',bougai:'妨',another:'異'}[c.type]||'')+'</div>'+
-      '<div class="card-cost '+c.rarity+'">'+c.cost+'</div>'+
+      (c.type==='another'?'':'<div class="card-cost '+c.rarity+'">'+c.cost+'</div>')+
       cardIconHtml(c)+
       '<div class="card-name" style="font-size:'+_cardNameSize(c.name+nameSuffix)+'px;">'+c.name+nameSuffix+'</div>'+
       '<div class="card-divider"></div>'+
