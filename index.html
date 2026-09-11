@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver386</title>
+<title>DUNGEON WALKER DWCver389</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -835,23 +835,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div class="overlay" id="ov-admin" style="gap:8px;padding:12px 10px;z-index:2100;">
   <div class="ov-title" style="font-size:14px;color:#e74c3c;margin-top:0;">🔧 管理者モード</div>
-  <!-- エリア選択タブ -->
-  <div style="display:flex;gap:6px;width:100%;margin-bottom:2px;">
-    <div id="admin-tab-cave" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid #7ec8a0;background:rgba(126,200,160,.15);color:#7ec8a0;">🪨 始まりの洞窟</div>
-    <div id="admin-tab-ruins" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(201,168,76,.4);background:rgba(0,0,0,.6);color:#888;">🏚️ 忘却の遺跡</div>
-    <div id="admin-tab-temple" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(224,112,48,.4);background:rgba(0,0,0,.6);color:#888;">🌋 炎の神殿</div>
-    <div id="admin-tab-raimei" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(240,208,32,.4);background:rgba(0,0,0,.6);color:#888;">⚡ 雷鳴の高原</div>
-    <div id="admin-tab-swamp" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(124,196,122,.4);background:rgba(0,0,0,.6);color:#888;">🐍 毒の沼地</div>
-    <div id="admin-tab-iron" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(156,176,200,.4);background:rgba(0,0,0,.6);color:#888;">🛡️ 鉄壁の砦</div>
-    <div id="admin-tab-ice" style="flex:1;text-align:center;padding:6px 0;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;touch-action:manipulation;border:2px solid rgba(120,200,240,.4);background:rgba(0,0,0,.6);color:#888;">❄️ 氷壁の迷宮</div>
-  </div>
+  <!-- エリア選択タブ：ADMIN_AREA_LISTから動的生成（新エリア追加時もここは自動対応） -->
+  <div id="admin-area-tabs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%;margin-bottom:2px;"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:72vh;">
-    
+
+    <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
+      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">⚔️ 開始ステージ ／ ⚡ チャージ</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;" id="admin-stage-btns"></div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;" id="admin-charge-btns"></div>
+    </div>
+
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
       <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">⬆️ ステータス強化（ボタンで何度でも追加）</div>
-      <div id="admin-statup-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+      <div id="admin-statup-list" style="display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;"></div>
     </div>
-    
+
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
       <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">🃏 カード追加（デッキ: <span id="admin-deck-count">0</span>枚）<span id="btn-admin-refresh" style="margin-left:8px;background:rgba(80,120,200,.2);border:1px solid rgba(80,120,200,.5);border-radius:4px;padding:2px 8px;color:#7db8f7;cursor:pointer;font-size:9px;touch-action:manipulation;">🔄 更新</span></div>
       <div style="display:flex;gap:6px;margin-bottom:6px;">
@@ -860,24 +858,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       </div>
       <div id="admin-deck-list" style="display:flex;flex-wrap:wrap;gap:3px;max-height:110px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:4px;padding:4px;min-height:28px;"></div>
     </div>
-    
+
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">⚔️ 開始ステージを選択</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;" id="admin-stage-btns"></div>
-    </div>
-    
-    <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">⚡ チャージタイプ選択</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;" id="admin-charge-btns"></div>
+      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">🛠️ ツール</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="ov-btn" id="btn-admin-cardtest" style="margin:0;font-size:10px;padding:8px 4px;background:rgba(80,120,200,.15);border-color:rgba(80,120,200,.6);color:#7db8f7;font-weight:bold;">🧪 カード挙動テスト</div>
+        <div class="ov-btn" id="btn-admin-monsterview" style="margin:0;font-size:10px;padding:8px 4px;background:rgba(160,80,200,.15);border-color:rgba(160,80,200,.6);color:#c87df0;font-weight:bold;">🖼️ モンスター画像確認</div>
+        <div class="ov-btn" id="btn-admin-deckgrant" style="margin:0;font-size:10px;padding:8px 4px;background:rgba(120,200,140,.15);border-color:rgba(120,200,140,.6);color:#7ed6a0;font-weight:bold;">🔧 デッキ枠+1&DP+3&カード1枚</div>
+        <div class="ov-btn" id="btn-admin-deckreset" style="margin:0;font-size:10px;padding:8px 4px;background:rgba(200,120,120,.15);border-color:rgba(200,120,120,.6);color:#e08a8a;font-weight:bold;">🔧 デッキテストリセット</div>
+        <div class="ov-btn" id="btn-admin-currency" style="margin:0;grid-column:span 2;font-size:10px;padding:8px 4px;background:rgba(240,208,32,.15);border-color:rgba(240,208,32,.6);color:#f0d020;font-weight:bold;">🔧 ゴールド+100＆クリスタル+100</div>
+      </div>
+      <div style="font-size:8px;color:#888;text-align:center;margin-top:6px;font-family:sans-serif;">※手札枚数依存のカード（捨て身等）は手札105枚基準の数値になります</div>
     </div>
   </div>
   <div class="ov-btn" id="btn-admin-start" style="background:rgba(231,76,60,.15);border-color:rgba(231,76,60,.6);color:#e74c3c;font-weight:bold;">▶ 選択ステージで開始</div>
-  <div class="ov-btn" id="btn-admin-cardtest" style="background:rgba(80,120,200,.15);border-color:rgba(80,120,200,.6);color:#7db8f7;font-weight:bold;">🧪 カード挙動テスト（実戦画面）</div>
-  <div class="ov-btn" id="btn-admin-monsterview" style="background:rgba(160,80,200,.15);border-color:rgba(160,80,200,.6);color:#c87df0;font-weight:bold;">🖼️ モンスター画像確認</div>
-  <div class="ov-btn" id="btn-admin-deckgrant" style="background:rgba(120,200,140,.15);border-color:rgba(120,200,140,.6);color:#7ed6a0;font-weight:bold;">🔧 デッキ編集：入れ替え枠+1＆DP上限+3＆カード1枚入手</div>
-  <div class="ov-btn" id="btn-admin-deckreset" style="background:rgba(200,120,120,.15);border-color:rgba(200,120,120,.6);color:#e08a8a;font-weight:bold;">🔧 デッキ編集：テストデータをリセット</div>
-  <div class="ov-btn" id="btn-admin-currency" style="background:rgba(240,208,32,.15);border-color:rgba(240,208,32,.6);color:#f0d020;font-weight:bold;">🔧 ゴールド+100＆クリスタル+100</div>
-  <div style="font-size:8px;color:#888;text-align:center;margin-top:-4px;font-family:sans-serif;">※手札枚数依存のカード（捨て身等）は手札105枚基準の数値になります</div>
   <div class="ov-btn" id="btn-admin-close" style="font-size:10px;">閉じる</div>
 </div>
 
@@ -885,16 +879,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <div class="overlay" id="ov-monster-viewer" style="gap:0;padding:0;z-index:2150;overflow:hidden;">
   <div style="width:100%;padding:10px 12px 6px;flex-shrink:0;background:rgba(0,0,0,.8);border-bottom:1px solid rgba(201,168,76,.2);">
     <div style="font-family:'Cinzel',serif;font-size:13px;color:#c87df0;text-align:center;margin-bottom:4px;">🖼️ モンスター画像確認</div>
-    <!-- エリアタブ -->
-    <div style="display:flex;gap:6px;">
-      <div id="mv-tab-0" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid #7ec8a0;background:rgba(126,200,160,.15);color:#7ec8a0;font-family:'Cinzel',serif;">🪨 洞窟</div>
-      <div id="mv-tab-1" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(201,168,76,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">🏚️ 遺跡</div>
-      <div id="mv-tab-2" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(224,112,48,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">🌋 神殿</div>
-      <div id="mv-tab-3" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(240,208,32,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">⚡ 高原</div>
-      <div id="mv-tab-4" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(124,196,122,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">🐍 沼地</div>
-      <div id="mv-tab-5" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(156,176,200,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">🛡️ 砦</div>
-      <div id="mv-tab-6" style="flex:1;text-align:center;padding:4px 0;border-radius:6px;font-size:10px;cursor:pointer;touch-action:manipulation;border:1px solid rgba(120,200,240,.3);background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;">❄️ 氷壁</div>
-    </div>
+    <!-- エリアタブ：ADMIN_AREA_LISTから動的生成 -->
+    <div id="mv-tabs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;"></div>
     <!-- フィルター凡例 -->
     <div style="display:flex;gap:6px;margin-top:6px;font-size:8px;font-family:sans-serif;color:#888;">
       <div style="flex:1;text-align:center;">🔲 元画像</div>
@@ -1251,6 +1237,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
           <div style="font-size:10px;color:#aaa;font-family:sans-serif;margin-top:3px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);">凍てつく氷壁が続く迷宮 ★★★ 10ステージ</div>
           <div id="area-clear-badge-6" style="display:none;font-size:9px;color:#ffd700;font-family:sans-serif;margin-top:3px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);">🏆 クリア済み</div>
           <div id="area-progress-6" style="display:none;font-size:9px;color:#8ab8d8;font-family:sans-serif;margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);"></div>
+        </div>
+        <div style="font-size:10px;color:#4aff88;font-family:sans-serif;background:rgba(74,255,136,.1);border:1px solid rgba(74,255,136,.4);border-radius:4px;padding:2px 8px;">プレイ可能</div>
+      </div>
+      <div id="area-btn-10" style="background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)),url(eria_kikai.png);background-size:cover;background-position:center;border:2px solid #888;border-radius:10px;padding:14px 18px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:12px;min-height:84px;box-sizing:border-box;">
+        <div style="flex:1;">
+          <div style="font-family:'Cinzel',serif;font-size:14px;color:#a0a8b8;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);">🤖 機械帝国</div>
+          <div style="font-size:10px;color:#aaa;font-family:sans-serif;margin-top:3px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);">機械仕掛けの兵器と戦闘機械が支配する帝国 ★★★ 10ステージ</div>
+          <div id="area-clear-badge-10" style="display:none;font-size:9px;color:#ffd700;font-family:sans-serif;margin-top:3px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);">🏆 クリア済み</div>
+          <div id="area-progress-10" style="display:none;font-size:9px;color:#8ab8d8;font-family:sans-serif;margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,1);"></div>
         </div>
         <div style="font-size:10px;color:#4aff88;font-family:sans-serif;background:rgba(74,255,136,.1);border:1px solid rgba(74,255,136,.4);border-radius:4px;padding:2px 8px;">プレイ可能</div>
       </div>
@@ -1750,6 +1745,7 @@ const AREA_CHARGE_ALLOWED={
   7: ['renGeki'],                               // チュートリアル：格闘家のみ
   8: ['renGeki','jikoSaisei'],                  // 呪いの廃墟：格闘家・僧侶
   9: ['renGeki','inori'],                       // 帰らずの森：格闘家・祈祷師
+  10:['tameAtk','jikoSaisei','teppeki'],         // 機械帝国：重戦士・僧侶・守護者
 };
 // エリアごとの「クリアしやすいおすすめチャージ」表示用
 const AREA_RECOMMENDED_CHARGE={
@@ -1766,6 +1762,11 @@ const AREA_HINTS={
     'このエリアの毒攻撃は、実際に受けたダメージと同じ量の毒を受けます。',
     'シールドでダメージを防げば、受ける毒も減らせます。',
     'ショップにある「耐毒のソウル」で毒の効果を減少できます。',
+  ]},
+  10: {title:'機械帝国', lines:[
+    'エリア効果「妨害電波」：カウントは1→2→3→1と循環し、現在のカウントと同じコストのカードはそのターン使用できません。',
+    '解析攻撃を受けると「弱点」が蓄積し、次にダメージを受けた時に追加ダメージを受けます（その後カウントは半分に）。',
+    'ショップにある「弱点克服のソウル」で弱点の付与量を減らせます。',
   ]},
   5: {title:'鉄壁の砦', lines:[
     'シールドがある敵には、通常の攻撃ではダメージを与えられません。',
@@ -1788,6 +1789,9 @@ const DB={
   strike:      {id:'strike',      name:'斬撃',    icon:'⚔️', type:'attack',  rarity:'common',   cost:1, desc:'攻撃 6',shortDesc:"攻撃 6",                    effect:{atk:6}},
   lifeFist:    {id:'lifeFist',    name:'生命の拳',   icon:'👊', type:'attack',  rarity:'common',   cost:1, desc:'攻撃力5 + 最大HP10ごとに+1',shortDesc:"攻5+HP10毎+1",       effect:{atk:5,hpScaleUnit:10,hpScaleBonus:1}},
   lifeIronFist:{id:'lifeIronFist',name:'生命の鉄拳', icon:'👊', type:'attack',  rarity:'common',   cost:2, desc:'攻撃力10 + 最大HP10ごとに+2',shortDesc:"攻10+HP10毎+2",       effect:{atk:10,hpScaleUnit:10,hpScaleBonus:2}},
+  analysisSlash:     {id:'analysisSlash',     name:'解析斬',   icon:'🗡️', type:'attack', rarity:'S', cost:1, desc:'攻撃3 + 弱点付与4',  shortDesc:'攻3+弱点4',  effect:{atk:3,weaknessAtk:4}},
+  analysisHeavySlash:{id:'analysisHeavySlash',name:'解析重斬', icon:'⚔️', type:'attack', rarity:'S', cost:2, desc:'攻撃6 + 弱点付与8',  shortDesc:'攻6+弱点8',  effect:{atk:6,weaknessAtk:8}},
+  thoroughAnalysis:  {id:'thoroughAnalysis',  name:'徹底解析', icon:'🔬', type:'skill',  rarity:'S', cost:1, desc:'敵のシールドを-10し、余った分（マイナス分）を敵に弱点として付与', shortDesc:'盾-10、余剰分は弱点に', effect:{shieldBreakWeaken:10}},
 
   // ===== アナザーカード＆Gカード（各チャージ専用・初期デッキに1枚ずつ同梱） =====
   renTotsu:        {id:'renTotsu',        name:'連突',     icon:'👊', type:'attack', rarity:'common', cost:0, desc:'攻撃1×3（合計3）', shortDesc:'攻1×3', effect:{atk:1,times:3}, vanishAtTurnEnd:true},
@@ -1995,6 +1999,9 @@ function getBgImg(stage){
   if(G.areaId===9){
     return stage>=4?'bg_mori2.png':'bg_mori1.png';
   }
+  if(G.areaId===10){
+    return stage>=10?'bg_kikai3.png':(stage>=6?'bg_kikai2.png':'bg_kikai1.png');
+  }
   if(stage>=9) return 'bg_boukyaku4.png';
   if(stage>=6) return 'bg_boukyaku3.png';
   if(stage>=3) return 'bg_boukyaku2.png';
@@ -2002,7 +2009,7 @@ function getBgImg(stage){
 }
 
 const ENEMY_IMGS=['enemy1.png','enemy2.png','enemy3.png','enemy4.png','enemy5.png','enemy6.png','enemy7.png','enemy8.png','enemy9.png','enemy10.png','enemy11.png','enemy12.png','enemy13.png','enemy14.png','enemy15.png'];
-const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png',G:'frame_epic.png',A:'frame_epic.png'};
+const FRAME_IMGS={common:'frame_common.png',uncommon:'frame_uncommon.png',rare:'frame_rare.png',epic:'frame_epic.png',legendary:'frame_legendary.png',gauge:'frame_charge.png',bougai:'frame_bougai.png',D:'frame_bougai.png',G:'frame_epic.png',A:'frame_epic.png',S:'frame_shop.png'};
 const ENEMIES=[
   {name:'ゴブリン',      icon:'👹',hp:60,  atk:8,  shield:0,  rank:1, pattern:['atk','atk','atk'],                                          boss:false, img:'enemy1.png'},
   {name:'コボルト',      icon:'🐲',hp:70,  atk:10, shield:0,  rank:1, pattern:['atk','def','big'],                                           boss:false, img:'enemy2.png'},
@@ -2044,7 +2051,20 @@ const TEMPLE_ENEMIES=[
   {name:'ブレイズトロール',    icon:'🧌',hp:250, atk:22, shield:25, rank:3, pattern:['bigignite','bigheal','bigignite','reflect_e','bigheal'],                 boss:false, img:'BOSS_tororu.png', filter:'hue-rotate(330deg) saturate(2.0) brightness(1.05)'},
   {name:'ブレイズデーモンロード',icon:'😈',hp:260,atk:28, shield:20, rank:5, pattern:['superignite','superbigdef','bigignite','superignite','bigheal'],          boss:true,  img:'BOSS_demonlord.png'},
 ];
-// 雷鳴の高原 敵データ（areaId:3）※ボス以外は既存モンスター画像を黄色系フィルターで流用
+// 機械帝国 敵データ（areaId:10）
+const MECH_ENEMIES=[
+  {name:'ﾒﾀﾙｽﾈｰｸ',     icon:'🐍',hp:60, atk:8,  shield:10, rank:1, pattern:['analysis_attack','poisonatk','bigdef','heal'],                    boss:false, img:'enemy_tuika51.png'},
+  {name:'ﾒﾀﾙﾏﾝﾃｨｽ',   icon:'🦗',hp:70, atk:10, shield:10, rank:1, pattern:['analysis_attack','curse','bigdef','heal'],                        boss:false, img:'enemy_tuika56.png'},
+  {name:'ﾒﾀﾙｳｲﾝｸﾞ',   icon:'🦅',hp:80, atk:11, shield:10, rank:1, pattern:['analysis_attack','drain','drain','bigdef'],                       boss:false, img:'enemy_tuika58.png'},
+  {name:'ﾒﾀﾙｽﾊﾟｲﾀﾞｰ', icon:'🕷️',hp:120,atk:13, shield:15, rank:1, pattern:['analysis_attack','poisonatk','poisonatk','bigdef'],               boss:false, img:'enemy_tuika59.png'},
+  {name:'ｳｫｯﾁｬｰ',      icon:'👁️',hp:130,atk:15, shield:20, rank:2, pattern:['analysis_attack','paralyze','bigdef','paralyze'],                boss:false, img:'enemy_tuika52.png'},
+  {name:'ﾒﾀﾙｽﾄｰｶｰ',   icon:'🤖',hp:150,atk:17, shield:20, rank:2, pattern:['analysis_attack','weaken_e','judgment','heal'],                   boss:false, img:'enemy_tuika54.png'},
+  {name:'ﾒﾀﾙｶﾞｰﾄﾞﾅｰ', icon:'🛡️',hp:170,atk:19, shield:20, rank:2, pattern:['analysis_attack','heavywound','bigdef','drain'],                  boss:false, img:'enemy_tuika57.png'},
+  {name:'ｽﾄｰﾑｱﾀｯｶｰ',  icon:'⚡',hp:200,atk:21, shield:30, rank:3, pattern:['analysis_attack','ignite','iceshot','paralyze'],                  boss:false, img:'enemy_tuika53.png'},
+  {name:'ｴﾝｼｪﾝﾄｷﾞｱ',  icon:'⚙️',hp:230,atk:23, shield:25, rank:3, pattern:['analysis_attack','bigignite','despair','bigdef','heal'],          boss:false, img:'enemy_tuika48.png'},
+  {name:'D-ﾃﾞｽﾄﾛｲﾔｰ', icon:'🤖',hp:280,atk:26, shield:40, rank:4, pattern:['analysis_attack','superignite','iceshot','bigdef','heal'],         boss:true,  img:'BOSS_D-desutoroiya.png'},
+];
+
 const RAIMEI_ENEMIES=[
   {name:'ボルトラビット',      icon:'🐇',hp:55,  atk:8,  shield:0,  rank:1, pattern:['atk','atk','paralyze','big'],                            boss:false, img:'cave_enemy2.png', filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
   {name:'ボルトゴブリン',      icon:'👹',hp:65,  atk:10, shield:0,  rank:1, pattern:['atk','paralyze','bigdef','big'],                         boss:false, img:'enemy1.png',      filter:'hue-rotate(35deg) saturate(2.3) brightness(1.2)'},
@@ -2163,6 +2183,19 @@ const MORI_ENEMIES=[
   {name:'ｳｨｯﾌﾟﾌﾟﾗﾝﾄ',    icon:'🌿',hp:100, atk:15, shield:0, rank:3, pattern:['drain','bigdef','drain','big','drain'], boss:true,  img:'enemy_tuika34.png'},
 ];
 const SANDBAG_ENEMY={name:'サンドバッグ（テスト用）',icon:'🛡️',hp:9999,atk:0,shield:0,pattern:['def'],boss:false,img:null};
+// 管理者パネル・モンスター画像確認で使う、全エリアの一覧（エリア選択画面と同じ並び順）。新エリア追加時はここに1行足すだけでよい。
+const ADMIN_AREA_LIST=[
+  {id:0, short:'洞窟', icon:'🪨', color:'#7ec8a0'},
+  {id:8, short:'廃墟', icon:'🏚️', color:'#a08060'},
+  {id:9, short:'森',   icon:'🌲', color:'#5cb85c'},
+  {id:4, short:'沼地', icon:'🐍', color:'#7cc47a'},
+  {id:5, short:'砦',   icon:'🛡️', color:'#9cb0c8'},
+  {id:2, short:'神殿', icon:'🌋', color:'#e07030'},
+  {id:3, short:'高原', icon:'⚡', color:'#f0d020'},
+  {id:6, short:'氷壁', icon:'❄️', color:'#78c8f0'},
+  {id:10,short:'機械', icon:'🤖', color:'#b0b8c8'},
+  {id:1, short:'遺跡', icon:'🏚️', color:'#c9a84c'},
+];
 // エリア効果：感電結界（雷鳴の高原）偶数ターンはカードコスト2倍
 function applyRaimeiCostMod(baseCost){
   if(baseCost<=0) return baseCost;
@@ -2173,18 +2206,22 @@ function applyRaimeiCostMod(baseCost){
   return baseCost;
 }
 // エリアに対応した敵リストを返す
+function getEnemiesForArea(areaId){
+  if(areaId===7) return [{...CAVE_ENEMIES[0], hp:25}]; // チュートリアル：既存の「スライム」を流用（HPのみチュートリアル専用に25へ調整）
+  if(areaId===0) return CAVE_ENEMIES;
+  if(areaId===2) return TEMPLE_ENEMIES;
+  if(areaId===3) return RAIMEI_ENEMIES;
+  if(areaId===4) return SWAMP_ENEMIES;
+  if(areaId===5) return IRON_ENEMIES;
+  if(areaId===6) return ICE_ENEMIES;
+  if(areaId===8) return NOROI_ENEMIES;
+  if(areaId===9) return MORI_ENEMIES;
+  if(areaId===10) return MECH_ENEMIES;
+  return ENEMIES;
+}
 function getAreaEnemies(){
   if(G._cardTestMode) return [SANDBAG_ENEMY];
-  if(G.areaId===7) return [{...CAVE_ENEMIES[0], hp:25}]; // チュートリアル：既存の「スライム」を流用（HPのみチュートリアル専用に25へ調整）
-  if(G.areaId===0) return CAVE_ENEMIES;
-  if(G.areaId===2) return TEMPLE_ENEMIES;
-  if(G.areaId===3) return RAIMEI_ENEMIES;
-  if(G.areaId===4) return SWAMP_ENEMIES;
-  if(G.areaId===5) return IRON_ENEMIES;
-  if(G.areaId===6) return ICE_ENEMIES;
-  if(G.areaId===8) return NOROI_ENEMIES;
-  if(G.areaId===9) return MORI_ENEMIES;
-  return ENEMIES;
+  return getEnemiesForArea(G.areaId);
 }
 // ===== チュートリアル（エリアID7）：ダイアログ進行＋操作制限＋強調表示 =====
 // 各フェーズ＝「説明ダイアログ（複数可）→ 指定された1つの操作」の組。
@@ -2859,6 +2896,7 @@ const AREA_REWARDS={
   1: {clearGold:100,clearCrystal:50, noContinueGold:120,noContinueCrystal:60, allChargeGold:160, allChargeCrystal:80},
   8: {clearGold:10, clearCrystal:6,  noContinueGold:15, noContinueCrystal:9,  allChargeGold:20,  allChargeCrystal:10},
   9: {clearGold:9,  clearCrystal:6,  noContinueGold:13, noContinueCrystal:8,  allChargeGold:0,   allChargeCrystal:0},
+  10:{clearGold:25, clearCrystal:12, noContinueGold:60, noContinueCrystal:35, allChargeGold:0,   allChargeCrystal:0},
 };
 // 全体共通報酬（クリア済みエリア数に応じて1回だけ付与）※未設定
 const GLOBAL_AREA_COUNT_REWARDS={2:null, 4:null, 6:null};
@@ -3030,6 +3068,8 @@ const SOULS={
   fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-5（0未満にはならない）'},
   fukutsu2:{id:'fukutsu2', name:'不屈のソウルⅡ', category:2, cost:2, icon:'💢', desc:'敵の呪いダメージ-10（0未満にはならない）'},
   fukutsu3:{id:'fukutsu3', name:'不屈のソウルⅢ', category:2, cost:3, icon:'💢', desc:'敵の呪いダメージ-15（0未満にはならない）'},
+  jakutenKoku: {id:'jakutenKoku', name:'弱点克服のソウルⅠ', category:2, cost:1, icon:'🎯', desc:'弱点付与量-6（0未満にはならない）'},
+  jakutenKoku2:{id:'jakutenKoku2', name:'弱点克服のソウルⅡ', category:2, cost:2, icon:'🎯', desc:'弱点付与量-12（0未満にはならない）'},
   taika:   {id:'taika',   name:'耐炎のソウルⅠ', category:2, cost:2, icon:'🔥', desc:'炎上・大炎上・超炎上の増加コストを-1する（0未満にはならない）'},
   taiden:  {id:'taiden',  name:'耐電のソウルⅠ', category:2, cost:2, icon:'⚡', desc:'麻痺で次に使用したカードの効果が無効化された場合、そのカードのコストは消費されない'},
   taihyou: {id:'taihyou', name:'耐氷のソウルⅠ', category:2, cost:2, icon:'❄️', desc:'氷雪弾による次ターンの使用可能カード枚数制限を、2枚までではなく3枚までにする'},
@@ -3341,11 +3381,17 @@ function _startStageBattle(){
   const e=getAreaEnemies()[G.stage];
   G.enemy={...e,curHp:e.hp,patIdx:0};
   G._enemyHpShown=e.hp; // 表示中HPの追跡値をリセット（新しい敵の最大HPから開始）
-  G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={};
+  G.enemyShield=e.shield||0; G.enemyPoison=0; G.enemyAtkDebuff=0; G.playerPoison=0; G.playerBurn=0; G.heatCount=0; G.igniteCostPenalties=[]; G.ignitedCards={}; G.weaknessCount=0; G.enemyWeaknessCount=0;
   // エリア効果：灼熱の刻印（炎の神殿）ステージ開始時にもカウント加算
   if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='heatcount'){
     const _initHeat=6;
     G.heatCount=_initHeat;
+  }
+  // エリア効果：妨害電波（機械帝国）ステージ開始時は必ず「1」から
+  if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='mechanical_signal'){
+    G.mechSignalCount=1;
+  } else {
+    G.mechSignalCount=0;
   }
   G.shield=G.initShieldBonus||0; G.atkBuff=G.permAtkBonus||0;
   G.mana=G.manaRegen+(G.firstTurnManaBonus||0);
@@ -3722,6 +3768,12 @@ function playCard(idx, _isChain){
     // 炎上コストペナルティ
     const _ignitePenalty=(G.ignitedCards&&G.ignitedCards[idx])||0;
     const _reducedCost=c.type==='another'?0:(isFreePass?0:(isHakiZeroPlay?(G.hakiZeroCostTarget!=null?G.hakiZeroCostTarget:0):applyRaimeiCostMod(Math.max(0,c.cost+costAdd+_ignitePenalty-(G.nextTurnAtkCostDown&&c.type==='attack'?1:0)-(G.hakiStageDiscount||0)))));
+    // 妨害電波（機械帝国）：実行層でも保険としてブロック
+    if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='mechanical_signal'&&_reducedCost===(G.mechSignalCount||1)){
+      dwRejectFeedback(document.getElementById('hand-cards'));
+      addLog('📡 妨害電波: コスト'+_reducedCost+'のカードは今使用できません！','sys');
+      return;
+    }
     if(G.mana<_reducedCost){addLog('💎 マナ不足！','sys');return;}
     const actualCost=_reducedCost;
     if(c.type==='another'){
@@ -3821,6 +3873,18 @@ function playCard(idx, _isChain){
     msgs.push('敵シールド-'+ef.shieldBreak+(sb>0?' ('+sb+'減少)':'(効果なし)'));
     if(sb>0){queueEffect(()=>{spawnDmgNum('🛡️-'+sb,'enemy-dmg');sfxShield();}, 800);}
   }
+  // 徹底解析：敵シールドを-N、余った分（シールドを超えた分）を弱点として付与
+  if(ef.shieldBreakWeaken){
+    const _actualReduce=Math.min(G.enemyShield,ef.shieldBreakWeaken);
+    const _overflow=ef.shieldBreakWeaken-_actualReduce;
+    G.enemyShield=Math.max(0,G.enemyShield-ef.shieldBreakWeaken);
+    msgs.push('敵シールド-'+_actualReduce);
+    if(_overflow>0){
+      G.enemyWeaknessCount=(G.enemyWeaknessCount||0)+_overflow;
+      msgs.push('余剰分'+_overflow+'を弱点として付与（敵の弱点'+G.enemyWeaknessCount+'）');
+    }
+    queueEffect(()=>{sfxShield();}, 800);
+  }
   // 自傷ダメージ・HP減少を攻撃より先に処理（魂喰らい+血の契約などの処理順確保）
   if(ef.selfDmg){
     const sd=(cid==='bloodPact'&&getEquippedSouls().includes('ketsuyakuSoul'))?5:ef.selfDmg;
@@ -3865,6 +3929,13 @@ function playCard(idx, _isChain){
       let d=baseAtk*_mult;
       const shieldAbs=G.enemyShield>0?Math.min(G.enemyShield,d):0;
       if(!ef.pierceBreak&&G.enemyShield>0){const a=shieldAbs;G.enemyShield-=a;d-=a;if(a){msgs.push('シールド'+a+'吸収');sfxShield();flashShieldBlock('enemy');}}
+      // 弱点（敵）：解析斬などで付与された弱点による追加ダメージ（1ヒット目のみ・その後半分に切り捨て）
+      if(i===0 && d>0 && (G.enemyWeaknessCount||0)>0){
+        const _ewk=G.enemyWeaknessCount;
+        d+=_ewk;
+        G.enemyWeaknessCount=Math.floor(_ewk/2);
+        msgs.push('敵の弱点: 追加ダメージ+'+_ewk+'（弱点'+_ewk+'→'+G.enemyWeaknessCount+'）');
+      }
       G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
       // 攻撃変換：防がれた分を除く、実際に与えたダメージ分だけ盾を得る（一度きり）
       if(G.nextDmgToShield && d>0){
@@ -3879,6 +3950,11 @@ function playCard(idx, _isChain){
       if(G.soulEaterActive && d>0){const _seH=Math.floor(d/2)+(G.soulEaterBonus||0);if(_seH>0){G.playerHp=Math.min(G.playerMaxHp,G.playerHp+_seH);addLog('💀 魂喰らい: +'+_seH+' 回復','sys');}_seHealPerHit.push(_seH>0?_seH:0);}else{_seHealPerHit.push(0);}
       if(G.swiftBladeActive && d>=10){queueEffect(()=>{addLog('⚡ 加速する刃: ドロー1','sys');flashDrawCard(1);setTimeout(()=>{drawCards(1);renderHand();},500);}, 800);}
       msgs.push(c.name+': '+d+'ダメ');
+    }
+    // 解析斬・解析重斬：弱点付与（敵）
+    if(ef.weaknessAtk){
+      G.enemyWeaknessCount=(G.enemyWeaknessCount||0)+ef.weaknessAtk;
+      msgs.push('弱点付与+'+ef.weaknessAtk+'（敵の弱点'+G.enemyWeaknessCount+'）');
     }
     // 先頭のqueueEffectでHP表示を_hpBeforeに一時戻し、1撃ごとに段階表示
     // ※G.enemy.curHpは書き換えない（次カードのダメージ計算に影響するため）
@@ -5020,7 +5096,7 @@ function enemyTurn(){
       summon:'🌑 召喚',quake:'🌍 地響き '+ea,seal:'🔒 封印 '+ea,poisonfang:'☠️ 猛毒牙 '+ea,
       burn:'🔥 火傷 '+ea,ignite:'🔥 炎上 '+ea,bigignite:'🔥 大炎上 '+ea,superignite:'🔥 超炎上 '+ea,weaken_e:'💀 衰弱 '+ea,judgment:'⚖️ 裁き '+ea,heavywound:'💔 重傷 '+ea,
       soulcrush:'💀 魂砕き '+ea,curse_bind:'⛓️ 呪縛 '+ea,despair:'😈 絶望 '+ea,
-      enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,paralyze:'⚡ 麻痺 '+ea,
+      enervate:'😩 脱力 '+ea,reflect_e:'🔄 反射 '+ea,paralyze:'⚡ 麻痺 '+ea,analysis_attack:'🎯 解析攻撃 '+ea,
     };
     const _actionBox=document.getElementById('enemy-action-box');
     if(G.nextEnemyEffectNull){ addLog('🛡️ 守備変換: 追加効果を無効化中！','sys'); }
@@ -5033,6 +5109,17 @@ function enemyTurn(){
     setTimeout(()=>{
     if(act==='atk'){enemySpriteAttack();dealToPlayer(ea,e.name+'の攻撃');}
     else if(act==='big'){enemySpriteAttack();dealToPlayer(Math.floor(ea*2),e.name+'の大攻撃💥');}
+    else if(act==='analysis_attack'){
+      enemySpriteAttack();
+      dealToPlayer(ea,e.name+'の解析攻撃🎯');
+      if(G.playerHp>0 && !G.nextEnemyEffectNull){
+        const _wkGain=Math.max(0, ea-(G.soulWeaknessReduce||0));
+        G.weaknessCount=(G.weaknessCount||0)+_wkGain;
+        if(G.soulWeaknessReduce>0) addLog('💠 弱点克服のソウル発動: 弱点付与-'+G.soulWeaknessReduce,'sys');
+        addLog('🎯 解析攻撃: 弱点+'+_wkGain+'（現在'+G.weaknessCount+'）','enemy');
+        updateUI();
+      }
+    }
     else if(act==='poisonatk'){
       if(G.invincibleTurns>0){
         addLog('🌟 無敵: '+e.name+'の毒攻撃 無効！','sys');
@@ -5426,6 +5513,13 @@ function enemyTurn(){
       addLog('🔥 灼熱の刻印: カウント+'+_heatAdd+'（現在'+G.heatCount+'）','sys');
       updateUI();
     }
+    // エリア効果：妨害電波（機械帝国）ターン開始時にカウントが1→2→3→1と循環する
+    if(AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='mechanical_signal'){
+      G.mechSignalCount=(G.mechSignalCount||1)+1;
+      if(G.mechSignalCount>3) G.mechSignalCount=1;
+      addLog('📡 妨害電波: '+G.mechSignalCount+'（コスト'+G.mechSignalCount+'のカードが使用不可）','sys');
+      updateUI(); renderHand();
+    }
     // ターン開始時シールド減少（基準50%、切り捨て、最低1は減少）
     // ※防壁維持のソウルⅠ/Ⅱを装着中は基準を40%/30%に上書き（Ⅱの方が強力なので優先）
     // ※剛体中は基準レートをさらに半分にする
@@ -5591,6 +5685,14 @@ function dealToPlayer(dmg,lbl){
     return 0; // 反射済みのため、プレイヤー自身はこの攻撃のダメージを受けない
   }
   let d=dmg;
+  // 弱点（機械帝国）：ダメージを受ける際、弱点カウント分の追加ダメージ。その後カウントを半分（切り捨て）にする
+  if(d>0 && (G.weaknessCount||0)>0){
+    const _wk=G.weaknessCount;
+    d+=_wk;
+    G.weaknessCount=Math.floor(_wk/2);
+    addLog('🎯 弱点: 追加ダメージ+'+_wk+'（弱点'+_wk+'→'+G.weaknessCount+'）','sys');
+    updateUI();
+  }
   // 虚弱D：手札にある間、受けるダメージ+20
   const kyojakuCount=(G.hand||[]).filter(id=>id==='bougai_kyojaku').length;
   if(kyojakuCount>0) d+=kyojakuCount*20;
@@ -5665,6 +5767,13 @@ function dealDirectToPlayer(dmg,lbl){
   if(G.nextDmgPercent){const _pct2=G.nextDmgPercent;G.nextDmgPercent=0;dmg=Math.max(1,Math.floor(dmg*(100-_pct2)/100));addLog('🛡️ 守護者: ダメージ'+_pct2+'%軽減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalf){G.nextDmgHalf=false;dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 守護者: 半減！','sys');updateGaugeLamps();}
   if(G.nextDmgHalfTurns>0){dmg=Math.max(1,Math.floor(dmg/2));addLog('🛡️ 神盾: 半減！','sys');}
+  // 弱点（機械帝国）：防御無視ダメージにも同様に適用
+  if(dmg>0 && (G.weaknessCount||0)>0){
+    const _wk2=G.weaknessCount;
+    dmg+=_wk2;
+    G.weaknessCount=Math.floor(_wk2/2);
+    addLog('🎯 弱点: 追加ダメージ+'+_wk2+'（弱点'+_wk2+'→'+G.weaknessCount+'）','sys');
+  }
   G.playerHp=Math.max(0,G.playerHp-dmg);
   if(G.playerHp<=0 && G.deathSaveActive && !G.deathSaveUsed){
     G.playerHp=1;G.deathSaveActive=false;G.deathSaveUsed=true;G.deathSaveTriggered=true;
@@ -5708,7 +5817,13 @@ function updateIntent(){
     enervate: '😩 脱力 '+ea,
     reflect_e:'🔄 反射準備 '+ea,
     paralyze: '⚡ 麻痺 '+ea,
+    analysis_attack:'🎯 解析攻撃 '+ea,
   };
+  // 弱点：ダメージを与える行動には「(+N)」で追加ダメージ予告を表示する（実際に非ダメージ系の行動は除外）
+  if((G.weaknessCount||0)>0){
+    const _noWkDmg=['def','bigdef','superbigdef','heal','bigheal','summon','reflect_e'];
+    Object.keys(short).forEach(k=>{ if(!_noWkDmg.includes(k)) short[k]+=' (+'+G.weaknessCount+')'; });
+  }
   // 詳細テキスト（ポップアップ用）
   const detail={
     atk:      '⚔️ 攻撃\nダメージ: '+ea,
@@ -5741,13 +5856,14 @@ function updateIntent(){
     enervate: '😩 脱力\nダメージ: '+ea+'\n脱力Dカード×2をデッキに追加（手札にある間マナ最大値-2）',
     reflect_e:'🔄 反射準備\nダメージ: '+ea+'\n次に受けるプレイヤーの攻撃を反射してダメージを与える',
     paralyze: '⚡ 麻痺\nダメージ: '+ea+'\n次にプレイヤーが使用するカード1枚の効果を無効化する（カードの使用自体・コスト消費は通常通り）',
+    analysis_attack:'🎯 解析攻撃\nダメージ: '+ea+'\n弱点カウント+'+ea+'（自身の攻撃力と同じ値。次にダメージを受けた時、弱点カウント分の追加ダメージ）',
   };
   let intentText='次: '+(short[next]||('??? ('+next+')'));
   if(G.enemy&&G.enemy.reflectActive) intentText+=' 🔄';
   const intentEl=document.getElementById('enemy-intent');
   if(intentEl){
     // 行動種別で色分け
-    const _yellow=['atk','poisonatk','curse','drain','summon','iceshot','paralyze'];
+    const _yellow=['atk','poisonatk','curse','drain','summon','iceshot','paralyze','analysis_attack'];
     const _red=['big','bigcurse','moudokuatk'];
     const _blue=['def','bigdef','superbigdef'];
     const _green=['heal','bigheal'];
@@ -5906,7 +6022,7 @@ function _doVictoryReward(){
     // ===== 最終ステージクリア：セーブ（エリアクリアフラグ）→豪華エンディング演出 =====
     if(!G._cardTestMode){
       const _isFirstClear=markAreaCleared(G.areaId);
-      // クリア実績：初回クリアの場合、そのエリアに設定されたソウルを入手
+      // クリア実績：初回クリアの場合、そのエリアに設定されたソウル（またはcapRewardならソウル枠上限拡張）を入手
       G._newSoulUnlocked = _isFirstClear ? grantAreaClearSoul(G.areaId) : false;
       // クリア報酬：毎回付与（ゴールド・クリスタル）
       G._clearReward = grantAreaClearReward(G.areaId);
@@ -6188,7 +6304,7 @@ function closeReward(){
   }
 
   // ===== 10ステージ構成（炎の神殿・雷鳴の高原・氷壁の迷宮）共通イベント =====
-  if(G.areaId===2||G.areaId===3||G.areaId===6){
+  if(G.areaId===2||G.areaId===3||G.areaId===6||G.areaId===10){
     if(G.stage===1){
       showStatUpEvent(true); // Stage1後：初期強化
     } else if(G.stage===2||G.stage===4||G.stage===5){
@@ -6785,6 +6901,24 @@ const AREA_DATA = [
     allChargeCapReward: {category:4, amount:1},
     popupBg: 'pop_mori.png',
   },
+  {
+    name: '機械帝国',
+    icon: '🤖',
+    stages: 10,
+    difficulty: '★★★',
+    desc: '機械仕掛けの兵器と戦闘機械が支配する帝国',
+    areaEffect: {
+      id: 'mechanical_signal',
+      name: '妨害電波',
+      icon: '📡',
+      shortDesc: 'カウントと同じコストのカードが使用不可',
+      fullDesc: 'ステージ開始時カウント「1」。ターン経過ごとに1→2→3→1と循環する。現在のカウントと同じコストのカード（現在の実際の使用コストで判定）は、そのターン使用できない（マナは消費せず、カード自体が消えることもない）。',
+    },
+    soulReward: null,
+    capReward: {category:2, amount:1},
+    allChargeCapReward: {category:1, amount:1},
+    popupBg: 'pop_kikai.png',
+  },
 ];
 // AREA_DATA定義後に配列長を揃える（エリア追加時に配列長が足りない場合は初期値で埋める）
 while(SAVE.clearedAreas.length<AREA_DATA.length) SAVE.clearedAreas.push(false);
@@ -6816,10 +6950,10 @@ while(SAVE.bestStage.length<AREA_DATA.length) SAVE.bestStage.push(0);
 function showAreaSelect(){
   showOv('ov-area-select');
   initAreaBackBtn();
-  [0,1,2,3,4,5,6,7,8,9].forEach(idx=>{
+  [0,1,2,3,4,5,6,7,8,9,10].forEach(idx=>{
     const btn=document.getElementById('area-btn-'+idx);
     const area=AREA_DATA[idx];
-    const locked = idx===1 && !(SAVE.areasUnlocked && SAVE.areasUnlocked[1]); // 忘却の遺跡はショップ購入で解放
+    const locked = (idx===1 || idx===10) && !(SAVE.areasUnlocked && SAVE.areasUnlocked[idx]); // 忘却の遺跡・機械帝国はショップ購入で解放
     if(btn){
       if(locked){
         btn.style.filter='grayscale(100%) brightness(0.5)';
@@ -6976,6 +7110,7 @@ function showChargeSelect(){
           G.initShieldBonus=_soulShieldBonus2;
           G.soulPoisonReduce=_soulPoisonReduce2;
           G.soulCurseReduce=_soulCurseReduce2;
+          G.soulWeaknessReduce=(_equippedSoulsNow2.includes('jakutenKoku')?6:0)+(_equippedSoulsNow2.includes('jakutenKoku2')?12:0);
           G.manaRegen=3+_soulManaBonus2; G.mana=3+_soulManaBonus2;
           G.firstTurnManaBonus=_soulFirstMana2; G.gotFirstTurnMana=_soulFirstMana2>0;
           G.initHandBonus=_soulInitHand2; G.gotHandPlus=_soulInitHand2>0;
@@ -7655,6 +7790,7 @@ function updateUI(){
         if(_aef.id==='heatcount') _countEl.textContent=(G.heatCount||0);
         else if(_aef.id==='raimeicost') _countEl.textContent=((G.turnCount||1)%2===0)?'×'+(_aef.evenTurnMultiplier||1):'';
         else if(_aef.id==='coldair') _countEl.textContent=(G.manaRegenPenaltyNext||0)>0?('-'+G.manaRegenPenaltyNext):'';
+        else if(_aef.id==='mechanical_signal') _countEl.textContent=(G.mechSignalCount||1);
         else _countEl.textContent='';
       }
       _aefBox.style.display='flex';
@@ -7797,6 +7933,7 @@ function updateUI(){
   if(G.nextDmgHalf) pParts.push('<span style="color:#2980b9;">🛡️半減待機</span>');
   if(G.nextDmgPercent>0) pParts.push('<span style="color:#2980b9;">🛡️'+G.nextDmgPercent+'%軽減待機</span>');
   if(G.paralyzeNextCard) pParts.push('<span style="color:#f4d03f;animation:boss-warn-blink 1s infinite;">⚡麻痺中（次のカード無効）</span>');
+  if((G.weaknessCount||0)>0) pParts.push('<span style="color:#ff6060;">🎯弱点 '+G.weaknessCount+'</span>');
   // チャージ満タン待機中（発動タイミングを待っている状態）
   if(G.chargeType&&G.chargeCount>0){
     const _ctDisp=curCT();
@@ -8174,6 +8311,7 @@ function showStatusDetail(target){
     if(G.shieldWeakenTurns>0) lines.push('💀 衰弱 '+G.shieldWeakenTurns+'T\nターン開始時にシールドが0になる');
     if(G.quakeTurns>0) lines.push('🌍 地響き '+G.quakeTurns+'T\nコスト1のカードが使用不可');
     if(G.paralyzeNextCard) lines.push('⚡ 麻痺\n次に使うカードの効果が無効');
+    if((G.weaknessCount||0)>0) lines.push('🎯 弱点 '+G.weaknessCount+'\nダメージを受ける際、弱点カウント分の追加ダメージ。その後カウントが半分（切り捨て）になる');
     if((G.manaRegenPenaltyNext||0)>0) lines.push('⛓️❄️ マナペナルティ\n次ターン開始マナ-'+G.manaRegenPenaltyNext);
     if(lines.length<=1) lines.push('（状態異常なし）');
   }
@@ -8367,6 +8505,8 @@ function renderHand(){
     const isSealLocked = G.sealedCardId && c.id===G.sealedCardId;
     // 地響き：コスト1カード使用不可
     const isQuakeLocked = G.quakeTurns>0 && reducedCost===1;
+    // 妨害電波（機械帝国）：現在の実際のコストと一致するカードは使用不可
+    const isMechSignalLocked = AREA_DATA[G.areaId]&&AREA_DATA[G.areaId].areaEffect&&AREA_DATA[G.areaId].areaEffect.id==='mechanical_signal'&&reducedCost===(G.mechSignalCount||1);
     // 妨害除外系：手札に妨害カードがない場合は使用不可
     const ef=c.effect||{};
     const needsBougai=ef.bougaiExile_atk||ef.bougaiExile_shield||ef.bougaiExile_heal||ef.bougaiExile_curse;
@@ -8384,11 +8524,11 @@ function renderHand(){
       if(_tutAction==='card') isTutorialCardLocked=(i!==G.tutorialTargetHandIdx);
       else isTutorialCardLocked=true; // ダイアログ表示中／チャージ操作中は全カード不可
     }
-    const canUse = ok && !isPoisonKillLocked && !isLastStandLocked && !isFuryDanceLocked && !isSwiftLocked && !isEchoLocked && !isFreePassLocked && !isFreePassCostLocked && !isChainNoSkillLocked && !isAfterForceLocked && !isSealLocked && !isQuakeLocked && !isBougaiLocked && !isExorciseLocked && !isHalfHpLocked && !isTutorialCardLocked;
+    const canUse = ok && !isPoisonKillLocked && !isLastStandLocked && !isFuryDanceLocked && !isSwiftLocked && !isEchoLocked && !isFreePassLocked && !isFreePassCostLocked && !isChainNoSkillLocked && !isAfterForceLocked && !isSealLocked && !isQuakeLocked && !isMechSignalLocked && !isBougaiLocked && !isExorciseLocked && !isHalfHpLocked && !isTutorialCardLocked;
     const isNewCard=!G._skipDrawAnim&&(G._lastDrawnIndices||[]).includes(i);
     const isTutorialTarget = G.areaId===7 && tutorialCurrentAction()==='card' && i===G.tutorialTargetHandIdx;
     d.className='card '+c.rarity+' '+(canUse?'playable':'unplayable')+(isSelected?' selected-card':'')+(isNewCard?' card-slide-in':'')+(isTutorialTarget?' tutorial-target-card':'');
-    if(isPoisonKillLocked||isLastStandLocked||isSwiftLocked||isEchoLocked||isFreePassLocked||isFreePassCostLocked||isChainNoSkillLocked||isAfterForceLocked||isSealLocked||isQuakeLocked||isBougaiLocked||isExorciseLocked||isHalfHpLocked||isTutorialCardLocked) d.style.filter='grayscale(100%)';
+    if(isPoisonKillLocked||isLastStandLocked||isSwiftLocked||isEchoLocked||isFreePassLocked||isFreePassCostLocked||isChainNoSkillLocked||isAfterForceLocked||isSealLocked||isQuakeLocked||isMechSignalLocked||isBougaiLocked||isExorciseLocked||isHalfHpLocked||isTutorialCardLocked) d.style.filter='grayscale(100%)';
     else d.style.filter='';
     // 麻痺中：次に使うカードが無効化されることが分かるよう、手札全体を黄色く色付けする
     if(G.paralyzeNextCard){
@@ -8688,12 +8828,14 @@ function renderHand(){
             const atkExtra=_atk+soulAtkB;
             const dmg=_d(c.effect.atk+atkExtra);
             const total=dmg*t;
+            const wkExtra=G.enemyWeaknessCount||0;
+            const wkTag=wkExtra>0?'<span style="color:#ff6060;font-size:9px;">(+'+wkExtra+')</span>':'';
             if(t>1){
-              return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'
+              return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+wkTag
                 +(atkExtra>0?'<br><span style="color:#e74c3c;font-size:8px;">(ATK+'+atkExtra+')</span>':'');
             }
-            if(atkExtra>0){
-              return '攻'+_hi(dmg)+'<span style="color:#e74c3c;font-size:9px;">(+'+atkExtra+')</span>';
+            if(atkExtra>0||wkExtra>0){
+              return '攻'+_hi(dmg)+(atkExtra>0?'<span style="color:#e74c3c;font-size:9px;">(+'+atkExtra+')</span>':'')+wkTag;
             }
           }
           return c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':'');
@@ -10955,32 +11097,37 @@ function openAdminMode(){
     adminAreaId=G.areaId;
   }
 
-  // エリアタブ
-  const tabCave=document.getElementById('admin-tab-cave');
-  const tabRuins=document.getElementById('admin-tab-ruins');
+  // エリアタブ：ADMIN_AREA_LISTから動的生成
+  const tabsContainer=document.getElementById('admin-area-tabs');
+  tabsContainer.innerHTML='';
+  const tabEls={};
+  ADMIN_AREA_LIST.forEach(a=>{
+    const tab=document.createElement('div');
+    tab.id='admin-tab-'+a.id;
+    tab.style.cssText="text-align:center;padding:6px 2px;border-radius:8px;font-family:'Cinzel',serif;font-size:10px;cursor:pointer;touch-action:manipulation;border:2px solid "+a.color+"44;background:rgba(0,0,0,.6);color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+    tab.textContent=a.icon+' '+a.short;
+    tabsContainer.appendChild(tab);
+    tabEls[a.id]=tab;
+  });
   const setTab=(areaId)=>{
     adminAreaId=areaId;
     G.areaId=areaId;
-    if(tabCave){tabCave.style.background=areaId===0?'rgba(126,200,160,.3)':'rgba(0,0,0,.6)';tabCave.style.borderColor=areaId===0?'#7ec8a0':'rgba(126,200,160,.3)';tabCave.style.color=areaId===0?'#7ec8a0':'#666';}
-    if(tabRuins){tabRuins.style.background=areaId===1?'rgba(201,168,76,.2)':'rgba(0,0,0,.6)';tabRuins.style.borderColor=areaId===1?'#c9a84c':'rgba(201,168,76,.3)';tabRuins.style.color=areaId===1?'#c9a84c':'#666';}
-    const tabTemple=document.getElementById('admin-tab-temple');
-    if(tabTemple){tabTemple.style.background=areaId===2?'rgba(224,112,48,.2)':'rgba(0,0,0,.6)';tabTemple.style.borderColor=areaId===2?'#e07030':'rgba(224,112,48,.3)';tabTemple.style.color=areaId===2?'#e07030':'#666';}
-    const tabRaimei=document.getElementById('admin-tab-raimei');
-    if(tabRaimei){tabRaimei.style.background=areaId===3?'rgba(240,208,32,.2)':'rgba(0,0,0,.6)';tabRaimei.style.borderColor=areaId===3?'#f0d020':'rgba(240,208,32,.3)';tabRaimei.style.color=areaId===3?'#f0d020':'#666';}
-    const tabSwamp=document.getElementById('admin-tab-swamp');
-    if(tabSwamp){tabSwamp.style.background=areaId===4?'rgba(124,196,122,.2)':'rgba(0,0,0,.6)';tabSwamp.style.borderColor=areaId===4?'#7cc47a':'rgba(124,196,122,.3)';tabSwamp.style.color=areaId===4?'#7cc47a':'#666';}
-    const tabIron=document.getElementById('admin-tab-iron');
-    if(tabIron){tabIron.style.background=areaId===5?'rgba(156,176,200,.2)':'rgba(0,0,0,.6)';tabIron.style.borderColor=areaId===5?'#9cb0c8':'rgba(156,176,200,.3)';tabIron.style.color=areaId===5?'#9cb0c8':'#666';}
-    const tabIce=document.getElementById('admin-tab-ice');
-    if(tabIce){tabIce.style.background=areaId===6?'rgba(120,200,240,.2)':'rgba(0,0,0,.6)';tabIce.style.borderColor=areaId===6?'#78c8f0':'rgba(120,200,240,.3)';tabIce.style.color=areaId===6?'#78c8f0':'#666';}
-    // ステージボタン再構築
+    ADMIN_AREA_LIST.forEach(a=>{
+      const t=tabEls[a.id];
+      const on=a.id===areaId;
+      t.style.background=on?a.color+'33':'rgba(0,0,0,.6)';
+      t.style.borderColor=on?a.color:a.color+'44';
+      t.style.color=on?a.color:'#666';
+    });
+    // ステージボタン再構築（実際のAREA_DATA・敵データから算出。新エリア追加時も自動対応）
     const stageBtns2=document.getElementById('admin-stage-btns');
     stageBtns2.innerHTML='';
     adminTargetStage=0;
-    const maxS=areaId===0?5:areaId===2?10:areaId===3?10:areaId===4?7:areaId===5?7:areaId===6?10:15;
+    const maxS=(AREA_DATA[areaId]&&AREA_DATA[areaId].stages)||5;
+    const enemyList=getEnemiesForArea(areaId);
     for(let i=1;i<=maxS;i++){
       const btn=document.createElement('div');
-      const isBoss=(areaId===0&&i===5)||(areaId===1&&(i===9||i===15))||(areaId===2&&i===10)||(areaId===3&&i===10)||(areaId===4&&i===7)||(areaId===5&&i===7)||(areaId===6&&i===10);
+      const isBoss=!!(enemyList[i-1]&&enemyList[i-1].boss);
       btn.textContent='S'+i+(isBoss?' 👿':'');
       btn.style.cssText="background:rgba(0,0,0,.6);border:2px solid rgba(201,168,76,.4);border-radius:7px;padding:7px 10px;color:#c9a84c;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;touch-action:manipulation;";
       const pick2=(s,b)=>(e)=>{e.stopPropagation();adminTargetStage=s;stageBtns2.querySelectorAll('div').forEach(x=>{x.style.borderColor='rgba(201,168,76,.4)';x.style.background='rgba(0,0,0,.6)';x.style.color='#c9a84c';});b.style.borderColor='#e74c3c';b.style.background='rgba(231,76,60,.2)';b.style.color='#fff';};
@@ -11021,18 +11168,11 @@ function openAdminMode(){
       chargeBtns2.appendChild(btn);
     });
   };
-  if(tabCave){tabCave.onclick=(e)=>{e.stopPropagation();setTab(0);};tabCave.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(0);};}
-  if(tabRuins){tabRuins.onclick=(e)=>{e.stopPropagation();setTab(1);};tabRuins.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(1);};}
-  const tabTemple2=document.getElementById('admin-tab-temple');
-  if(tabTemple2){tabTemple2.onclick=(e)=>{e.stopPropagation();setTab(2);};tabTemple2.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(2);};}
-  const tabRaimei2=document.getElementById('admin-tab-raimei');
-  if(tabRaimei2){tabRaimei2.onclick=(e)=>{e.stopPropagation();setTab(3);};tabRaimei2.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(3);};}
-  const tabSwamp2=document.getElementById('admin-tab-swamp');
-  if(tabSwamp2){tabSwamp2.onclick=(e)=>{e.stopPropagation();setTab(4);};tabSwamp2.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(4);};}
-  const tabIron2=document.getElementById('admin-tab-iron');
-  if(tabIron2){tabIron2.onclick=(e)=>{e.stopPropagation();setTab(5);};tabIron2.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(5);};}
-  const tabIce2=document.getElementById('admin-tab-ice');
-  if(tabIce2){tabIce2.onclick=(e)=>{e.stopPropagation();setTab(6);};tabIce2.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(6);};}
+  ADMIN_AREA_LIST.forEach(a=>{
+    const t=tabEls[a.id];
+    t.onclick=(e)=>{e.stopPropagation();setTab(a.id);};
+    t.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();setTab(a.id);};
+  });
 
   // ステータス強化ボタン
   const statList=document.getElementById('admin-statup-list');
@@ -11133,16 +11273,20 @@ const MV_FILTERS = [
 let _mvAreaId = 0;
 
 function openMonsterViewer(){
-  _mvAreaId = 0;
-  _mvRenderTab(0);
-  // タブクリック
-  [0,1,2,3,4,5,6].forEach(idx=>{
-    const tab = document.getElementById('mv-tab-'+idx);
-    if(!tab) return;
-    const go = ()=>_mvRenderTab(idx);
-    tab.onclick = go;
-    tab.ontouchend = e=>{ e.preventDefault(); go(); };
+  const tabsContainer=document.getElementById('mv-tabs');
+  tabsContainer.innerHTML='';
+  ADMIN_AREA_LIST.forEach(a=>{
+    const tab=document.createElement('div');
+    tab.id='mv-tab-'+a.id;
+    tab.style.cssText="text-align:center;padding:4px 2px;border-radius:6px;font-size:9px;cursor:pointer;touch-action:manipulation;border:1px solid "+a.color+"44;background:rgba(0,0,0,.6);color:#666;font-family:'Cinzel',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+    tab.textContent=a.icon+' '+a.short;
+    const go=()=>_mvRenderTab(a.id);
+    tab.onclick=go;
+    tab.ontouchend=e=>{e.preventDefault();go();};
+    tabsContainer.appendChild(tab);
   });
+  _mvAreaId = ADMIN_AREA_LIST[0].id;
+  _mvRenderTab(_mvAreaId);
   bind('btn-mv-close',()=>hideOv('ov-monster-viewer'));
   showOv('ov-monster-viewer');
 }
@@ -11150,20 +11294,19 @@ function openMonsterViewer(){
 function _mvRenderTab(areaIdx){
   _mvAreaId = areaIdx;
   // タブ色更新
-  const tabColors = ['#7ec8a0','#c9a84c','#e07030','#f0d020','#7cc47a','#9cb0c8','#78c8f0'];
-  const tabBorders = ['rgba(126,200,160,.3)','rgba(201,168,76,.3)','rgba(224,112,48,.3)','rgba(240,208,32,.3)','rgba(124,196,122,.3)','rgba(156,176,200,.3)','rgba(120,200,240,.3)'];
-  [0,1,2,3,4,5,6].forEach(i=>{
-    const t = document.getElementById('mv-tab-'+i);
+  ADMIN_AREA_LIST.forEach(a=>{
+    const t = document.getElementById('mv-tab-'+a.id);
     if(!t) return;
-    t.style.borderColor = i===areaIdx ? tabColors[i] : tabBorders[i];
-    t.style.background  = i===areaIdx ? 'rgba(0,0,0,.4)' : 'rgba(0,0,0,.6)';
-    t.style.color       = i===areaIdx ? tabColors[i] : '#666';
+    const on=a.id===areaIdx;
+    t.style.borderColor = on ? a.color : a.color+'44';
+    t.style.background  = on ? 'rgba(0,0,0,.4)' : 'rgba(0,0,0,.6)';
+    t.style.color       = on ? a.color : '#666';
   });
 
   const list = document.getElementById('mv-list');
   list.innerHTML = '';
 
-  const enemies = areaIdx===0 ? CAVE_ENEMIES : areaIdx===2 ? TEMPLE_ENEMIES : areaIdx===3 ? RAIMEI_ENEMIES : areaIdx===4 ? SWAMP_ENEMIES : areaIdx===5 ? IRON_ENEMIES : areaIdx===6 ? ICE_ENEMIES : ENEMIES;
+  const enemies = getEnemiesForArea(areaIdx);
 
   enemies.forEach((e, i)=>{
     // 行ラベル（敵名・ステージ）
@@ -11858,6 +12001,12 @@ const SHOP_ITEMS=[
   {id:'buy_guideStrike',cat:'card', icon:'✨', name:'導きの一撃',   desc:'カードポイント10のカードをデッキ編集の入れ替え候補に追加', price:60, currency:'gold', unlockArea:'始まりの洞窟', oneTime:true, cardId:'guideStrike'},
   // ===== エリア解放（初期は選択画面に出ず、購入で追加される） =====
   {id:'buy_area_ruins', cat:'area', icon:'🗺️', name:'忘却の遺跡', desc:'エリア選択に「忘却の遺跡」が追加される', price:100, currency:'gold', unlockArea:null, oneTime:true, areaId:1},
+  {id:'buy_area_mechempire', cat:'area', icon:'🤖', name:'機械帝国', desc:'エリア選択に「機械帝国」が追加される', price:100, currency:'gold', unlockArea:null, oneTime:true, areaId:10},
+  {id:'buy_jakutenKoku',  cat:'soul', icon:'🎯', name:'弱点克服のソウルⅠ', desc:'②状態異常軽減系 コスト1・弱点付与量-6', price:20, currency:'crystal', unlockArea:null, requireAreaPurchased:10, oneTime:true, soulId:'jakutenKoku'},
+  {id:'buy_jakutenKoku2', cat:'soul', icon:'🎯', name:'弱点克服のソウルⅡ', desc:'②状態異常軽減系 コスト2・弱点付与量-12', price:40, currency:'crystal', unlockArea:'機械帝国', requireSouls:['jakutenKoku'], oneTime:true, soulId:'jakutenKoku2'},
+  {id:'buy_analysisSlash',      cat:'card', icon:'🗡️', name:'解析斬',   desc:'S 攻撃3+弱点付与4のカードをデッキ編集の入れ替え候補に追加', price:100, currency:'gold', unlockArea:'機械帝国', oneTime:true, cardId:'analysisSlash'},
+  {id:'buy_analysisHeavySlash', cat:'card', icon:'⚔️', name:'解析重斬', desc:'S 攻撃6+弱点付与8のカードをデッキ編集の入れ替え候補に追加', price:100, currency:'gold', unlockArea:'機械帝国', oneTime:true, cardId:'analysisHeavySlash'},
+  {id:'buy_thoroughAnalysis',   cat:'card', icon:'🔬', name:'徹底解析', desc:'S 敵シールド-10、余剰分を弱点付与するカードをデッキ編集の入れ替え候補に追加', price:100, currency:'gold', unlockArea:'機械帝国', oneTime:true, cardId:'thoroughAnalysis'},
   // ===== キャパシティアップ（すべて1度のみ購入・条件解放は100ゴールド） =====
   {id:'buy_cardpoint5', cat:'cap', icon:'🃏', name:'カードポイント+5', desc:'デッキ編集のデッキポイント上限を5拡張', price:100, currency:'gold', unlockArea:'忘却の遺跡', oneTime:true, capType:'point', amount:5},
   {id:'buy_swap1',      cat:'cap', icon:'🔄', name:'カードの入替枚数+1', desc:'デッキ編集時のカード入れ替え上限を1拡張', price:100, currency:'gold', unlockArea:null, unlockClearCount:3, oneTime:true, capType:'swap', amount:1},
@@ -11885,6 +12034,7 @@ function _shopUnlockedItems(){
       const _clearedCount=(SAVE.clearedAreas||[]).filter(Boolean).length;
       if(_clearedCount<it.unlockClearCount) return false;
     }
+    if(it.requireAreaPurchased!=null && !(SAVE.areasUnlocked && SAVE.areasUnlocked[it.requireAreaPurchased])) return false;
     if(!it.unlockArea) return true;
     const idx=AREA_DATA.findIndex(a=>a.name===it.unlockArea);
     return idx>=0 && !!(SAVE.clearedAreas && SAVE.clearedAreas[idx]);
@@ -12764,7 +12914,7 @@ let _deckEditChargeId=null;
 let _deckEditWorkingDeck=[]; // 編集中のデッキ：[{id,origin:'preset'|'pool'}, ...]（入れ替えのたびに即座にSAVEへ反映される）
 let _deckEditSideDeckArr=[]; // サイドデッキ：外したプリセット由来カードのidの配列
 // デッキポイント制：ショップで購入できるカードには、レアリティに応じたデッキポイントが設定されている
-const RARITY_DECK_POINTS={common:1, uncommon:2, rare:3, epic:4, legendary:5, gauge:3, bougai:2, A:0, G:0};
+const RARITY_DECK_POINTS={common:1, uncommon:2, rare:3, epic:4, legendary:5, gauge:3, bougai:2, A:0, G:0, S:4};
 // ショップで販売するカードなど、個別にカードポイントを設定したいものはここで上書きする
 const CARD_POINT_OVERRIDES={
   teate:5, smallShield:5, strike2:5, allIn:5, afterForce:5, poison:5, swiftBlade:5,
@@ -13711,6 +13861,9 @@ setTimeout(initUiImages,200);
     'bg_teltupeki1.png','bg_teltupeki2.png',
     'bg_noroi1.png','bg_noroi2.png',
     'bg_mori1.png','bg_mori2.png',
+    'bg_kikai1.png','bg_kikai2.png','bg_kikai3.png','eria_kikai.png','pop_kikai.png',
+    'enemy_tuika51.png','enemy_tuika56.png','enemy_tuika58.png','enemy_tuika59.png','enemy_tuika52.png',
+    'enemy_tuika54.png','enemy_tuika57.png','enemy_tuika53.png','enemy_tuika48.png','BOSS_D-desutoroiya.png',
     'menu_eria.png','menu_soul.png','menu_jiltuseki.png','menu_kesu.png','menu_deck.png','menu_data.png','menu_oto.png',
     'munyu_haikei.png',
     'eria_hajimari.png','eria_dokunuma.png','eria_teltupeki.png','eria_honoo.png','eria_kougen.png','eria_boukyaku.png','eria_noroi.png','eria_mori.png',
