@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver390</title>
+<title>DUNGEON WALKER DWCver392</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -4808,7 +4808,7 @@ function endTurn(){
     addLog('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','sys');
     showTurnSlide('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','#a855f7');
     updateUI();
-    _fudouDelay=2200;
+    _fudouDelay=3300;
   }
   G.phase='enemy';
   // エリア効果：冷気（氷壁の迷宮）マナを使い切らずにターン終了した場合、次のターン開始時のマナ-1
@@ -4888,7 +4888,7 @@ function processPlayerTurnEnd(onDone){
         G.freeNextCard=true; G.freePassUsedThisTurn=true; G.freePassManaAtUse=-1;
         playCard(0);
       }
-      setTimeout(next,2200);
+      setTimeout(next,3300);
     });
   }
   if(G.gotHandless && _handSnapshotAtTurnEnd===0){
@@ -4897,21 +4897,23 @@ function processPlayerTurnEnd(onDone){
       addLog('❤️ ハンドレス発動！ HP+'+_hlHeal,'sys');
       showTurnSlide('❤️ ハンドレス発動！ HP+'+_hlHeal,'#e74c3c');
       spawnDmgNum('+'+_hlHeal,'heal'); updateUI();
-      setTimeout(next,2200);
+      setTimeout(next,3300);
     });
   }
   if(G.gotCardBarrier){
     addStep((next)=>{
-      const _cbCards=G.hand.slice();
+      // ターン終了時点で実際に手札にあった枚数を超えて処理しない（非同期処理で後から増えたカードを誤って巻き込まない）
+      const _cbCards=G.hand.slice(0, Math.min(G.hand.length, _handSnapshotAtTurnEnd));
       if(_cbCards.length>0){
-        G.discard.push(..._cbCards); G.hand=[]; clampPage();
+        _cbCards.forEach(id=>{const i=G.hand.indexOf(id); if(i>=0) G.hand.splice(i,1);});
+        G.discard.push(..._cbCards); clampPage();
         const _cbShield=_cbCards.length*3;
         G.shield+=_cbShield;
         addLog('🛡️ カードバリア発動！ 手札'+_cbCards.length+'枚→盾+'+_cbShield,'sys');
         showTurnSlide('🛡️ カードバリア発動！ 盾+'+_cbShield,'#3498db');
         updateUI(); renderHand();
       }
-      setTimeout(next,2200);
+      setTimeout(next,3300);
     });
   }
   if(G.gotManaStrike){
@@ -4929,7 +4931,7 @@ function processPlayerTurnEnd(onDone){
         spawnDmgNum('-'+dLeft,'enemy-dmg'); shakeEnemyArea(); flashScreen('flash-gold'); sfxDamage();
         updateUI(); checkEnemyDeath();
       }
-      setTimeout(next,2200);
+      setTimeout(next,3300);
     });
   }
 
@@ -8821,17 +8823,19 @@ function renderHand(){
           // 攻撃カード
           if(c.type==='attack'&&c.effect&&c.effect.atk){
             const t=c.effect.times||1;
-            const atkExtra=_atk+soulAtkB;
+            const hpScaleExtra=c.effect.hpScaleUnit?Math.floor(G.playerMaxHp/c.effect.hpScaleUnit)*c.effect.hpScaleBonus:0;
+            const atkExtra=_atk+soulAtkB+hpScaleExtra;
             const dmg=_d(c.effect.atk+atkExtra);
             const total=dmg*t;
             const wkExtra=G.enemyWeaknessCount||0;
             const wkTag=wkExtra>0?'<span style="color:#ff6060;font-size:9px;">(+'+wkExtra+')</span>':'';
+            const hpTag=hpScaleExtra>0?'<span style="color:#4ecdc4;font-size:8px;">(HP+'+hpScaleExtra+')</span>':'';
             if(t>1){
               return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+wkTag
-                +(atkExtra>0?'<br><span style="color:#e74c3c;font-size:8px;">(ATK+'+atkExtra+')</span>':'');
+                +(atkExtra>0?'<br><span style="color:#e74c3c;font-size:8px;">(ATK+'+(atkExtra-hpScaleExtra)+')</span>'+hpTag:'');
             }
             if(atkExtra>0||wkExtra>0){
-              return '攻'+_hi(dmg)+(atkExtra>0?'<span style="color:#e74c3c;font-size:9px;">(+'+atkExtra+')</span>':'')+wkTag;
+              return '攻'+_hi(dmg)+((atkExtra-hpScaleExtra)>0?'<span style="color:#e74c3c;font-size:9px;">(+'+(atkExtra-hpScaleExtra)+')</span>':'')+hpTag+wkTag;
             }
           }
           return c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':'');
@@ -13502,19 +13506,16 @@ function renderMonsterEncyclopedia(content, progress){
   });
   content.innerHTML=html;
   if(progress) progress.textContent='発見数: '+found+' / '+total;
-  // タップで詳細ポップアップ（行動パターンは現在のライブデータから取得）
-  const areaListMap={0:CAVE_ENEMIES,1:ENEMIES,2:TEMPLE_ENEMIES,3:RAIMEI_ENEMIES,4:SWAMP_ENEMIES,5:IRON_ENEMIES,6:ICE_ENEMIES};
+  // タップで詳細ポップアップ（行動パターンは現在のライブデータから取得）／スクロール操作が誤タップにならないようbindTapSwipeで判定
   content.querySelectorAll('.zukan-monster-card').forEach(el=>{
     const openDetail=(e)=>{
-      if(e.type==='touchend') e.preventDefault();
       const aId=parseInt(el.dataset.area,10), idx=parseInt(el.dataset.idx,10);
       const rec=ZUKAN.defeated[aId+'_'+idx];
-      const liveList=areaListMap[aId];
+      const liveList=getEnemiesForArea(aId);
       const pattern=(liveList && liveList[idx] && liveList[idx].pattern) || [];
       if(rec) showMonsterDetailPopup(rec, pattern);
     };
-    el.onclick=openDetail;
-    el.ontouchend=openDetail;
+    bindTapSwipe(el, openDetail);
   });
 }
 // 図鑑専用カード拡大表示（#appの外から呼ばれるためbodyに直接追加する）
@@ -13587,12 +13588,10 @@ function renderCardEncyclopedia(content, progress){
   if(progress) progress.textContent='獲得数: '+found+' / '+total;
   content.querySelectorAll('.zukan-card-tap').forEach(el=>{
     const openDetail=(e)=>{
-      if(e.type==='touchend') e.preventDefault();
       const c=DB[el.dataset.cardid];
       if(c) showZukanCardDetail(c);
     };
-    el.onclick=openDetail;
-    el.ontouchend=openDetail;
+    bindTapSwipe(el, openDetail);
   });
 }
 
