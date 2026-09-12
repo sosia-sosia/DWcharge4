@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver389</title>
+<title>DUNGEON WALKER DWCver390</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -2834,6 +2834,10 @@ function _restoreBattleVisualsFromSavedState(){
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===8
           ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===9
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===10
+          ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===2
           ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
           : G.areaId===3
@@ -3449,6 +3453,10 @@ function _startStageBattle(){
         : G.areaId===6
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===8
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===9
+          ? (isFinalStage?'scale-mid':'scale-small')
+        : G.areaId===10
           ? (isFinalStage?'scale-mid':'scale-small')
         : G.areaId===2
           ? (isFinalStage?'scale-boss-sm':G.stage===8?'scale-large-sm':G.stage>=7?'scale-large':G.stage>=4?'scale-mid':'scale-small')
@@ -4793,12 +4801,14 @@ function endTurn(){
     return;
   }
   // 不動の構え：カードもマナも使わずターンを終了した瞬間に発動（他のターン終了時効果より先）
+  let _fudouDelay=0;
   if(G.gotFudouKamae && (G.turnCardsUsed||0)===0){
     const _fkHeal=healPlayer(5);
     G.shield+=5;
     addLog('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','sys');
     showTurnSlide('🧘 不動の構え発動！ HP+'+_fkHeal+' 盾+5','#a855f7');
     updateUI();
+    _fudouDelay=2200;
   }
   G.phase='enemy';
   // エリア効果：冷気（氷壁の迷宮）マナを使い切らずにターン終了した場合、次のターン開始時のマナ-1
@@ -4822,6 +4832,7 @@ function endTurn(){
   G.soulEaterActive=false; G.soulEaterDmgThisTurn=0;
 
   // プレイヤーターン終了チェックフェイズ（手札は敵ターン終了後に捨てる）
+  setTimeout(()=>{
   processPlayerTurnEnd(()=>{
     // 呪縛タイマー
     const curseTurn=G.turnCount;
@@ -4844,6 +4855,7 @@ function endTurn(){
     G.chargeEffectActive=false;
     setTimeout(enemyTurn,350);
   });
+  }, _fudouDelay);
 }
 
 // プレイヤーターン終了チェックフェイズ
@@ -4876,7 +4888,7 @@ function processPlayerTurnEnd(onDone){
         G.freeNextCard=true; G.freePassUsedThisTurn=true; G.freePassManaAtUse=-1;
         playCard(0);
       }
-      setTimeout(next,300);
+      setTimeout(next,2200);
     });
   }
   if(G.gotHandless && _handSnapshotAtTurnEnd===0){
@@ -4885,7 +4897,7 @@ function processPlayerTurnEnd(onDone){
       addLog('❤️ ハンドレス発動！ HP+'+_hlHeal,'sys');
       showTurnSlide('❤️ ハンドレス発動！ HP+'+_hlHeal,'#e74c3c');
       spawnDmgNum('+'+_hlHeal,'heal'); updateUI();
-      setTimeout(next,300);
+      setTimeout(next,2200);
     });
   }
   if(G.gotCardBarrier){
@@ -4899,7 +4911,7 @@ function processPlayerTurnEnd(onDone){
         showTurnSlide('🛡️ カードバリア発動！ 盾+'+_cbShield,'#3498db');
         updateUI(); renderHand();
       }
-      setTimeout(next,300);
+      setTimeout(next,2200);
     });
   }
   if(G.gotManaStrike){
@@ -4917,7 +4929,7 @@ function processPlayerTurnEnd(onDone){
         spawnDmgNum('-'+dLeft,'enemy-dmg'); shakeEnemyArea(); flashScreen('flash-gold'); sfxDamage();
         updateUI(); checkEnemyDeath();
       }
-      setTimeout(next,300);
+      setTimeout(next,2200);
     });
   }
 
@@ -4952,7 +4964,7 @@ function processPlayerTurnEnd(onDone){
       G.stanceEffects.forEach(e=>{e.turns--;});
       G.stanceEffects=G.stanceEffects.filter(e=>e.turns>0);
       updateUI();
-      setTimeout(next,300);
+      setTimeout(next,600);
     });
   }
 
@@ -7820,25 +7832,9 @@ function updateUI(){
   const eAreaEl=document.getElementById('enemy-area');
   const spriteEl=document.getElementById('enemy-sprite');
   if(eAreaEl) eAreaEl.classList.toggle('boss-overflow', G.stage===getAreaEnemies().length-1&&G.areaId!==0);
-  const imgSrc= G._cardTestMode ? null : (G.areaId===0
-    ? ((e&&e.img)||null)           // 洞窟：cave_enemy1〜5.pngを直接使用
-    : G.areaId===2
-      ? ((e&&e.img)||null)         // 炎の神殿：temple_enemy1〜10.pngを直接使用
-      : G.areaId===3
-        ? ((e&&e.img)||null)       // 雷鳴の高原：ボルト系enemy画像を直接使用
-        : G.areaId===4
-          ? ((e&&e.img)||null)     // 毒の沼地：enemy_tuika系画像を直接使用
-          : G.areaId===5
-            ? ((e&&e.img)||null)   // 鉄壁の砦：enemy1〜6・enemy_tuika系画像を直接使用
-            : G.areaId===6
-              ? ((e&&e.img)||null) // 氷壁の迷宮：既存画像流用＋新規ボス画像を直接使用
-              : G.areaId===7
-                ? ((e&&e.img)||null) // チュートリアル：スライム(cave_enemy1.png)を直接使用
-                : G.areaId===8
-                  ? ((e&&e.img)||null) // 呪いの廃墟：enemy_tuika系画像を直接使用
-                  : G.areaId===9
-                    ? ((e&&e.img)||null) // 帰らずの森：enemy_tuika系画像を直接使用
-                    : (ENEMY_IMGS[G.stage]||(e&&e.img)||null));  // 遺跡：従来通りインデックス参照
+  const imgSrc= G._cardTestMode ? null : (G.areaId!==1
+    ? ((e&&e.img)||null)              // 遺跡以外の全エリア：敵データのimgフィールドを直接使用
+    : (ENEMY_IMGS[G.stage]||(e&&e.img)||null));  // 遺跡：従来通りインデックス参照
   if(imgSrc){
     // imgタグ方式でサイズを確実に指定する
     const _isFinal2=G.stage===getAreaEnemies().length-1;
@@ -11038,6 +11034,8 @@ function exitCardTestMode(){
   if(_btnEnd) _btnEnd.style.display='';
   appDiv.style.display='none';
   logoScreen.style.display='flex';
+  stopBgm();
+  playOpBgm();
   openAdminMode();
 }
 bind('btn-cardtest-reset',()=>{ resetCardTestState(); });
@@ -13467,15 +13465,11 @@ function showMonsterDetailPopup(rec, pattern){
   document.body.appendChild(popup);
 }
 function renderMonsterEncyclopedia(content, progress){
-  const areas=[
-    {id:0, name:'始まりの洞窟', list:CAVE_ENEMIES},
-    {id:1, name:'忘却の遺跡', list:ENEMIES},
-    {id:2, name:'炎の神殿', list:TEMPLE_ENEMIES},
-    {id:3, name:'雷鳴の高原', list:RAIMEI_ENEMIES},
-    {id:4, name:'毒の沼地', list:SWAMP_ENEMIES},
-    {id:5, name:'鉄壁の砦', list:IRON_ENEMIES},
-    {id:6, name:'氷壁の迷宮', list:ICE_ENEMIES}
-  ];
+  const areas=ADMIN_AREA_LIST.map(a=>({
+    id:a.id,
+    name:(AREA_DATA[a.id]&&AREA_DATA[a.id].name)||a.short,
+    list:getEnemiesForArea(a.id),
+  }));
   let total=0, found=0, html='';
   areas.forEach(area=>{
     html+='<div style="font-family:\'Cinzel\',serif;font-size:11px;color:#c9a84c;margin-top:4px;">'+area.name+'</div>'
