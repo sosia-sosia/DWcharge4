@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver397</title>
+<title>DUNGEON WALKER DWCver398</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -2711,6 +2711,33 @@ function _doAbandonRun(){
   _consumeDisposableCardsOnAreaExit(); // 破棄されなかった使い捨てカードをここで消滅処理
   _goToNormalTitleSkippingSplash();
 }
+// 鍛冶屋で強化されたカード（IDが「元ID_kai」）は、強化した瞬間にDB[newId]を
+// メモリ上に動的追加しているだけなので、ページ再読み込み後に「攻略中データ」を
+// 復元しても、そのDB定義自体は失われてしまう（G側のIDだけは残るためDB参照が
+// 不正IDになり、そのカードが手札等から消えてしまう不具合の原因だった）。
+// 復元直後に、保存データ内に残っている「元ID_kai」を元データ＋強化テーブルから
+// 再構築し、DBへ登録し直す。
+function _reconstructSmithKaiCards(state){
+  if(!state) return;
+  const ids=new Set();
+  ['deck','hand','discard','drawPile','tempExiled','exileOnBattle'].forEach(key=>{
+    const arr=state[key];
+    if(Array.isArray(arr)) arr.forEach(cid=>{ if(typeof cid==='string' && cid.endsWith('_kai')) ids.add(cid); });
+  });
+  ids.forEach(newId=>{
+    if(DB[newId]) return; // 既に存在すれば何もしない
+    const origId=newId.slice(0,-4); // '_kai'を除去
+    const origC=DB[origId];
+    const upg=SMITH_UPGRADES[origId];
+    if(!origC || !upg){
+      console.warn('[DW] 強化カード「'+newId+'」の再構築に失敗しました（元データが見つかりません）。',origId);
+      return;
+    }
+    const tempC=Object.assign({},origC);
+    upg.apply(tempC);
+    DB[newId]=Object.assign({},tempC,{id:newId,name:origC.name+'・改',_smithKai:true,_baseId:origId});
+  });
+}
 function _doResumeRun(){
   hideOv('ov-resume-run');
   const saved=_pendingRunResume;
@@ -2725,7 +2752,7 @@ function _doResumeRun(){
     return;
   }
   G=st;
-  // 「敵ターン処理中」「演出待ち」等の中断状態は、再開後に自然には進行しない（フリーズの原因になる）ため、
+  _reconstructSmithKaiCards(G);
   // 復元時は必ず「プレイヤーの手番」として安全に復帰させる（HP等の数値は保存時点のものをそのまま使う）
   // ★保存時点のphaseが'player'以外だった場合、本来ターン開始処理（手札の捨て直し・新規ドロー・
   //   ターン加算）が実行されるより前の状態で保存されている。そのままphaseだけ'player'に矯正すると、
