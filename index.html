@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver394</title>
+<title>DUNGEON WALKER DWCver396</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -4948,8 +4948,8 @@ function processPlayerTurnEnd(onDone){
         if(G.enemyShield>0){const a=Math.min(G.enemyShield,dLeft);G.enemyShield-=a;dLeft-=a;}
         G.enemy.curHp=Math.max(0,G.enemy.curHp-dLeft);
         G.totalDmgDealt=(G.totalDmgDealt||0)+dLeft;
-        addLog('💥 マナストライク発動！ マナ'+_msMana+'消費→'+dLeft+'ダメ','sys');
-        showTurnSlide('💥 マナストライク発動！ '+dLeft+'ダメージ！','#f39c12');
+        addLog('💥 マナストライク発動！ マナ'+_msMana+'消費→'+dmgLogStr(dLeft,_msDmg),'sys');
+        showTurnSlide('💥 マナストライク発動！ '+dmgLogStr(dLeft,_msDmg)+'！','#f39c12');
         spawnEnemyDmgNum(dLeft,_msDmg); shakeEnemyArea(); flashScreen('flash-gold'); sfxDamage();
         updateUI(); checkEnemyDeath();
         setTimeout(next,3300);
@@ -8571,7 +8571,8 @@ function renderHand(){
     // 条件付きカード・現在値の動的表示
     const _atk=G.atkBuff||0;
     const _dbl=G.doubleNext;
-    const _d=(base)=>_dbl?(base*2):base; // doubleNext考慮
+    const _dblMult=G.doubleMultiplier||2;
+    const _d=(base)=>_dbl?(base*_dblMult):base; // doubleNext考慮（実際の倍率を反映）
     const _hi=(n)=>'<span style="color:#f0c040;font-weight:bold;">'+n+'</span>';
     const _baseId=c._baseId||c.id; // 改カードは元のIDで判定
     const displayDesc = (()=>{
@@ -8860,7 +8861,7 @@ function renderHand(){
               return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+wkTag
                 +(atkExtra>0?'<br><span style="color:#e74c3c;font-size:8px;">(ATK+'+(atkExtra-hpScaleExtra)+')</span>'+hpTag:'');
             }
-            if(atkExtra>0||wkExtra>0){
+            if(atkExtra>0||wkExtra>0||_dbl){
               return '攻'+_hi(dmg)+((atkExtra-hpScaleExtra)>0?'<span style="color:#e74c3c;font-size:9px;">(+'+(atkExtra-hpScaleExtra)+')</span>':'')+hpTag+wkTag;
             }
           }
@@ -8968,8 +8969,10 @@ function showCardUsePopup(c,idx,canUse){
   cardDiv.className='card '+c.rarity;
   cardDiv.style.cssText='position:relative;width:180px;pointer-events:none;';
   if(fImg){cardDiv.style.backgroundImage='url('+fImg+')';cardDiv.style.backgroundSize='100% 100%';}
+  const _imgId1=c._baseId||c.id;
+  const _imgSrc1=CARD_ICON_OVERRIDE[_imgId1]||('card_'+_imgId1+'.png');
   const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:18px auto 4px;">'
-    +'<img src="card_'+(c._baseId||c.id)+'.png" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" '
+    +'<img src="'+_imgSrc1+'" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" '
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
     +'onload="this.nextSibling.style.display=\'none\';">'
     +'<div class="card-icon" style="font-size:24px;line-height:1;">'+c.icon+'</div>'
@@ -9045,8 +9048,10 @@ function showCardDetail(c){
   if(fImg){inner.style.backgroundImage='url('+fImg+')';inner.style.backgroundSize='100% 100%';}
   else{inner.style.backgroundImage='';}
   // アイコン1.5倍（45px）、参照ファイルなければ絵文字
+  const _imgId2=c._baseId||c.id;
+  const _imgSrc2=CARD_ICON_OVERRIDE[_imgId2]||('card_'+_imgId2+'.png');
   const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:18px auto 4px;">'
-    +'<img src="card_'+c.id+'.png" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" '
+    +'<img src="'+_imgSrc2+'" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" '
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
     +'onload="this.nextSibling.style.display=\'none\';">'
     +'<div class="card-icon" style="font-size:24px;line-height:1;">'+c.icon+'</div>'
@@ -13571,8 +13576,10 @@ function showZukanCardDetail(c){
   cardDiv.className='card '+c.rarity;
   cardDiv.style.cssText='position:relative;width:180px;';
   if(fImg){cardDiv.style.backgroundImage='url('+fImg+')';cardDiv.style.backgroundSize='100% 100%';}
+  const _imgId3=c._baseId||c.id;
+  const _imgSrc3=CARD_ICON_OVERRIDE[_imgId3]||('card_'+_imgId3+'.png');
   const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:18px auto 4px;">'
-    +'<img src="card_'+(c._baseId||c.id)+'.png" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" '
+    +'<img src="'+_imgSrc3+'" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" '
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
     +'onload="this.nextSibling.style.display=\'none\';">'
     +'<div class="card-icon" style="font-size:24px;line-height:1;">'+c.icon+'</div>'
