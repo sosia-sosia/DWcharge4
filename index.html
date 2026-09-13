@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver396</title>
+<title>DUNGEON WALKER DWCver397</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -8496,8 +8496,10 @@ function renderHand(){
   const soulcrushCount=(G.hand||[]).filter(id=>id==='bougai_soulcrush').length;
   const hasBougaiInHand=G.hand.some(id=>DB[id]&&DB[id].type==='bougai');
   pageCards.forEach((cid,pi)=>{
+   try{
     const i=start+pi;
-    const c=DB[cid];if(!c)return;
+    const c=DB[cid];
+    if(!c){addLog('⚠️ DEBUG: 手札に不正なカードID: '+cid,'sys');return;}
     const isHakiZero=G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.includes(cid)&&G.hand.includes(cid);
     // 魂砕きD: 全コスト+1
     const costAdd=c.type!=='bougai'?soulcrushCount:0;
@@ -8935,6 +8937,11 @@ function renderHand(){
     // PC用
     d.addEventListener('click',(ev)=>{if(!('ontouchstart' in window))tapHandler(ev);});
     el.appendChild(d);
+   }catch(_renderErr){
+    // 1枚のカード描画で例外が起きても手札全体の表示が止まらないようにする
+    console.error('renderHand: card render error',cid,_renderErr);
+    addLog('⚠️ DEBUG: 手札カード描画エラー('+cid+'): '+(_renderErr&&_renderErr.message),'sys');
+   }
   });
   // ドット更新
   const totalPages=Math.max(1,Math.ceil(G.hand.length/CARDS_PER_PAGE));
