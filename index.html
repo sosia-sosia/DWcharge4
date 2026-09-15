@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver399</title>
+<title>DUNGEON WALKER DWCver402</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -783,7 +783,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v399</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v402</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -817,7 +817,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver368</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver402</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -1826,7 +1826,7 @@ const DB={
   combo:       {id:'combo',       name:'連撃',    icon:'🌀', type:'attack',  rarity:'uncommon',  cost:3, desc:'攻撃 5×3（合計15）',shortDesc:"攻5×3(計15)",                 effect:{atk:5,times:3}},
   shieldBash:  {id:'shieldBash',  name:'盾の一撃',icon:'🛡', type:'attack',  rarity:'gauge',     cost:0, desc:'自分のシールド値分ダメージ + シールドを0に',shortDesc:"盾の値ダメ",         effect:{shieldAtk:true}},
   godstrike:   {id:'godstrike',   name:'神撃',    icon:'⭐', type:'attack',  rarity:'legendary',cost:3, desc:'攻撃 25 + シールド10',shortDesc:"攻撃25+盾10",            effect:{atk:25,shield:10}},
-  stormSlash:  {id:'stormSlash',  name:'嵐乱斬',  icon:'🌪', type:'attack',  rarity:'legendary',cost:4, desc:'攻撃 3×6（合計18）',shortDesc:"攻3×6(計18)",                 effect:{atk:3,times:6}, onlyCharge:'renGeki'},
+  stormSlash:  {id:'stormSlash',  name:'嵐風斬',  icon:'🌪', type:'attack',  rarity:'legendary',cost:4, desc:'攻撃 3×6（合計18）',shortDesc:"攻3×6(計18)",                 effect:{atk:3,times:6}, onlyCharge:'renGeki'},
   poisonKill:  {id:'poisonKill',  name:'毒滅',    icon:'💢', type:'attack',  rarity:'epic',cost:1, desc:'敵の毒カウントが10以上の時のみ使用可 / 攻撃 18',shortDesc:"毒10以上:攻18",         effect:{atk:18,requirePoisonHigh:true}},
   // 防御
   guard:       {id:'guard',       name:'防御',    icon:'🛡️', type:'shield',  rarity:'common',   cost:1, desc:'シールド 6',shortDesc:"シールド 6",                    effect:{shield:6}},
@@ -2578,6 +2578,21 @@ function filterChargeRestricted(ids){
     return !c || !c.onlyCharge || c.onlyCharge===G.chargeType;
   });
 }
+// 妨害カードを生成しうる敵の行動一覧（addBougaiCardsを呼ぶ行動のみ）
+const BOUGAI_PRODUCING_ACTIONS=['poisonfang','burn','soulcrush','despair','enervate'];
+// 「手札の妨害カードを除外しないと発動しない」カード（説明文に妨害とあるだけの浄化＝exorciseは、
+// 妨害カードが無くても毒/火傷/地響き/封印/マナペナルティ等を対象にできるため対象外）
+const BOUGAI_DEPENDENT_CARD_IDS=['evilCombo','curseShield','curseSuck','curseReturn'];
+// 現在のエリアの敵に、妨害カードを実際に生成しうる行動を持つ個体が1体でもいるか
+function areaHasBougaiSource(areaId){
+  const enemies=getEnemiesForArea(areaId)||[];
+  return enemies.some(e=>e.pattern&&e.pattern.some(a=>BOUGAI_PRODUCING_ACTIONS.includes(a)));
+}
+// そのエリアで妨害カードが一切発生し得ない場合、妨害カード必須カードを候補から除外する
+function filterBougaiDependent(ids){
+  if(areaHasBougaiSource(G.areaId)) return ids;
+  return ids.filter(id=>!BOUGAI_DEPENDENT_CARD_IDS.includes(id));
+}
 // レジェンドカード抽選：まだ一枚もレジェンドを持っていない場合、チャージ専用レジェンドを2倍の重みで抽選する（1枚持ったら通常確率に戻る）
 function _weightedPickLegendary(pool){
   const gotLegendary=G.deck.some(id=>DB[id]&&DB[id].rarity==='legendary');
@@ -2599,6 +2614,8 @@ function pickCard(stage, exclude=[]){
   // チャージ別解放Gカードを候補に追加
   // GAUGEカードは報酬に含めない
   pool=filterChargeRestricted(pool);
+  pool=filterBougaiDependent(pool);
+  if(!pool.length) pool=filterBougaiDependent(filterChargeRestricted((CARD_POOL[rarity]||CARD_POOL.rare).filter(id=>!exclude.includes(id))));
   if(!pool.length) pool=filterChargeRestricted((CARD_POOL[rarity]||CARD_POOL.rare).filter(id=>!exclude.includes(id)));
   if(!pool.length) pool=filterChargeRestricted(CARD_POOL.rare);
   if(!pool.length) pool=CARD_POOL.rare;
@@ -2680,6 +2697,11 @@ function saveRunState(force){
 function clearRunState(){
   try{ localStorage.removeItem(RUN_SAVE_KEY); }catch(e){}
 }
+// バックグラウンド化・タブを閉じる直前に、直近のアニメーション待ち等で
+// saveRunState()のデバウンス（250ms）に間に合わず保存が古いまま残ることを防ぐため、
+// その時点のGを強制的に即保存する（手札消失バグの一因対策）。
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveRunState(true); });
+window.addEventListener('pagehide',()=>{ saveRunState(true); });
 function loadRunState(){
   try{
     const raw=localStorage.getItem(RUN_SAVE_KEY);
@@ -3731,8 +3753,6 @@ function playCard(idx, _isChain){
     const _allowed=(_tutAction==='card' && _handIdx===G.tutorialTargetHandIdx);
     if(!_allowed){ dwRejectFeedback(document.getElementById('hand-cards')); return; }
   }
-  // カードエフェクト発動（チェーン再発動時はスキップ）
-  if(!_isChain) triggerCardEffect(cid);
   if(!_isChain) tutorialOnCardUsed();
   // カード効果中操作ロック
   const _lockTargets=['hand-area','end-turn-btn','btn-deck-view','charge-gauge-box','curse-timer-box'];
@@ -3762,7 +3782,8 @@ function playCard(idx, _isChain){
     }
     // 氷雪弾：このターンに使用できるカード枚数の上限に達している場合は使用不可
     if(G.cardPlayLimitThisTurn!=null && (G.turnCardsUsed||0)>=G.cardPlayLimitThisTurn && !isHakiZeroPlay && !isFreePass){
-      addLog('❄️ 氷雪弾の影響で、このターンはこれ以上カードを使用できない！','sys'); return;
+      dwRejectFeedback(document.getElementById('hand-cards'));
+      addLog('❄️ 氷雪弾の効果でこのカードは使用できません（残り使用可能枚数: 0）','sys'); return;
     }
     if(isFreePass){
       // 踏み倒し：使用時のマナ以下のコストのカードは使用不可
@@ -3876,6 +3897,10 @@ function playCard(idx, _isChain){
       updateUI(); renderHand();
       return;
     }
+    // カードエフェクト発動（チェーン再発動時はスキップ）
+    // ※ここまでの使用可否判定（地響き・封印・氷雪弾・妨害電波・マナ不足・妨害カード不足・麻痺 等）を
+    //   すべて通過した後で演出を発動する（使用不可なのに成功演出だけ流れる不具合の防止）
+    if(!_isChain) triggerCardEffect(cid);
     if(c.type==='attack'){
       G.turnAtkCardCount=(G.turnAtkCardCount||0)+1;
       if(G.comboHealActive){const chHeal=healPlayer((G.comboHealVal||3)+(G.healBuff||0));if(chHeal>0){queueEffect(()=>{sfxHeal();spawnDmgNum('+'+chHeal,'heal');flashHealEffect(chHeal);}, 800);}}
@@ -4075,7 +4100,7 @@ function playCard(idx, _isChain){
     const atkVal=isFullHp?ef.atkFullHp:(ef.atkNormal||6);
     const _m2=(G.doubleNext)?(G.doubleMultiplier||2):1;
     if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
-    let d=(atkVal+G.atkBuff)*_m2;
+    let d=(atkVal+G.atkBuff+(G.stageAtkBonus||0))*_m2;
     const _rawD_atkFullHp=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4088,7 +4113,7 @@ function playCard(idx, _isChain){
     const atkCount=Math.max(0,(G.turnAtkCardCount-1));
     const _m3=(G.doubleNext)?(G.doubleMultiplier||2):1;
     if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
-    let d=(atkCount*ef.atkCardCountDmg+G.atkBuff)*_m3;
+    let d=(atkCount*ef.atkCardCountDmg+G.atkBuff+(G.stageAtkBonus||0))*_m3;
     if(G.doubleNext) G.doubleNext=false;
     const _rawD_atkCardCount=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
@@ -4102,8 +4127,9 @@ function playCard(idx, _isChain){
     const spent=G.stageManaSpent||0;
     const _tsumikasaneBonus=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul'))?2:0;
     const _tsumikasaneBonus2=(cid==='accumulate'&&getEquippedSouls().includes('tsumikasaneSoul2'))?6:0;
-    let d=Math.max(1,(spent+G.atkBuff+_tsumikasaneBonus+_tsumikasaneBonus2))*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _tsumikasaneMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    let d=Math.max(1,(spent+G.atkBuff+(G.stageAtkBonus||0)+_tsumikasaneBonus+_tsumikasaneBonus2))*_tsumikasaneMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     const _rawD_costSum=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4122,8 +4148,9 @@ function playCard(idx, _isChain){
     } else { G.hand=[]; }
     const n=_toDiscard.length; G.discard.push(..._toDiscard);
     const baseDmg=n*ef.discardAllDmg;
-    let d=(baseDmg+G.atkBuff)*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _discardMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    let d=(baseDmg+G.atkBuff+(G.stageAtkBonus||0))*_discardMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     const _rawD_discardAll=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4142,15 +4169,17 @@ function playCard(idx, _isChain){
       G.protectedCardId=null;
     } else { G.hand=[]; }
     const n=_toDiscard2.length; G.discard.push(..._toDiscard2);
-    const s=n*ef.discardAllShield; G.shield+=s;
-    msgs.push('大盤振る舞い: '+n+'枚捨て×2=盾+'+s);
+    // 盾強化(G.shieldBuff)をプレビュー表示と同じ計算式（捨てた枚数×倍率 + 盾強化）で加算する
+    const _allInShieldBuff=G.shieldBuff||0;
+    const s=n*ef.discardAllShield+_allInShieldBuff; G.shield+=s;
+    msgs.push('大盤振る舞い: '+n+'枚捨て×'+ef.discardAllShield+'=盾+'+s+(_allInShieldBuff>0?' (盾強化+'+_allInShieldBuff+'込み)':''));
     queueEffect(()=>{flashShield();flashShieldAdd('player',s);sfxShield();}, 800);
     clampPage();
   }
   if(ef.drawPileInverseDmg){
     const rem=G.drawPile.length||1;
     const doubleApplied=G.doubleNext; if(doubleApplied) G.doubleNext=false;
-    let d=Math.floor((ef.drawPileInverseDmg*(20/rem)+G.atkBuff)*(doubleApplied?(G.doubleMultiplier||2):1));
+    let d=Math.floor((ef.drawPileInverseDmg*(20/rem)+G.atkBuff+(G.stageAtkBonus||0))*(doubleApplied?(G.doubleMultiplier||2):1));
     if(d<0) d=0;
     let dmgLeft=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,dmgLeft);G.enemyShield-=a;dmgLeft-=a;}
@@ -4162,8 +4191,9 @@ function playCard(idx, _isChain){
     checkEnemyDeath(); // HP0でもここではreturnしない（後続の効果ブロックを継続処理。最終判定は関数末尾）
   }
   if(ef.deckCountDmg){
-    let d=(G.deck.length*ef.deckCountDmg+G.atkBuff)*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _knowMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    let d=(G.deck.length*ef.deckCountDmg+G.atkBuff+(G.stageAtkBonus||0))*_knowMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     const _rawD_deckCount=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4209,8 +4239,8 @@ function playCard(idx, _isChain){
         if(pef.shieldFirstBreak){const _sfb=Math.min(G.enemyShield,pef.shieldFirstBreak);G.enemyShield=Math.max(0,G.enemyShield-pef.shieldFirstBreak);echoMsgs.push('盾-'+pef.shieldFirstBreak+(_sfb>0?' ('+_sfb+'減少)':'(効果なし)'));}
         if(pef.pierceBreak&&G.enemyShield>0){echoMsgs.push('敵盾破壊');G.enemyShield=0;}
         for(let i=0;i<t;i++){
-          let d=(pef.atk+G.atkBuff+(G.stageAtkBonus||0))*(G.doubleNext&&i===0?2:1);
-          if(G.doubleNext&&i===0) G.doubleNext=false;
+          let d=(pef.atk+G.atkBuff+(G.stageAtkBonus||0))*(G.doubleNext&&i===0?(G.doubleMultiplier||2):1);
+          if(G.doubleNext&&i===0){G.doubleNext=false;G.doubleMultiplier=1;}
           const _rawD_echo=d;
           if(!pef.ignoreShield&&!pef.pierceBreak&&G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
           G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4222,7 +4252,7 @@ function playCard(idx, _isChain){
       }
       if(pef.atkPlusPrevHpLoss){
         const prevLoss=G.prevTurnHpLoss||0;
-        const baseDmg=G.atkBuff+(prevLoss>0?prevLoss:0);
+        const baseDmg=G.atkBuff+(G.stageAtkBonus||0)+(prevLoss>0?prevLoss:0);
         const _mult=(G.doubleNext)?(G.doubleMultiplier||2):1;if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
         let d=baseDmg*_mult;
         const _rawD_atkPlusPrev=d;
@@ -4272,8 +4302,9 @@ function playCard(idx, _isChain){
   // 札手裏剣：このターン使用したカードの枚数×倍率の攻撃
   if(ef.turnCardCountAtk){
     const _cnt=(G.turnCardsUsed||0);
-    const d=Math.max(1,_cnt*ef.turnCardCountAtk+G.atkBuff)*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _shurikenMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    const d=Math.max(1,_cnt*ef.turnCardCountAtk+G.atkBuff+(G.stageAtkBonus||0))*_shurikenMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     let dLeft=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,dLeft);G.enemyShield-=a;dLeft-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-dLeft);
@@ -4455,8 +4486,9 @@ function playCard(idx, _isChain){
   // 神聖なる拳：ステージ中の回復合計分ダメージ
   if(ef.healSumDmg){
     const healTotal=G.stageHealSum||0;
-    const d=Math.max(1,(healTotal+G.atkBuff))*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _holyMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    const d=Math.max(1,(healTotal+G.atkBuff+(G.stageAtkBonus||0)))*_holyMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     let hd=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,hd);G.enemyShield-=a;hd-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-hd);
@@ -4472,7 +4504,9 @@ function playCard(idx, _isChain){
   // 憤怒の舞：攻3+ドロー1+累積ダメ（制限なし）
   if(ef.furyDance){
     const furyBonus=G.furyDanceBonus||0;
-    const furyDmg=getFuryDanceBaseAtk()+furyBonus+G.atkBuff;
+    const _furyMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    const furyDmg=(getFuryDanceBaseAtk()+furyBonus+G.atkBuff+(G.stageAtkBonus||0))*_furyMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     let fd=furyDmg;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,fd);G.enemyShield-=a;fd-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-fd);
@@ -4492,7 +4526,7 @@ function playCard(idx, _isChain){
     const isSecondAtk=(G.turnAtkCardCount>=2);
     const bonusVal=ef.bonusIfNotFirstVal||8;
     const atkPow=isSecondAtk?bonusVal:4;
-    let d=(atkPow+G.atkBuff)*(G.doubleNext?(G.doubleMultiplier||2):1);
+    let d=(atkPow+G.atkBuff+(G.stageAtkBonus||0))*(G.doubleNext?(G.doubleMultiplier||2):1);
     if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     const _rawD_bonusIfNotFirst=d;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
@@ -4587,8 +4621,9 @@ function playCard(idx, _isChain){
     const sv=Math.min(Math.floor(G.shield/2),_svAvail2);
     if(sv>0){
       G.shield=Math.max(getShieldFloor(),G.shield-sv);
-      let d=(sv+G.atkBuff)*(G.doubleNext?2:1);
-      if(G.doubleNext) G.doubleNext=false;
+      const _reflectMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+      let d=(sv+G.atkBuff+(G.stageAtkBonus||0))*_reflectMult;
+      if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
       const _rawD_shieldAttackHalf=d;
       if(G.enemyShield>0){const a=Math.min(G.enemyShield,d);G.enemyShield-=a;d-=a;}
       G.enemy.curHp=Math.max(0,G.enemy.curHp-d);
@@ -4615,9 +4650,12 @@ function playCard(idx, _isChain){
     if(G.enemyPoison>0) count++;
     if(G.enemyAtkDebuff>0) count++;
     if(G.weakenHalf) count++;
+    if(G.enemyFrozen) count++; // カード表示のプレビューと同じ対象（毒・敵ATK低下・攻撃力半減・凍結）に合わせる
     const bd=count*ef.statusBurstDmg;
-    let bda=(bd+G.atkBuff)*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    // ステージ攻撃力ボーナス・実際のdoubleNext倍率（チャージレベルにより2倍/3倍等）を他の攻撃カードと同様に反映する
+    const _burstMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    let bda=(bd+G.atkBuff+(G.stageAtkBonus||0))*_burstMult;
+    if(G.doubleNext){ G.doubleNext=false; G.doubleMultiplier=1; }
     const _rawD_statusBurst=bda;
     if(G.enemyShield>0){const a=Math.min(G.enemyShield,bda);G.enemyShield-=a;bda-=a;}
     G.enemy.curHp=Math.max(0,G.enemy.curHp-bda);
@@ -4630,8 +4668,9 @@ function playCard(idx, _isChain){
     const pc=G.enemyPoison||0;
     const _bakudokuBonus=(cid==='expPoison'&&getEquippedSouls().includes('bakudokuSoul'))?2:0;
     const _bakudokuBonus2=(cid==='expPoison'&&getEquippedSouls().includes('bakudokuSoul2'))?4:0;
-    const pd=(pc+G.atkBuff+_bakudokuBonus+_bakudokuBonus2)*(G.doubleNext?2:1);
-    if(G.doubleNext) G.doubleNext=false;
+    const _expPoisonMult=(G.doubleNext?(G.doubleMultiplier||2):1);
+    const pd=(pc+G.atkBuff+(G.stageAtkBonus||0)+_bakudokuBonus+_bakudokuBonus2)*_expPoisonMult;
+    if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     if(pc>0){
       let epd=pd;
       if(G.enemyShield>0){const a=Math.min(G.enemyShield,epd);G.enemyShield-=a;epd-=a;}
@@ -4652,8 +4691,10 @@ function playCard(idx, _isChain){
     if(lsDmg<=0){
       msgs.push('吸血: 与ダメ0のため回復なし');
     } else {
-      const _lsha=healPlayer(lsDmg);
-      msgs.push('吸血回復+'+_lsha); queueEffect(()=>{spawnDmgNum('+'+_lsha,'heal');sfxHeal();}, 800);
+      // 他の回復カードと同様、回復強化(G.healBuff)を加算してから回復させる
+      const _lsHealVal=lsDmg+(G.healBuff||0);
+      const _lsha=healPlayer(_lsHealVal);
+      msgs.push('吸血回復+'+_lsha+(G.healBuff>0?' (与ダメ'+lsDmg+'+回復強化'+G.healBuff+')':'')); queueEffect(()=>{spawnDmgNum('+'+_lsha,'heal');sfxHeal();}, 800);
     }
   }
   // 鎧抜き：敵シールドを無視して攻撃
@@ -4697,7 +4738,7 @@ function playCard(idx, _isChain){
   }
   if(ef.atkPlusPrevHpLoss){
     const prevLoss=G.prevTurnHpLoss||0;
-    const baseDmg=G.atkBuff+(prevLoss>0?prevLoss:0);
+    const baseDmg=G.atkBuff+(G.stageAtkBonus||0)+(prevLoss>0?prevLoss:0);
     const _mult=(G.doubleNext)?(G.doubleMultiplier||2):1;if(G.doubleNext){G.doubleNext=false;G.doubleMultiplier=1;}
     let d=baseDmg*_mult;
     const _rawD_atkPlusPrev2=d;
@@ -5526,12 +5567,8 @@ function enemyTurn(){
     // 致死無効：驚異の生命力のリセット（敵ターン後に使用済みフラグをリセット）
     // （deathSaveUsedは敵ターンでのみ消費済みにする）
     // 守護の学び：前ターンの被ダメ分をシールドに
-    if(G.absorbShieldPending && G.absorbShieldAccum>0){
-      const _asa=G.absorbShieldAccum;
-      G.shield+=_asa;
-      addLog('📘 守護の学び: シールド+'+_asa,'sys');
-      queueEffect(()=>{flashShield();flashShieldAdd('player',_asa);sfxShield();}, 800);
-    }
+    // ※ターン開始時シールド減少処理より後に加算する（新しく得たシールドがその減少の対象にならないように）
+    const _studyGuardAccum=(G.absorbShieldPending && G.absorbShieldAccum>0)?G.absorbShieldAccum:0;
     G.absorbShieldPending=false; G.absorbShieldAccum=0;
     // 応急処置：前ターンの被ダメ分を回復に
     if(G.absorbHealPending && G.absorbHealAccum>0){
@@ -5613,6 +5650,12 @@ function enemyTurn(){
         addLog('🛡️ シールド-'+shieldDecay+'（ターン開始'+Math.round(decayRate*100)+'%減）','sys');
         updateUI();
       }
+    }
+    // 守護の学び：シールド減少処理の後に加算（新しく得たシールドはその減少の対象にならない）
+    if(_studyGuardAccum>0){
+      G.shield+=_studyGuardAccum;
+      addLog('📘 守護の学び: シールド+'+_studyGuardAccum,'sys');
+      queueEffect(()=>{flashShield();flashShieldAdd('player',_studyGuardAccum);sfxShield();}, 800);
     }
     G._skipDrawAnim=true; drawCards(5+(G.nextTurnDrawBonusPending||0), true); G.nextTurnDrawBonusPending=0; G._skipDrawAnim=false; updateUI(); updateIntent();
     addLog('── ターン'+G.turnCount+' ──','sys');
@@ -7978,6 +8021,7 @@ function updateUI(){
     const tempAtk=G.atkBuff-(G.permAtkBonus||0);
     if(tempAtk>0) pParts.push('<span style="color:#e74c3c;">⚔️+'+tempAtk+'(一時)</span>');
   }
+  if(G.stageAtkBonus>0) pParts.push('<span style="color:#e74c3c;">⚔️+'+G.stageAtkBonus+'(ステージ中)</span>');
   if(G.nextTurnAtkCostDown) pParts.push('<span style="color:#e07030;">💪コスト-1</span>');
   if(G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.length>0) pParts.push('<span style="color:#e07030;">💪手札コスト0('+G.hakiZeroCostCardIds.length+'枚)</span>');
   if(G.hakiStageDiscount>0) pParts.push('<span style="color:#e07030;">💪全カードコスト-'+G.hakiStageDiscount+'</span>');
@@ -8599,7 +8643,8 @@ function renderHand(){
     d.style.backgroundSize='100% 100%';
     d.style.backgroundRepeat='no-repeat';
     // 条件付きカード・現在値の動的表示
-    const _atk=G.atkBuff||0;
+    // ※実際の攻撃力計算（G.atkBuff＋G.stageAtkBonus）と一致させる
+    const _atk=(G.atkBuff||0)+(G.stageAtkBonus||0);
     const _dbl=G.doubleNext;
     const _dblMult=G.doubleMultiplier||2;
     const _d=(base)=>_dbl?(base*_dblMult):base; // doubleNext考慮（実際の倍率を反映）
@@ -8690,7 +8735,9 @@ function renderHand(){
         case 'poisonNeedle':{
           const base=(c.effect.atk||3)+getSoulCardAtkBonus('poisonNeedle');
           const pndmg=_d(base+_atk);
-          return '攻'+_hi(pndmg)+' 毒+'+_hi(pndmg);
+          // 毒付与量は「実際に与えるダメージ」＝敵シールドで軽減された後の値を基準にする（実処理と一致させる）
+          const pnRealDmg=Math.max(0,pndmg-(G.enemyShield||0));
+          return '攻'+_hi(pndmg)+' 毒+'+_hi(pnRealDmg)+(pnRealDmg<pndmg?'<span style="color:#5dade2;font-size:9px;">（盾軽減後）</span>':'');
         }
         case 'strike2':{
           const bonusVal=c.effect.bonusIfNotFirstVal||8;
@@ -8705,8 +8752,10 @@ function renderHand(){
         }
         case 'lifesteal':{
           const dmg=_d(10+_atk);
-          const hv=dmg+(G.healBuff||0);
-          return '攻'+_hi(dmg)+'+HP+'+(G.healBuff>0?_hi(hv):dmg)+'回復';
+          // 実際に与えるダメージ（敵シールド軽減後）を基準に回復量を計算する（実処理と一致させる）
+          const lsRealDmg=Math.max(0,dmg-(G.enemyShield||0));
+          const hv=lsRealDmg+(G.healBuff||0);
+          return '攻'+_hi(dmg)+'+HP+'+_hi(hv)+'回復'+(lsRealDmg<dmg?'<span style="color:#5dade2;font-size:9px;">（盾軽減後）</span>':'');
         }
         case 'strikeBack':{
           const prevLoss=G.prevTurnHpLoss||0;
