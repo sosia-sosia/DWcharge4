@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver402</title>
+<title>DUNGEON WALKER DWCver404</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -368,6 +368,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ov-title{font-size:22px;color:var(--gold);letter-spacing:4px;text-shadow:0 0 24px rgba(201,168,76,.7);text-align:center;margin-top:12px;}
 .ov-sub{font-size:12px;color:var(--dim);font-style:italic;text-align:center;line-height:1.8;font-family:sans-serif;}
 .ov-btn{font-size:11px;color:var(--gold);letter-spacing:2px;background:rgba(30,22,8,.82);border:1px solid rgba(201,168,76,.45);border-radius:8px;padding:11px 24px;cursor:pointer;touch-action:manipulation;}
+/* 全メニュー画面共通の「← 戻る」ボタン（左上・1階層戻る）。
+   ソウル設定／デッキ構築の既存デザインを基準に統一。スマホでも押しやすいタップ領域を確保する。 */
+.nav-back-row{width:100%;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-back-btn{display:inline-flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;color:var(--gold);background:rgba(0,0,0,.85);border:1px solid rgba(201,168,76,.5);border-radius:8px;padding:9px 16px;min-height:38px;cursor:pointer;touch-action:manipulation;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.nav-back-btn:active{background:rgba(201,168,76,.22);}
+.nav-back-title{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);letter-spacing:1px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* ショップ商品カード（1商品=1カード）。スマホ縦画面で読みやすい余白・文字サイズを確保し、
+   横スクロールが出ないよう幅は常に100%・box-sizing:border-box とする。 */
+.shop-item-card{width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:7px;background:linear-gradient(160deg,rgba(24,18,10,.92),rgba(10,8,14,.92));border:1px solid rgba(201,168,76,.32);border-radius:12px;padding:12px 13px;margin-bottom:10px;position:relative;overflow:hidden;}
+.shop-item-card.is-locked{opacity:.72;border-color:rgba(160,80,80,.4);}
+.shop-item-head{display:flex;align-items:flex-start;gap:9px;}
+.shop-item-icon{font-size:24px;line-height:1.1;flex-shrink:0;}
+.shop-item-name{font-size:13.5px;color:#fff;font-weight:bold;line-height:1.35;word-break:break-word;}
+.shop-item-chip{display:inline-block;font-size:9.5px;color:#8ab8d8;background:rgba(138,184,216,.12);border:1px solid rgba(138,184,216,.32);border-radius:5px;padding:2px 7px;margin-top:4px;font-family:sans-serif;white-space:nowrap;}
+.shop-item-desc{font-size:11px;color:#cfc6b6;line-height:1.6;font-family:sans-serif;word-break:break-word;}
+.shop-item-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid rgba(255,255,255,.1);padding-top:8px;margin-top:1px;}
+.shop-item-price{font-size:14px;font-weight:bold;color:#f0d47a;white-space:nowrap;font-family:'Cinzel',serif;letter-spacing:.5px;}
+.shop-item-price.short{color:#e07070;}
+.shop-item-cond{font-size:10px;color:#e0a0a0;line-height:1.5;font-family:sans-serif;background:rgba(120,40,40,.18);border:1px solid rgba(200,90,90,.3);border-radius:6px;padding:5px 8px;}
+.shop-buy-btn{font-size:12px;color:#f0d47a;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.55);border-radius:8px;padding:8px 20px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;cursor:pointer;touch-action:manipulation;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.shop-buy-btn:active{background:rgba(201,168,76,.3);}
+.shop-buy-btn.disabled{color:#8a8a8a;border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.04);}
+.shop-item-new{background:#e74c3c;color:#fff;font-size:8.5px;font-weight:bold;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:5px;letter-spacing:.5px;}
 /* メニューの画像ボタン：背景画像が読み込めた場合はテキストを隠し、読み込めなかった場合はテキストを表示する */
 .menu-img-btn{position:relative;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;padding:0;}
 .menu-img-btn .menu-btn-fallback{display:none;align-items:center;justify-content:center;gap:6px;font-family:sans-serif;font-size:13px;color:#fff;font-weight:bold;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.7);width:100%;height:100%;letter-spacing:0;}
@@ -783,7 +806,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v402</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v404</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -817,7 +840,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver402</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver404</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -979,7 +1002,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- ショップ画面（#appの外側に配置） -->
 <div class="overlay" id="ov-shop" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(menubg_shop.png);background-size:cover;background-position:center;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">🛒 ショップ</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-shop-back">← 戻る</div>
+    <div class="nav-back-title" id="shop-header-title">🛒 ショップ</div>
+  </div>
   <div style="width:100%;background:rgba(0,0,0,.7);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:space-around;">
     <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💰ゴールド</span><br><span id="shop-gold-val" style="font-size:15px;color:#f0d020;font-weight:bold;">0</span></div>
     <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💎クリスタル</span><br><span id="shop-soul-val" style="font-size:15px;color:#c9a8ff;font-weight:bold;">0</span></div>
@@ -994,14 +1020,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="shop-tab" data-cat="cap" style="flex:1;text-align:center;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:6px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">📦 上限</div>
   </div>
   <div id="shop-soul-subtabs" style="display:none;width:100%;gap:4px;">
-    <div class="shop-subtab" data-soulcat="" style="flex:1;text-align:center;font-size:9px;color:#8ab8d8;background:rgba(0,0,0,.4);border:1px solid rgba(138,184,216,.3);border-radius:5px;padding:4px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">全て</div>
-    <div class="shop-subtab" data-soulcat="1" style="flex:1;text-align:center;font-size:9px;color:#8ab8d8;background:rgba(0,0,0,.4);border:1px solid rgba(138,184,216,.3);border-radius:5px;padding:4px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">①上昇系</div>
-    <div class="shop-subtab" data-soulcat="2" style="flex:1;text-align:center;font-size:9px;color:#8ab8d8;background:rgba(0,0,0,.4);border:1px solid rgba(138,184,216,.3);border-radius:5px;padding:4px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">②軽減系</div>
-    <div class="shop-subtab" data-soulcat="3" style="flex:1;text-align:center;font-size:9px;color:#8ab8d8;background:rgba(0,0,0,.4);border:1px solid rgba(138,184,216,.3);border-radius:5px;padding:4px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">③強化系</div>
-    <div class="shop-subtab" data-soulcat="4" style="flex:1;text-align:center;font-size:9px;color:#8ab8d8;background:rgba(0,0,0,.4);border:1px solid rgba(138,184,216,.3);border-radius:5px;padding:4px 2px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">④特殊系</div>
+    <div class="shop-subtab" data-soulcat="" style="flex:1;text-align:center;font-size:10px;color:#8ab8d8;background:rgba(0,0,0,.45);border:1px solid rgba(138,184,216,.3);border-radius:6px;padding:9px 2px;min-height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">全て</div>
+    <div class="shop-subtab" data-soulcat="1" style="flex:1;text-align:center;font-size:10px;color:#8ab8d8;background:rgba(0,0,0,.45);border:1px solid rgba(138,184,216,.3);border-radius:6px;padding:9px 2px;min-height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">①上昇系</div>
+    <div class="shop-subtab" data-soulcat="2" style="flex:1;text-align:center;font-size:10px;color:#8ab8d8;background:rgba(0,0,0,.45);border:1px solid rgba(138,184,216,.3);border-radius:6px;padding:9px 2px;min-height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">②軽減系</div>
+    <div class="shop-subtab" data-soulcat="3" style="flex:1;text-align:center;font-size:10px;color:#8ab8d8;background:rgba(0,0,0,.45);border:1px solid rgba(138,184,216,.3);border-radius:6px;padding:9px 2px;min-height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">③強化系</div>
+    <div class="shop-subtab" data-soulcat="4" style="flex:1;text-align:center;font-size:10px;color:#8ab8d8;background:rgba(0,0,0,.45);border:1px solid rgba(138,184,216,.3);border-radius:6px;padding:9px 2px;min-height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">④特殊系</div>
   </div>
   <div id="shop-content" style="width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:6px;"></div>
-  <div class="ov-btn" id="btn-shop-close" style="margin-top:4px;">閉じる</div>
+
 </div>
 
 <!-- ショップ購入確認ポップアップ（#appの外側に配置） -->
@@ -1026,15 +1052,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- ガチャ種類選択画面（#appの外側に配置） -->
 <div class="overlay" id="ov-gacha-select" style="gap:10px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(menubg_gatya.png);background-size:cover;background-position:center;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">🎰 ガチャ</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-gacha-select-back">← 戻る</div>
+    <div class="nav-back-title">🎰 ガチャ</div>
+  </div>
   <div style="font-size:10px;color:#ccc;line-height:1.5;padding:6px 8px;background:rgba(0,0,0,.55);border-radius:6px;">ゴールドやクリスタルを使って、ランダムな能力を持つカードを生成できます。</div>
   <div id="gacha-select-list" style="width:100%;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
-  <div class="ov-btn" id="btn-gacha-select-close" style="margin-top:4px;">閉じる</div>
+
 </div>
 
 <!-- ノーマルガチャ画面（#appの外側に配置） -->
 <div class="overlay" id="ov-gacha-common" style="gap:10px;padding:14px 12px;position:fixed;z-index:2010;background-image:url(menubg_gatya.png);background-size:cover;background-position:center;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">🃏 ノーマルガチャ</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="gacha-back-to-select">← 戻る</div>
+    <div class="nav-back-title">🃏 ノーマルガチャ</div>
+  </div>
   <div style="width:100%;background:rgba(0,0,0,.7);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:8px 12px;display:flex;align-items:center;justify-content:space-around;">
     <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💰ゴールド</span><br><span id="gacha-gold-val" style="font-size:15px;color:#f0d020;font-weight:bold;">0</span></div>
     <div style="text-align:center;"><span style="font-size:10px;color:#c9a84c;">💎クリスタル</span><br><span id="gacha-crystal-val" style="font-size:15px;color:#c9a8ff;font-weight:bold;">0</span></div>
@@ -1055,7 +1087,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div id="gacha-buy-crystal" class="ov-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">💎 10クリスタルで1回引く</div>
   </div>
   <div style="flex:1;"></div>
-  <div class="ov-btn" id="gacha-back-to-select" style="margin-top:4px;background:rgba(80,60,20,.3);border-color:rgba(200,160,80,.4);color:#e0b878;">← ガチャ選択に戻る</div>
+
 </div>
 
 <!-- ガチャ購入確認ポップアップ（#appの外側に配置） -->
@@ -1079,11 +1111,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- ガチャ結果画面（#appの外側に配置） -->
 <div class="overlay" id="ov-gacha-result" style="gap:10px;padding:14px 12px;position:fixed;z-index:2070;justify-content:flex-start;background:rgba(5,3,10,.96);">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">✨ カード生成完了！</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-gacha-result-close">← 戻る</div>
+    <div class="nav-back-title">✨ カード生成完了！</div>
+  </div>
   <div id="gacha-result-card" style="width:140px;margin:6px auto;"></div>
   <div id="gacha-result-detail" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:10px 14px;font-size:11px;color:#e8dcc8;line-height:1.7;font-family:sans-serif;"></div>
   <div style="flex:1;"></div>
-  <div class="ov-btn" id="btn-gacha-result-close" style="margin-top:4px;">ガチャ画面に戻る</div>
+
 </div>
 
 <!-- ソウル設定画面（#appの外側に配置） -->
@@ -1127,21 +1162,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- ゲームデータ画面（タイトル画面から使うため#appの外側に配置） -->
 <div class="overlay" id="ov-gamedata" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(munyu_haikei.png);background-size:cover;background-position:center;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">📊 ゲームデータ</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-gamedata-back">← 戻る</div>
+    <div class="nav-back-title">📊 ゲームデータ</div>
+  </div>
   <div style="display:flex;gap:8px;width:100%;">
     <div id="gamedata-tab-monster" class="ov-btn" style="flex:1;font-size:11px;padding:8px 0;">👹 モンスター図鑑</div>
     <div id="gamedata-tab-card" class="ov-btn" style="flex:1;font-size:11px;padding:8px 0;">🃏 カード図鑑</div>
   </div>
   <div id="gamedata-progress" style="font-size:10px;color:#999;font-family:sans-serif;"></div>
   <div id="gamedata-content" style="width:100%;overflow-y:auto;max-height:56vh;display:flex;flex-direction:column;gap:8px;"></div>
-  <div class="ov-btn" id="btn-gamedata-close" style="margin-top:4px;">閉じる</div>
+
 </div>
 
 <!-- 実績ページ（タイトル画面から使うため#appの外側に配置） -->
 <div class="overlay" id="ov-achievements" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(munyu_haikei.png);background-size:cover;background-position:center;">
-  <div class="ov-title" style="font-size:16px;margin-top:0;">🏆 実績</div>
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-achievements-back">← 戻る</div>
+    <div class="nav-back-title">🏆 実績</div>
+  </div>
   <div id="achievements-content" style="width:100%;overflow-y:auto;max-height:64vh;display:flex;flex-direction:column;gap:8px;"></div>
-  <div class="ov-btn" id="btn-achievements-close" style="margin-top:4px;">閉じる</div>
+
 </div>
 
 
@@ -2784,13 +2825,16 @@ function _doResumeRun(){
   //   そのため、その未完了だったターン移行処理をここで肩代わりして実行する。
   const _wasMidEnemyTurn=(G.phase!=='player');
   if(G.phase!=='player') G.phase='player';
-  if(_wasMidEnemyTurn) _completeInterruptedTurnTransition();
   companyScreen.style.display='none';
   const opScr=document.getElementById('op-screen');
   if(opScr) opScr.style.display='none';
   logoScreen.style.display='none';
   appDiv.style.display='flex';
   _restoreBattleVisualsFromSavedState();
+  // ★ターン開始処理の補完は「画面(DOM)の復元後」に行う。
+  //   毒/炎上ダメージ・シールド減少・ドロー等はupdateUI()やrenderHand()などDOMを操作するため、
+  //   画面を表示する前に実行すると反映されない・エラーになる可能性がある。
+  if(_wasMidEnemyTurn) _completeInterruptedTurnTransition();
 }
 // ★新規追加：敵ターン処理の途中（setTimeoutチェーンの完了前）にアプリが閉じられて再開した場合、
 // 本来「⑥ターン開始処理」(enemyTurn内)で行われるはずだった
@@ -2799,51 +2843,10 @@ function _doResumeRun(){
 // 　閉じる直前に既に適用済みの可能性があり二重適用を避けるため、ここでは意図的に対象外としている
 // 　（対象は「手札とターン数がズレる」主要因の解消に限定）。
 function _completeInterruptedTurnTransition(){
-  // 手札を捨て札に戻す（虚弱Dのみ手札に残す仕様を踏襲）
-  const kyojakuInHand=(G.hand||[]).filter(id=>id==='bougai_kyojaku');
-  const otherHand=(G.hand||[]).filter(id=>id!=='bougai_kyojaku');
-  if(otherHand.length>0) G.discard.push(...otherHand);
-  G.hand=kyojakuInHand;
-  if(typeof clampPage==='function') clampPage();
-  G.turnCount=(G.turnCount||1)+1;
-  // 地響きロック解除
-  if(G.quakeTurns>0){ G.quakeTurns--; }
-  // マナ：ターン開始時に固定値へリセット（呪縛/裁きペナルティを反映）
-  const _manaPenalty=(G.manaRegenPenaltyNext||0);
-  G.manaRegenPenaltyNext=0;
-  G.mana=Math.min(G.manaMax, Math.max(0, G.manaRegen+(G.nextManaBonus||0)-_manaPenalty));
-  G.atkBuff=G.permAtkBonus||0; G.nextManaBonus=0;
-  G.turnAtkCardCount=0; G.turnCostSum=0;
-  G.doubleNextCard=false; G.miniComboBuff=0;
-  G.usedFirstAtkBuff2=false; G.turnCardsUsed=0; G.doubleNext=false; G.doubleMultiplier=1;
-  G.chargeEffectActive=false;
-  G.furyDanceUsedThisTurn=false; G.soulEaterActive=false; G.soulEaterDmgThisTurn=0;
-  G.swiftUsedThisTurn=false; G.chainNoSkill=false;
-  G.comboHealActive=false; G.usedHighCostThisTurn=false;
-  G.freePassUsedThisTurn=false;
-  G.poisonDoubleTurn=false;
-  G.chargeUsedThisTurn=false;
-  G.ignitedCards={};
-  G.dokushiPoisonDouble=false;
-  if(G.berserkManaBonus>0){ G.mana=Math.min(G.manaMax,G.mana+G.berserkManaBonus); }
-  // 封印処理
-  G.sealedCardId=null;
-  if(G.sealNextTurn){ G.sealNextTurn=false; G.sealThisTurn=true; }
-  // 氷雪弾の使用制限
-  G.cardPlayLimitThisTurn=null;
-  if(G.cardPlayLimitNextTurn!=null){ G.cardPlayLimitThisTurn=G.cardPlayLimitNextTurn; G.cardPlayLimitNextTurn=null; }
-  if(G.shieldWeakenTurns>0) G.shieldWeakenTurns--;
-  if(G.heavyWoundTurns>0) G.heavyWoundTurns--;
-  if(G.invincibleTurns>0) G.invincibleTurns--;
-  if(G.halfShieldLossTurns>0) G.halfShieldLossTurns--;
-  if(G.nextDmgHalfTurns>0) G.nextDmgHalfTurns--;
-  if(G.weakenTurns>0){G.weakenTurns--;if(G.weakenTurns<=0){G.enemyAtkDebuff=0;}}
-  if(G.weakenHalfTurns>0){G.weakenHalfTurns--;if(G.weakenHalfTurns<=0){G.weakenHalf=false;}}
-  // 新しい手札を配る（アニメーションはスキップ）
-  G._skipDrawAnim=true;
-  drawCards(5+(G.nextTurnDrawBonusPending||0), true);
-  G.nextTurnDrawBonusPending=0;
-  G._skipDrawAnim=false;
+  // 通常プレイと完全に同じ共通関数を呼ぶ（処理の抜け・二重適用を防ぐため独自実装は持たない）。
+  // ※G.phase!=='player'＝⑥ターン開始処理が1行も実行されていない状態でのみ呼ばれるため、
+  //   ここで全てのターン開始効果を実行しても二重適用にはならない。
+  performPlayerTurnStart(true);
   addLog('⚠️ 前回、ターン移行の途中でアプリが終了されたため、ターン開始処理を補完しました','sys');
 }
 // 保存済みG（戦闘状態）は既に復元済みという前提で、画面(DOM)側だけを合わせて復元する。
@@ -5511,6 +5514,25 @@ function enemyTurn(){
   // ⑥ ターン開始処理（自己再生・聖域・弱体化カウントなど）
   steps.push(()=>{
     setTimeout(()=>{
+    performPlayerTurnStart(false);
+    },1000); // 行動終了から1秒後にあなたのターン開始
+  });
+
+  // ステップ実行エンジン
+  let stepIdx=0;
+  function nextStep(){
+    if(stepIdx>=steps.length) return;
+    if(G.phase==='gameover') return; // defeat後は中断
+    steps[stepIdx++]();
+  }
+  setTimeout(nextStep,1000); // 敵ターン開始から1秒後に最初のステップ開始
+}
+// ★プレイヤーターン開始処理の本体。
+// 通常プレイ（敵ターン終了→⑥ターン開始処理）と、中断復帰時の補完処理の
+// 両方から呼ばれる共通関数。両者で結果が完全に一致するようにするため、
+// 状態(G)の変更は一切分岐させず、演出のみ isRestore で抑制する。
+// ※この関数が呼ばれる時点では G.phase!=='player'（=ターン開始処理が未実行）であることが前提。
+function performPlayerTurnStart(isRestore){
     G.phase='player'; G.turnCount++;
     // 敵ターン終了：手札を捨て札に（虚弱Dは残す）
     const kyojakuInHand=G.hand.filter(id=>id==='bougai_kyojaku');
@@ -5659,11 +5681,11 @@ function enemyTurn(){
     }
     G._skipDrawAnim=true; drawCards(5+(G.nextTurnDrawBonusPending||0), true); G.nextTurnDrawBonusPending=0; G._skipDrawAnim=false; updateUI(); updateIntent();
     addLog('── ターン'+G.turnCount+' ──','sys');
-    showTurnSlide('⚔️ あなたのターン','#4ae080');
+    if(!isRestore) showTurnSlide('⚔️ あなたのターン','#4ae080');
     document.getElementById('btn-end').classList.remove('disabled');
     const tc=document.getElementById('turn-counter');if(tc)tc.textContent='T'+G.turnCount;
     // 呪縛警告：ターン5になったら「あと1ターンで発動」警告
-    if(G.turnCount===5){
+    if(G.turnCount===5 && !isRestore){
       setTimeout(()=>{
         const warn=document.createElement('div');
         warn.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9200;background:rgba(80,0,0,.96);border:2px solid #e74c3c;border-radius:12px;padding:16px 22px;text-align:center;max-width:280px;cursor:pointer;touch-action:manipulation;';
@@ -5733,17 +5755,6 @@ function enemyTurn(){
         }
       }
     },450);
-    },1000); // 行動終了から1秒後にあなたのターン開始
-  });
-
-  // ステップ実行エンジン
-  let stepIdx=0;
-  function nextStep(){
-    if(stepIdx>=steps.length) return;
-    if(G.phase==='gameover') return; // defeat後は中断
-    steps[stepIdx++]();
-  }
-  setTimeout(nextStep,1000); // 敵ターン開始から1秒後に最初のステップ開始
 }
 function healPlayer(amount, label){
   const before=G.playerHp;
@@ -12215,6 +12226,24 @@ function _shopGoBack(){
   _shopActiveSoulCat='';
   renderShopContent();
 }
+// 共通「← 戻る」：必ず1階層だけ戻る。
+// ソウルのサブカテゴリ表示中 → カテゴリ内の一覧（全て）へ
+// カテゴリ選択済み        → ショップのカテゴリ選択へ
+// カテゴリ選択画面        → メインメニューへ（オーバーレイを閉じる）
+function _shopNavBack(){
+  if(_shopActiveCat==='soul' && _shopActiveSoulCat!==''){
+    sfxCancel();
+    _shopActiveSoulCat='';
+    renderShopContent();
+    return;
+  }
+  if(_shopActiveCat){
+    _shopGoBack();
+    return;
+  }
+  sfxBack();
+  hideOv('ov-shop');
+}
 function renderShopContent(){
   const content=document.getElementById('shop-content');
   if(!content) return;
@@ -12225,6 +12254,16 @@ function renderShopContent(){
   if(goldEl) goldEl.textContent=SAVE.gold;
   if(soulEl) soulEl.textContent=SAVE.crystal;
 
+  // 画面左上の見出しを現在の階層に合わせて更新（戻り先が分かるように）
+  (function(){
+    const _ht=document.getElementById('shop-header-title');
+    if(!_ht) return;
+    const _CATTITLE={soul:'💠 ソウル',card:'🃏 カード',area:'🗺️ エリア解放',cap:'📦 上限解放',charge:'⚡ チャージ強化'};
+    const _SUBTITLE={'1':'① ステータスアップ系','2':'② 状態異常軽減系','3':'③ カード強化系','4':'④ 特殊効果付与系'};
+    if(_shopActiveCat==='soul' && _SUBTITLE[String(_shopActiveSoulCat)]) _ht.textContent=_SUBTITLE[String(_shopActiveSoulCat)];
+    else if(_shopActiveCat) _ht.textContent=_CATTITLE[_shopActiveCat]||'🛒 ショップ';
+    else _ht.textContent='🛒 ショップ';
+  })();
   const CAT_LABEL={soul:'💠 ソウル',card:'🃏 カード（1度のみ）',area:'🗺️ エリア解放',cap:'📦 キャパシティアップ（1度のみ）',charge:'⚡ チャージ強化'};
   const SOUL_SUBCAT_LABEL={1:'①ステータスアップ系',2:'②状態異常軽減系',3:'③カード強化系',4:'④特殊効果付与系'};
   SAVE.shopPurchased=SAVE.shopPurchased||{};
@@ -12264,13 +12303,13 @@ function renderShopContent(){
       const cnt=_catItems.length;
       const _hasNew=_catItems.some(it=>(SAVE.shopNewItemIds||[]).includes(it.id));
       const box=document.createElement('div');
-      box.style.cssText='width:100%;display:flex;align-items:center;gap:12px;background:rgba(10,8,6,.78);border:1px solid rgba(201,168,76,.4);border-radius:12px;padding:14px 16px;cursor:pointer;touch-action:manipulation;position:relative;';
+      box.style.cssText='width:100%;box-sizing:border-box;display:flex;align-items:center;gap:13px;background:linear-gradient(160deg,rgba(26,20,10,.9),rgba(10,8,14,.9));border:1px solid rgba(201,168,76,.45);border-radius:14px;padding:18px 16px;min-height:74px;cursor:pointer;touch-action:manipulation;position:relative;';
       box.innerHTML=
         (_hasNew?'<span style="position:absolute;top:-6px;right:-6px;background:#e74c3c;color:#fff;font-size:9px;font-weight:bold;padding:2px 6px;border-radius:10px;letter-spacing:1px;box-shadow:0 0 6px rgba(231,76,60,.8);">NEW</span>':'')+
-        '<span style="font-size:26px;">'+info.icon+'</span>'+
+        '<span style="font-size:30px;flex-shrink:0;">'+info.icon+'</span>'+
         '<div style="flex:1;min-width:0;">'+
           '<div style="font-family:\'Cinzel\',serif;font-size:14px;color:#f0d47a;font-weight:bold;">'+info.label+' <span style="font-size:10px;color:#999;font-weight:normal;">（'+cnt+'点）</span></div>'+
-          '<div style="font-size:9px;color:#aaa;margin-top:3px;line-height:1.4;">'+info.desc+'</div>'+
+          '<div style="font-size:10.5px;color:#b5ab99;margin-top:4px;line-height:1.5;">'+info.desc+'</div>'+
         '</div>'+
         '<span style="font-size:16px;color:#c9a84c;">›</span>';
       bindTapSwipe(box,()=>{ sfxSelect(); _shopSelectCat(cat); });
@@ -12280,13 +12319,8 @@ function renderShopContent(){
     return;
   }
 
-  // 戻るボタン（カテゴリ選択画面に戻る）
-  const backRow=document.createElement('div');
-  backRow.style.cssText='width:100%;';
-  backRow.innerHTML='<div class="shop-back-btn" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#c9a84c;background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:5px 12px;cursor:pointer;touch-action:manipulation;font-family:sans-serif;">← カテゴリ選択に戻る</div>';
+  // 戻る操作は画面左上の共通「← 戻る」ボタン(_shopNavBack)に統一
   content.innerHTML='';
-  content.appendChild(backRow);
-  bindTapSwipe(backRow.querySelector('.shop-back-btn'), _shopGoBack);
 
   items=items.filter(it=>it.cat===_shopActiveCat);
 
@@ -12370,7 +12404,8 @@ function renderShopContent(){
       const priceLabel=_formatItemPrice(it);
       const canAfford=_canAffordItem(it);
       const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(10,8,6,.78);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;margin-bottom:6px;';
+      row.className='shop-item-card'+(canAfford?'':' is-locked');
+      // 効果説明（既存データをそのまま使用。カードは既存の追記仕様を踏襲）
       let _rowDesc=it.desc;
       if(it.cat==='card' && it.cardId && DB[it.cardId]){
         const _cardRef=DB[it.cardId];
@@ -12380,15 +12415,27 @@ function renderShopContent(){
         _rowDesc='<span style="color:#8ab8d8;">コスト'+_cardRef.cost+'　'+_rarityAbbr+'　'+_typeLabel+'</span><br>'
           +_cardRef.desc+'　<span style="color:#f0d47a;">DP'+_dp+'</span>（デッキ編集の入れ替え候補に追加）';
       }
+      // カテゴリ表示（ソウルは①〜④の系統名、それ以外は大分類名）
+      let _chip='';
+      if(cat==='soul' && _soulRef && SOUL_SUBCAT_LABEL[_soulRef.category]) _chip=SOUL_SUBCAT_LABEL[_soulRef.category];
+      else _chip=({soul:'💠 ソウル',card:'🃏 カード',area:'🗺️ エリア解放',cap:'📦 上限解放',charge:'⚡ チャージ強化'})[cat]||'';
+      // 購入条件（価格とは別領域に表示）。不足している通貨だけを具体的に示す。
+      const _shortages=_getItemCosts(it)
+        .filter(co=>_getBalance(co.currency)<co.amount)
+        .map(co=>_currencyIcon(co.currency)+_currencyName(co.currency)+'が'+(co.amount-_getBalance(co.currency))+'不足');
       row.innerHTML=
-        '<span style="font-size:20px;">'+it.icon+'</span>'+
-        '<div style="flex:1;min-width:0;">'+
-          '<div style="font-size:12px;color:#fff;font-weight:bold;">'+it.name+((SAVE.shopNewItemIds||[]).includes(it.id)?' <span style="background:#e74c3c;color:#fff;font-size:8px;font-weight:bold;padding:1px 5px;border-radius:6px;vertical-align:middle;">NEW</span>':'')+'</div>'+
-          '<div style="font-size:9px;color:#aaa;line-height:1.4;">'+_rowDesc+'</div>'+
+        '<div class="shop-item-head">'+
+          '<span class="shop-item-icon">'+it.icon+'</span>'+
+          '<div style="flex:1;min-width:0;">'+
+            '<div class="shop-item-name">'+it.name+((SAVE.shopNewItemIds||[]).includes(it.id)?'<span class="shop-item-new">NEW</span>':'')+'</div>'+
+            (_chip?'<span class="shop-item-chip">'+_chip+'</span>':'')+
+          '</div>'+
         '</div>'+
-        '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'+
-          '<div style="font-size:10px;color:'+(canAfford?'#c9a84c':'#e07070')+';white-space:nowrap;">'+priceLabel+'</div>'+
-          '<div class="shop-buy-btn" style="font-size:10px;color:#c9a84c;border:1px solid rgba(201,168,76,.5);border-radius:6px;padding:3px 10px;white-space:nowrap;">購入</div>'+
+        '<div class="shop-item-desc">'+_rowDesc+'</div>'+
+        (_shortages.length?'<div class="shop-item-cond">⚠️ '+_shortages.join(' ／ ')+'</div>':'')+
+        '<div class="shop-item-foot">'+
+          '<span class="shop-item-price'+(canAfford?'':' short')+'">'+priceLabel+'</span>'+
+          '<div class="shop-buy-btn'+(canAfford?'':' disabled')+'">購入</div>'+
         '</div>';
       const buyBtn=row.querySelector('.shop-buy-btn');
       bindTapSwipe(buyBtn,()=>{ _showShopBuyConfirm(it); });
@@ -12533,7 +12580,7 @@ function _bindTitleExtraButtons(){
   bind('btn-deck-edit-close',()=>{ sfxBack(); hideOv('ov-deck-edit'); });
   bind('menu-btn-gamedata',()=>{ sfxSelect(); showGameDataScreen(); });
   bind('menu-btn-shop',()=>{ sfxSelect(); showShopScreen(); });
-  bind('btn-shop-close',()=>{ sfxBack(); hideOv('ov-shop'); });
+  bind('btn-shop-back', _shopNavBack);
   bind('sc-ok',()=>{
     if(!_shopConfirmItem) return;
     const okBtnEl=document.getElementById('sc-ok');
@@ -12545,7 +12592,7 @@ function _bindTitleExtraButtons(){
   });
   bind('sc-cancel',()=>{ sfxCancel(); _shopConfirmItem=null; hideOv('ov-shop-confirm'); });
   bind('menu-btn-gacha',()=>{ sfxSelect(); showGachaSelectScreen(); });
-  bind('btn-gacha-select-close',()=>{ sfxBack(); hideOv('ov-gacha-select'); });
+  bind('btn-gacha-select-back',()=>{ sfxBack(); hideOv('ov-gacha-select'); });
   bind('gacha-back-to-select',()=>{ sfxBack(); hideOv('ov-gacha-common'); showGachaSelectScreen(); });
   bind('gacha-buy-gold',()=>{ _showGachaBuyConfirm('gold'); });
   bind('gacha-buy-crystal',()=>{ _showGachaBuyConfirm('crystal'); });
@@ -13397,7 +13444,7 @@ function renderSoulSetupContent(){
 }
 function showAchievementsScreen(){
   renderAchievementsContent();
-  const closeBtn=document.getElementById('btn-achievements-close');
+  const closeBtn=document.getElementById('btn-achievements-back');
   if(closeBtn){
     closeBtn.onclick=(e)=>{e.stopPropagation();sfxBack();hideOv('ov-achievements');};
     closeBtn.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();sfxBack();hideOv('ov-achievements');};
@@ -13484,7 +13531,7 @@ function showGameDataScreen(){
   // ボタン類はHTMLがメインスクリプトより後方にあるため、開くたびに紐付ける
   const tabM=document.getElementById('gamedata-tab-monster');
   const tabC=document.getElementById('gamedata-tab-card');
-  const closeBtn=document.getElementById('btn-gamedata-close');
+  const closeBtn=document.getElementById('btn-gamedata-back');
   if(tabM){
     tabM.onclick=(e)=>{e.stopPropagation();sfxSelect();_gamedataTab='monster';renderGameDataContent();};
     tabM.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();sfxSelect();_gamedataTab='monster';renderGameDataContent();};
