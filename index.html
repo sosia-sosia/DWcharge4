@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver408</title>
+<title>DUNGEON WALKER DWCver409</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v408</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v409</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver408</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver409</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -5922,41 +5922,65 @@ function dealDirectToPlayer(dmg,lbl){
   spawnDmgNum('-'+dmg,'player-dmg'); shakePlayerArea(); flashScreen('flash-red');
   updateUI(); if(G.playerHp<=0)defeat(G.enemy?(G.enemy.name+'の防御無視攻撃'):undefined);
 }
+// 現在プレイヤーに有効な被ダメージ軽減効果を考慮し、敵の攻撃が実際に何ダメージになるかを
+// プレイヤーへ予告表示するためのプレビュー計算。状態は変更しない（実際の消費はdealToPlayer/
+// dealDirectToPlayerで行う）。isDirect=trueは「防御無視・シールド貫通」系（呪い・大呪い）用。
+function previewIncomingDamage(rawDmg, isDirect){
+  if(G.invincibleTurns>0) return 0;
+  if(G.nextDmgNull) return 0;
+  let dmg=rawDmg;
+  if(!isDirect && G.weakenHalf) dmg=Math.max(1,Math.floor(dmg/2));
+  if(isDirect && G.soulCurseReduce) dmg=Math.max(0,dmg-G.soulCurseReduce);
+  if(G.nextDmgPercent) dmg=Math.max(1,Math.floor(dmg*(100-G.nextDmgPercent)/100));
+  if(G.nextDmgHalf) dmg=Math.max(1,Math.floor(dmg/2));
+  if(G.nextDmgHalfTurns>0) dmg=Math.max(1,Math.floor(dmg/2));
+  return dmg;
+}
+// 上のプレビュー結果を「軽減が無ければそのまま／軽減があれば 元→実際 」のテキストにする（プレーンテキスト専用）
+function dmgIntentText(rawDmg, isDirect){
+  const shown=previewIncomingDamage(rawDmg, isDirect);
+  return shown===rawDmg ? (''+rawDmg) : (rawDmg+'→'+shown);
+}
 function updateIntent(){
   const e=G.enemy,next=e.pattern[e.patIdx%e.pattern.length],ea=Math.max(1,e.atk-G.enemyAtkDebuff);
+  // 被ダメージ軽減バフ（神盾・守護者・鈍化等）が有効な場合、実際に受けるダメージをプレビューするための表示用テキスト
+  const eaTxt=dmgIntentText(ea,false);
+  const ea2Txt=dmgIntentText(Math.floor(ea*2),false);
+  const eaCurseTxt=dmgIntentText(ea,true);
+  const ea2CurseTxt=dmgIntentText(Math.floor(ea*2),true);
   // 短い表示テキスト（intent bar用）
   const short={
-    atk:      '⚔️ 攻撃 '+ea,
-    big:      '💥 大攻撃 '+(ea*2),
-    poisonatk:'☠️ 毒攻撃 '+ea,
-    moudokuatk:'☠️💥 猛毒攻撃 '+(ea*2),
-    iceshot:  '❄️ 氷雪弾 '+ea,
-    drain:    '🩸 吸収 '+ea,
+    atk:      '⚔️ 攻撃 '+eaTxt,
+    big:      '💥 大攻撃 '+ea2Txt,
+    poisonatk:'☠️ 毒攻撃 '+eaTxt,
+    moudokuatk:'☠️💥 猛毒攻撃 '+ea2Txt,
+    iceshot:  '❄️ 氷雪弾 '+eaTxt,
+    drain:    '🩸 吸収 '+eaTxt,
     def:      '🛡️ 防御',
     bigdef:   '🛡️🛡️ 大防御',
     superbigdef:'🛡️🛡️🛡️ 超防御',
-    curse:    '☠️ 呪い '+ea,
-    bigcurse: '☠️☠️ 大呪い '+(ea*2),
+    curse:    '☠️ 呪い '+eaCurseTxt,
+    bigcurse: '☠️☠️ 大呪い '+ea2CurseTxt,
     heal:     '💚 回復',
     bigheal:  '💚💚 大回復',
     summon:   '🌑 召喚',
-    quake:    '🌍 地響き '+ea,
-    seal:     '🔒 封印 '+ea,
-    poisonfang:'☠️ 猛毒牙 '+ea,
-    burn:     '🔥 火傷 '+ea,
-    ignite:   '🔥 炎上 '+ea,
-    bigignite:'🔥 大炎上 '+ea,
-    superignite:'🔥 超炎上 '+ea,
-    weaken_e: '💀 衰弱 '+ea,
-    judgment: '⚖️ 裁き '+ea,
-    heavywound:'💔 重傷 '+ea,
-    soulcrush:'💀 魂砕き '+ea,
-    curse_bind:'⛓️ 呪縛 '+ea,
-    despair:  '😈 絶望 '+ea,
-    enervate: '😩 脱力 '+ea,
-    reflect_e:'🔄 反射準備 '+ea,
-    paralyze: '⚡ 麻痺 '+ea,
-    analysis_attack:'🎯 解析攻撃 '+ea,
+    quake:    '🌍 地響き '+eaTxt,
+    seal:     '🔒 封印 '+eaTxt,
+    poisonfang:'☠️ 猛毒牙 '+eaTxt,
+    burn:     '🔥 火傷 '+eaTxt,
+    ignite:   '🔥 炎上 '+eaTxt,
+    bigignite:'🔥 大炎上 '+eaTxt,
+    superignite:'🔥 超炎上 '+eaTxt,
+    weaken_e: '💀 衰弱 '+eaTxt,
+    judgment: '⚖️ 裁き '+eaTxt,
+    heavywound:'💔 重傷 '+eaTxt,
+    soulcrush:'💀 魂砕き '+eaTxt,
+    curse_bind:'⛓️ 呪縛 '+eaTxt,
+    despair:  '😈 絶望 '+eaTxt,
+    enervate: '😩 脱力 '+eaTxt,
+    reflect_e:'🔄 反射準備 '+eaTxt,
+    paralyze: '⚡ 麻痺 '+eaTxt,
+    analysis_attack:'🎯 解析攻撃 '+eaTxt,
   };
   // 弱点：ダメージを与える行動には「(+N)」で追加ダメージ予告を表示する（実際に非ダメージ系の行動は除外）
   if((G.weaknessCount||0)>0){
@@ -5965,37 +5989,37 @@ function updateIntent(){
   }
   // 詳細テキスト（ポップアップ用）
   const detail={
-    atk:      '⚔️ 攻撃\nダメージ: '+ea,
-    big:      '💥 大攻撃\nダメージ: '+(ea*2)+'（通常の2倍）',
-    poisonatk:'☠️ 毒攻撃\nダメージ: '+ea+'\n毒カウント+（実際に与えたダメージと同数。毎ターン毒カウント分ダメージを与え、カウントは半減・切り捨て）',
-    moudokuatk:'☠️💥 猛毒攻撃\nダメージ: '+(ea*2)+'（通常の2倍）\n毒カウント+（実際に与えたダメージと同数。毎ターン毒カウント分ダメージを与え、カウントは半減・切り捨て）',
-    iceshot:  '❄️ 氷雪弾\nダメージ: '+ea+'\n次ターン、使用できるカードが2枚までに制限される',
-    drain:    '🩸 吸収攻撃\nダメージ: '+ea+'\n自己回復: ダメージ量の50%',
+    atk:      '⚔️ 攻撃\nダメージ: '+eaTxt,
+    big:      '💥 大攻撃\nダメージ: '+ea2Txt+'（通常の2倍）',
+    poisonatk:'☠️ 毒攻撃\nダメージ: '+eaTxt+'\n毒カウント+（実際に与えたダメージと同数。毎ターン毒カウント分ダメージを与え、カウントは半減・切り捨て）',
+    moudokuatk:'☠️💥 猛毒攻撃\nダメージ: '+ea2Txt+'（通常の2倍）\n毒カウント+（実際に与えたダメージと同数。毎ターン毒カウント分ダメージを与え、カウントは半減・切り捨て）',
+    iceshot:  '❄️ 氷雪弾\nダメージ: '+eaTxt+'\n次ターン、使用できるカードが2枚までに制限される',
+    drain:    '🩸 吸収攻撃\nダメージ: '+eaTxt+'\n自己回復: ダメージ量の50%',
     def:      '🛡️ 防御\nシールド+12',
     bigdef:   '🛡️🛡️ 大防御\nシールド+24',
     superbigdef:'🛡️🛡️🛡️ 超防御\nシールド+36',
-    curse:    '☠️ 呪い\nHP-'+ea+'（防御無視・シールド貫通）',
-    bigcurse: '☠️☠️ 大呪い\nHP-'+(ea*2)+'（防御無視・シールド貫通）',
+    curse:    '☠️ 呪い\nHP-'+eaCurseTxt+'（防御無視・シールド貫通）',
+    bigcurse: '☠️☠️ 大呪い\nHP-'+ea2CurseTxt+'（防御無視・シールド貫通）',
     heal:     '💚 回復\n最大HPの10%を回復',
     bigheal:  '💚💚 大回復\n最大HPの20%を回復',
     summon:   '🌑 召喚\nシールド+15 & 攻撃力+15（以降全攻撃に適用）',
-    quake:    '🌍 地響き\nダメージ: '+ea+'\n次のプレイヤーターン中、コスト1のカードが使用不可',
-    seal:     '🔒 封印\nダメージ: '+ea+'\n次のターン、手札で最もコストの高いカードが使用不可',
-    poisonfang:'☠️ 猛毒牙\nダメージ: '+ea+'\n猛毒牙Dカード×2をデッキに追加（使用時HP-5・毒+3）',
-    burn:     '🔥 火傷\nダメージ: '+ea+'\n火傷Dカード×3をデッキに追加（ターン終了時HP-5/枚）',
-    ignite:   '🔥 炎上\nダメージ: '+ea+'\n次ターンドロー1枚のコスト+1（ターン終了時リセット）',
-    bigignite:'🔥 大炎上\nダメージ: '+ea+'\n次ターンドロー1枚のコスト+2（ターン終了時リセット）',
-    superignite:'🔥 超炎上\nダメージ: '+ea+'\n次ターンドロー2枚のコスト+2（ターン終了時リセット）',
-    weaken_e: '💀 衰弱\nダメージ: '+ea+'\n2ターン間、ターン開始時にシールドが0になる',
-    judgment: '⚖️ 裁き\nダメージ: '+ea+'\n次のターン開始時マナ-1',
-    heavywound:'💔 重傷\nダメージ: '+ea+'\n3ターン間、回復効果が半減',
-    soulcrush:'💀 魂砕き\nダメージ: '+ea+'\n魂砕きDカード×1をデッキに追加（使用時HP-8）',
-    curse_bind:'⛓️ 呪縛\nダメージ: '+ea+'\n次のターン開始時マナ-2',
-    despair:  '😈 絶望\nダメージ: '+ea+'\n足枷Dカード×3をデッキに追加（使用時マナ-1）',
-    enervate: '😩 脱力\nダメージ: '+ea+'\n脱力Dカード×2をデッキに追加（手札にある間マナ最大値-2）',
-    reflect_e:'🔄 反射準備\nダメージ: '+ea+'\n次に受けるプレイヤーの攻撃を反射してダメージを与える',
-    paralyze: '⚡ 麻痺\nダメージ: '+ea+'\n次にプレイヤーが使用するカード1枚の効果を無効化する（カードの使用自体・コスト消費は通常通り）',
-    analysis_attack:'🎯 解析攻撃\nダメージ: '+ea+'\n弱点カウント+'+ea+'（自身の攻撃力と同じ値。次にダメージを受けた時、弱点カウント分の追加ダメージ）',
+    quake:    '🌍 地響き\nダメージ: '+eaTxt+'\n次のプレイヤーターン中、コスト1のカードが使用不可',
+    seal:     '🔒 封印\nダメージ: '+eaTxt+'\n次のターン、手札で最もコストの高いカードが使用不可',
+    poisonfang:'☠️ 猛毒牙\nダメージ: '+eaTxt+'\n猛毒牙Dカード×2をデッキに追加（使用時HP-5・毒+3）',
+    burn:     '🔥 火傷\nダメージ: '+eaTxt+'\n火傷Dカード×3をデッキに追加（ターン終了時HP-5/枚）',
+    ignite:   '🔥 炎上\nダメージ: '+eaTxt+'\n次ターンドロー1枚のコスト+1（ターン終了時リセット）',
+    bigignite:'🔥 大炎上\nダメージ: '+eaTxt+'\n次ターンドロー1枚のコスト+2（ターン終了時リセット）',
+    superignite:'🔥 超炎上\nダメージ: '+eaTxt+'\n次ターンドロー2枚のコスト+2（ターン終了時リセット）',
+    weaken_e: '💀 衰弱\nダメージ: '+eaTxt+'\n2ターン間、ターン開始時にシールドが0になる',
+    judgment: '⚖️ 裁き\nダメージ: '+eaTxt+'\n次のターン開始時マナ-1',
+    heavywound:'💔 重傷\nダメージ: '+eaTxt+'\n3ターン間、回復効果が半減',
+    soulcrush:'💀 魂砕き\nダメージ: '+eaTxt+'\n魂砕きDカード×1をデッキに追加（使用時HP-8）',
+    curse_bind:'⛓️ 呪縛\nダメージ: '+eaTxt+'\n次のターン開始時マナ-2',
+    despair:  '😈 絶望\nダメージ: '+eaTxt+'\n足枷Dカード×3をデッキに追加（使用時マナ-1）',
+    enervate: '😩 脱力\nダメージ: '+eaTxt+'\n脱力Dカード×2をデッキに追加（手札にある間マナ最大値-2）',
+    reflect_e:'🔄 反射準備\nダメージ: '+eaTxt+'\n次に受けるプレイヤーの攻撃を反射してダメージを与える',
+    paralyze: '⚡ 麻痺\nダメージ: '+eaTxt+'\n次にプレイヤーが使用するカード1枚の効果を無効化する（カードの使用自体・コスト消費は通常通り）',
+    analysis_attack:'🎯 解析攻撃\nダメージ: '+eaTxt+'\n弱点カウント+'+ea+'（自身の攻撃力と同じ値。次にダメージを受けた時、弱点カウント分の追加ダメージ）',
   };
   let intentText='次: '+(short[next]||('??? ('+next+')'));
   if(G.enemy&&G.enemy.reflectActive) intentText+=' 🔄';
