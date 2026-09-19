@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver411</title>
+<title>DUNGEON WALKER DWCver413</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v411</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v413</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver411</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver413</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2822,6 +2822,10 @@ function _doResumeRun(){
   }
   G=st;
   _reconstructSmithKaiCards(G);
+  // 演出専用の一時フラグ（多段ヒット演出中フラグ等）は、保存前に演出が完了しないまま
+  // 中断された場合に「立ったまま」保存されてしまうことがある。そのまま復元すると、
+  // 以後ずっと死亡判定やHPバー同期がロックされたままになりうるため、必ずリセットする。
+  G._multiHitRevealPending=0;
   // 復元時は必ず「プレイヤーの手番」として安全に復帰させる（HP等の数値は保存時点のものをそのまま使う）
   // ★保存時点のphaseが'player'以外だった場合、本来ターン開始処理（手札の捨て直し・新規ドロー・
   //   ターン加算）が実行されるより前の状態で保存されている。そのままphaseだけ'player'に矯正すると、
@@ -3772,6 +3776,9 @@ function playCard(idx, _isChain){
   }
   setTimeout(_unlockUI,200);
 
+  // 連撃回復：if(!_isChain)ブロックの内側で判定・計算するため、ブロックの外側（この関数のトップレベル）で
+  // 宣言しておく必要がある（letはブロックスコープのため、内側だけで宣言すると後段の参照でReferenceErrorになる）。
+  let _comboHealPendingVal=0;
   if(!_isChain){
     const handIdx=(typeof idx==='number')?idx:G.hand.indexOf(cid);
     const isHakiZeroPlay=G.hakiZeroCostCardIds&&G.hakiZeroCostCardIds.includes(cid)&&G.hand.includes(cid);
@@ -3913,7 +3920,6 @@ function playCard(idx, _isChain){
     // 全てキューに積まれた後に回すため、後ろで使う変数として保持しておく。
     // 【バグ対策】ここで即queueEffectすると、まだ1つもキューに積まれていない攻撃の演出より
     // 先に「回復」の表示が再生され、「攻撃エフェクト→回復→連撃攻撃」という不自然な順序に見えていた。
-    let _comboHealPendingVal=0;
     if(c.type==='attack'){
       G.turnAtkCardCount=(G.turnAtkCardCount||0)+1;
       if(G.comboHealActive){
@@ -8631,8 +8637,18 @@ function _cardNameSize(name){
   return n<=6?10.5:Math.max(7.5,10.5-(n-6)*0.5);
 }
 // カード説明文：基準9px、15文字目から自動縮小（最小6.5px）
+// カード上の説明文フォントサイズ。文字数（HTMLタグを除いた「見た目の文字数」）で自動縮小する。
+// デッキ確認／カード図鑑／カード編集など、静的な説明文（shortDesc等）を表示する画面で共通利用。
+function _stripTags(html){ return (''+(html||'')).replace(/<[^>]*>/g,''); }
 function _cardDescSize(text){
-  const n=(text||'').length;
+  const n=_stripTags(text).length;
+  return n<=14?9:Math.max(6.5,9-(n-14)*0.25);
+}
+// 戦闘中の手札カード専用（renderHand内のみで使用）。基本サイズを少し大きくしつつ、
+// 同じく「見た目の文字数」を基準に縮小するため、ハイライト用<span>タグの有無で
+// 不自然にサイズが変わることがない。
+function _handCardDescSize(text){
+  const n=_stripTags(text).length;
   return n<=14?10.5:Math.max(8,10.5-(n-14)*0.25);
 }
 
@@ -9035,7 +9051,7 @@ function renderHand(){
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc" style="font-size:'+_cardDescSize(displayDesc)+'px;">'+displayDesc+'</div>'+
+        '<div class="card-desc" style="font-size:'+_handCardDescSize(displayDesc)+'px;">'+displayDesc+'</div>'+
         '<div class="rarity-dot '+c.rarity+'">'+RL[c.rarity]+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
