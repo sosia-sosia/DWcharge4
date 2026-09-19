@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver409</title>
+<title>DUNGEON WALKER DWCver410</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -312,7 +312,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card-icon-wrap img{width:100%;height:100%;object-fit:contain;border-radius:50%;display:block;}
 
 /* カード名 */
-.card-name{font-size:10.5px;font-weight:bold;color:var(--text);letter-spacing:.3px;margin-top:1px;font-family:'Cinzel',serif;}
+.card-name{font-size:11.5px;font-weight:bold;color:var(--text);letter-spacing:.2px;margin-top:1px;font-family:'Cinzel',serif;line-height:1.15;}
 
 /* 区切り線 */
 .card-divider{height:1px;margin:1px 4px;}
@@ -323,7 +323,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card.legendary .card-divider{background:linear-gradient(90deg,transparent,rgba(255,149,0,.5),transparent);}
 
 /* 効果テキスト */
-.card-desc{font-size:9px;color:#c8c0b0;font-style:normal;line-height:1.4;font-family:sans-serif;padding:2px 2px;flex:1;display:block;text-align:center;overflow:hidden;}
+.card-desc{font-size:10px;color:#d8d0c2;font-style:normal;line-height:1.42;font-family:sans-serif;padding:2px 3px;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
 
 /* レアリティ表記 */
 .rarity-dot{display:none;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v409</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v410</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver409</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver410</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -3909,9 +3909,17 @@ function playCard(idx, _isChain){
     // ※ここまでの使用可否判定（地響き・封印・氷雪弾・妨害電波・マナ不足・妨害カード不足・麻痺 等）を
     //   すべて通過した後で演出を発動する（使用不可なのに成功演出だけ流れる不具合の防止）
     if(!_isChain) triggerCardEffect(cid);
+    // 連撃回復：回復量の計算とHP反映はここで行うが、演出（queueEffect）は攻撃の演出が
+    // 全てキューに積まれた後に回すため、後ろで使う変数として保持しておく。
+    // 【バグ対策】ここで即queueEffectすると、まだ1つもキューに積まれていない攻撃の演出より
+    // 先に「回復」の表示が再生され、「攻撃エフェクト→回復→連撃攻撃」という不自然な順序に見えていた。
+    let _comboHealPendingVal=0;
     if(c.type==='attack'){
       G.turnAtkCardCount=(G.turnAtkCardCount||0)+1;
-      if(G.comboHealActive){const chHeal=healPlayer((G.comboHealVal||3)+(G.healBuff||0));if(chHeal>0){queueEffect(()=>{sfxHeal();spawnDmgNum('+'+chHeal,'heal');flashHealEffect(chHeal);}, 800);}}
+      if(G.comboHealActive){
+        const chHeal=healPlayer((G.comboHealVal||3)+(G.healBuff||0));
+        if(chHeal>0) _comboHealPendingVal=chHeal;
+      }
     }
     if(actualCost>=3) G.usedHighCostThisTurn=true;
     const _ct_now_inner=G.chargeType?curCT():null;
@@ -4037,6 +4045,13 @@ function playCard(idx, _isChain){
         _renderEnemyHpDisplay(_hpBefore, true);
       }, 0);
     }
+    // 【バグ対策】多段ヒットの演出（1撃ずつ段階的にHPを見せる）が始まる前に、
+    // G.enemy.curHpは既にこのループ内で最終値まで進んでしまっている。
+    // この後の処理（他のeffect分岐や関数末尾）で同期的にupdateUI()が呼ばれると、
+    // 演出のqueueEffectが1つも実行されないうちにHPバーが最終値まで一気に飛んでしまい、
+    // 「連続攻撃で敵が倒れる時、HPが一気に減って見える」不具合の原因になっていた。
+    // そのため、段階演出が全て終わるまでupdateUI()側でのHPバー同期を一時的に止める。
+    if(_hpPerHit.length>0) G._multiHitRevealPending=(G._multiHitRevealPending||0)+1;
     _hpPerHit.forEach(function(hit, hitIdx){
       (function(dmg, snapHp, seHeal, raw, absorbed){
         queueEffect(()=>{
@@ -4059,11 +4074,19 @@ function playCard(idx, _isChain){
     });
     // 全ヒットの演出が終わった直後に死亡判定（演出中のHP巻き戻しの影響を受けないタイミングで判定するため）
     if(_hpPerHit.length>0 && _hpPerHit[_hpPerHit.length-1].hp<=0){
-      queueEffect(()=>{ checkEnemyDeath(); }, 0);
+      queueEffect(()=>{ checkEnemyDeath(); G._multiHitRevealPending=Math.max(0,(G._multiHitRevealPending||0)-1); }, 0);
+    } else if(_hpPerHit.length>0){
+      // 敵が倒れなかった場合も、段階演出が終わったタイミングでHPバー同期のロックを解除する
+      queueEffect(()=>{ G._multiHitRevealPending=Math.max(0,(G._multiHitRevealPending||0)-1); updateUI(); }, 0);
     }
     // 多段ヒット後：HP0でもここではreturnしない（このカードの他の効果＝盾/ドロー/毒付与等を継続処理するため）
     // 死亡判定の発火自体はcheckEnemyDeath()内でG.enemy.curHpを見て予約され、
     // 実際にプレイヤーへ見せる撃破処理は関数末尾の最終checkEnemyDeath()で確実に行われる
+  }
+  // 連撃回復の演出：攻撃の演出が全てキューに積まれた後に再生されるよう、ここで改めてqueueEffectする
+  // （攻撃エフェクト→攻撃ヒット→回復、の自然な順序にするため）
+  if(_comboHealPendingVal>0){
+    queueEffect(()=>{sfxHeal();spawnDmgNum('+'+_comboHealPendingVal,'heal');flashHealEffect(_comboHealPendingVal);}, 800);
   }
   if(ef.selfHp){
     const sv=ef.selfHp;
@@ -4848,7 +4871,13 @@ function playCard(idx, _isChain){
 
   addLog((c.rarity==='legendary'?'⭐ ':'▶ ')+msgs.join(' / '),c.rarity==='legendary'?'sys':'player');
   // 全効果処理完了後：必ずHP0チェック（複数効果カード対策）
-  if(checkEnemyDeath()) return;
+  // 【バグ対策】ただし多段ヒットの段階演出が予約されている間は、この同期チェックを呼ばない。
+  // 呼んでしまうと、まだ1つも演出(queueEffect)が再生されていない段階でHPバーが最終値(0)へ
+  // 一気に飛んでしまい、「連続攻撃で敵を倒すとHPが一気に減って見える」原因になっていた。
+  // 段階演出側が既に自前でcheckEnemyDeath()を適切なタイミング（全ヒット表示後）で予約している。
+  if(!(G._multiHitRevealPending>0)){
+    if(checkEnemyDeath()) return;
+  }
 
   // レジェンドカード使用時の特別エフェクト
   if(c.rarity==='legendary') spawnLegendaryEffect();
