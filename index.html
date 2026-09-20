@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver414</title>
+<title>DUNGEON WALKER DWCver416</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v414</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v416</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver414</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver416</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -8709,7 +8709,10 @@ function renderHand(){
     const needsBougai=ef.bougaiExile_atk||ef.bougaiExile_shield||ef.bougaiExile_heal||ef.bougaiExile_curse;
     const isBougaiLocked=needsBougai&&!hasBougaiInHand;
     // 浄化：状態異常を受けていないかつ手札に妨害カードもない場合は使用不可
-    const hasBougaiInHand = G.hand.some(id=>DB[id]&&DB[id].type==='bougai');
+    // （hasBougaiInHandは関数冒頭で既に宣言済みのものを使う。ここで再宣言すると、
+    //   ブロック内の先頭からその行までが一時的死角(TDZ)になり、上のisBougaiLocked行で
+    //   「初期化前にアクセスした」というReferenceErrorが発生していた＝妨害カード必須カードの
+    //   描画がエラーで丸ごと止まる不具合の原因だった）
     const _exorciseHasTarget=hasBougaiInHand||(G.playerPoison||0)>0||(G.playerBurn||0)>0||(G.heavyWoundTurns||0)>0||(G.shieldWeakenTurns||0)>0||(G.quakeTurns||0)>0||G.sealThisTurn||(G.manaRegenPenaltyNext||0)>0;
     const isExorciseLocked = (c.id==='exorcise'||c._baseId==='exorcise') && !_exorciseHasTarget;
     // 驚異の生命力：HP50%未満は使用不可
@@ -8744,9 +8747,15 @@ function renderHand(){
     // 条件付きカード・現在値の動的表示
     // ※実際の攻撃力計算（G.atkBuff＋G.stageAtkBonus）と一致させる
     const _atk=(G.atkBuff||0)+(G.stageAtkBonus||0);
+    // 「最初の一撃」系の上昇値（攻撃力強化2のソウル・次攻撃+X）。実処理では1ヒット目にのみ乗る。
+    const _firstAtkBonus=(G.permAtkBuff2&&!G.usedFirstAtkBuff2)?G.permAtkBuff2:0;
+    const _nextAtkBonus=(G.nextAtkBuffVal||0);
+    const _firstHitExtra=_firstAtkBonus+_nextAtkBonus;
     const _dbl=G.doubleNext;
     const _dblMult=G.doubleMultiplier||2;
     const _d=(base)=>_dbl?(base*_dblMult):base; // doubleNext考慮（実際の倍率を反映）
+    // 単発攻撃カード用：ベース値に「最初の一撃」上昇値も加算してから倍率をかける（実処理と同じ順序）
+    const _dSingle=(base)=>_d(base+_firstHitExtra);
     const _hi=(n)=>'<span style="color:#f0c040;font-weight:bold;">'+n+'</span>';
     const _baseId=c._baseId||c.id; // 改カードは元のIDで判定
     const displayDesc = (()=>{
@@ -8759,7 +8768,7 @@ function renderHand(){
         case 'bloodPact':{
           const _ketsuyakuSoul=getEquippedSouls().includes('ketsuyakuSoul');
           const sd=_ketsuyakuSoul?5:(c.effect.selfDmg||10);
-          const dmgBp=_d((c.effect.atk||20)+_atk+getSoulCardAtkBonus('bloodPact'));
+          const dmgBp=_dSingle((c.effect.atk||20)+_atk+getSoulCardAtkBonus('bloodPact'));
           return 'HP-'+sd+' + 攻'+_hi(dmgBp);
         }
         case 'shieldBash':{
@@ -8829,15 +8838,19 @@ function renderHand(){
         case 'poisonKill':{
           return G.enemyPoison<10
             ?'<span style="color:#888;">毒10以上のみ（現在'+G.enemyPoison+'）</span>'
-            :'攻'+_hi(_d(18+_atk));
+            :'攻'+_hi(_dSingle(18+_atk));
         }
         case 'poisonNeedle':{
           const baseAtk=c.effect.atk||3;
           const soulB=getSoulCardAtkBonus('poisonNeedle');
-          const pndmg=_d(baseAtk+soulB+_atk);
+          // 最初の一撃ボーナス（攻撃力強化2・次攻撃+X）も実際の毒付与量（与えたダメージ基準）に反映される
+          const firstAtkBonus=(G.permAtkBuff2&&!G.usedFirstAtkBuff2)?G.permAtkBuff2:0;
+          const nextAtkBonus=(G.nextAtkBuffVal||0);
+          const pndmg=_d(baseAtk+soulB+_atk+firstAtkBonus+nextAtkBonus);
           // 毒付与量は「実際に与えるダメージ」＝敵シールドで軽減された後の値を基準にする（実処理と一致させる）
           const pnRealDmg=Math.max(0,pndmg-(G.enemyShield||0));
-          return '攻'+fmtStatArrow(baseAtk,pndmg)+' 毒+'+_hi(pnRealDmg)+(pnRealDmg<pndmg?'<span style="color:#5dade2;font-size:9px;">（盾軽減後）</span>':'');
+          // カード幅が狭いと1行に収まらず不自然に折り返すため、<br>で2行に固定して見やすくする
+          return '攻'+fmtStatArrow(baseAtk,pndmg)+'<br>毒+'+_hi(pnRealDmg)+(pnRealDmg<pndmg?'<span style="color:#5dade2;font-size:8px;">(軽減後)</span>':'');
         }
         case 'strike2':{
           const bonusVal=c.effect.bonusIfNotFirstVal||8;
@@ -8848,10 +8861,10 @@ function renderHand(){
         case 'lastStand':{
           return G.playerHp>10
             ?'<span style="color:#888;">HP10以下のみ</span>'
-            :'攻'+_hi(_d(20+_atk));
+            :'攻'+_hi(_dSingle(20+_atk));
         }
         case 'lifesteal':{
-          const dmg=_d(10+_atk);
+          const dmg=_dSingle(10+_atk);
           // 実際に与えるダメージ（敵シールド軽減後）を基準に回復量を計算する（実処理と一致させる）
           const lsRealDmg=Math.max(0,dmg-(G.enemyShield||0));
           const hv=lsRealDmg+(G.healBuff||0);
@@ -8868,7 +8881,7 @@ function renderHand(){
           return '攻'+_hi(dmg)+'（回復合計'+hs+'）';
         }
         case 'konshin':{
-          const dmg=_d((c.effect.atk||25)+_atk);
+          const dmg=_dSingle((c.effect.atk||25)+_atk);
           return '攻'+_hi(dmg)+' <span style="color:#e74c3c;">次Tドロー-2</span>';
         }
         case 'chikara':{
@@ -8904,7 +8917,7 @@ function renderHand(){
         }
         case 'slash2':{
           const sb=c.effect.shieldFirstBreak||8;
-          const dmg=_d((c.effect.atk||10)+_atk);
+          const dmg=_dSingle((c.effect.atk||10)+_atk);
           return '盾-'+sb+' 攻'+_hi(dmg);
         }
         case 'armorPierce':{
@@ -8912,38 +8925,48 @@ function renderHand(){
           return '盾無視 攻'+_hi(dmg);
         }
         case 'guideStrike':{
-          const dmg=_d((c.effect.atk||4)+_atk);
+          const dmg=_dSingle((c.effect.atk||4)+_atk);
           return '攻'+_hi(dmg)+' ドロー1';
         }
         case 'combo':{
           const t=c.effect.times||3;
           const dmg=_d((c.effect.atk||5)+_atk);
           const total=dmg*t;
-          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
+          const _firstAll1=_firstHitExtra+(G.enemyWeaknessCount||0);
+          const firstTag=_firstAll1>0?'<span style="color:#f39c12;font-size:8px;">(1発目+'+_firstAll1+')</span>':'';
+          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+firstTag;
         }
         case 'stormSlash':{
           const t=c.effect.times||6;
           const dmg=_d((c.effect.atk||3)+_atk);
           const total=dmg*t;
-          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
+          const _firstAll2=_firstHitExtra+(G.enemyWeaknessCount||0);
+          const firstTag=_firstAll2>0?'<span style="color:#f39c12;font-size:8px;">(1発目+'+_firstAll2+')</span>':'';
+          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+firstTag;
         }
         case 'karuren':{
           const t=c.effect.times||2;
           const dmg=_d((c.effect.atk||2)+_atk+getSoulCardAtkBonus('karuren'));
           const total=dmg*t;
-          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
+          const _firstAll3=_firstHitExtra+(G.enemyWeaknessCount||0);
+          const firstTag=_firstAll3>0?'<span style="color:#f39c12;font-size:8px;">(1発目+'+_firstAll3+')</span>':'';
+          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+firstTag;
         }
         case 'evilCombo':{
           const t=c.effect.times||4;
           const dmg=_d((c.effect.atk||2)+_atk);
           const total=dmg*t;
-          return '妨害除外:<br>攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
+          const _firstAll4=_firstHitExtra+(G.enemyWeaknessCount||0);
+          const firstTag=_firstAll4>0?'<span style="color:#f39c12;font-size:8px;">(1発目+'+_firstAll4+')</span>':'';
+          return '妨害除外:<br>攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+firstTag;
         }
         case 'twin':{
           const t=c.effect.times||2;
           const dmg=_d((c.effect.atk||6)+_atk);
           const total=dmg*t;
-          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>';
+          const _firstAll5=_firstHitExtra+(G.enemyWeaknessCount||0);
+          const firstTag=_firstAll5>0?'<span style="color:#f39c12;font-size:8px;">(1発目+'+_firstAll5+')</span>':'';
+          return '攻'+_hi(dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+firstTag;
         }
         case 'anger':{
           const bv=c.effect.val||2;
@@ -8962,7 +8985,7 @@ function renderHand(){
           const _dpm=G.dokushiPoisonMult||2;
           const pamt=(base+(G.poisonAddBonus||0))*(G.poisonDoubleTurn?2:1)*(G.dokushiPoisonDouble?_dpm:1);
           return G.dokushiPoisonDouble
-            ? '毒'+fmtStatArrow(base,pamt)+'<span style="color:#8e44ad;font-size:9px;">（錬金'+_dpm+'倍！）</span>'
+            ? '毒'+fmtStatArrow(base,pamt)+'<br><span style="color:#8e44ad;font-size:8px;">(錬金'+_dpm+'倍)</span>'
             : '毒'+fmtStatArrow(base,pamt);
         }
         case 'chainPoison':{
@@ -8972,16 +8995,16 @@ function renderHand(){
           const pamt=(base+(G.poisonAddBonus||0))*(G.poisonDoubleTurn?2:1)*(G.dokushiPoisonDouble?_dpm2:1);
           const highPoison=G.enemyPoison>=10;
           return G.dokushiPoisonDouble
-            ? '毒'+fmtStatArrow(base,pamt)+(highPoison?'+'+_hi(bonus*_dpm2):'')+'<span style="color:#8e44ad;font-size:9px;">（錬金'+_dpm2+'倍！）</span>'
-            : '毒'+fmtStatArrow(base,pamt)+(highPoison?' +'+_hi(bonus):'（毒10↑+'+bonus+'）');
+            ? '毒'+fmtStatArrow(base,pamt)+(highPoison?'+'+_hi(bonus*_dpm2):'')+'<br><span style="color:#8e44ad;font-size:8px;">(錬金'+_dpm2+'倍)</span>'
+            : '毒'+fmtStatArrow(base,pamt)+(highPoison?' +'+_hi(bonus):'<br><span style="font-size:8px;color:#aaa;">(毒10↑で+'+bonus+')</span>');
         }
         case 'pollutedWorld':{
           const base=c.effect.poison||5;
           const _dpm3=G.dokushiPoisonMult||2;
           const pamt=(base+(G.poisonAddBonus||0))*(G.dokushiPoisonDouble?_dpm3:1)*2; // doublePoison込み
           return G.dokushiPoisonDouble
-            ? '毒'+fmtStatArrow(base,pamt)+'<span style="color:#8e44ad;font-size:9px;">（錬金'+_dpm3+'倍！）</span>このT毒2倍'
-            : '毒'+fmtStatArrow(base,(base+(G.poisonAddBonus||0))*2)+' このT毒2倍';
+            ? '毒'+fmtStatArrow(base,pamt)+'<br><span style="color:#8e44ad;font-size:8px;">(錬金'+_dpm3+'倍)</span>このT毒2倍'
+            : '毒'+fmtStatArrow(base,(base+(G.poisonAddBonus||0))*2)+'<br><span style="font-size:8px;color:#aaa;">このT毒2倍</span>';
         }
         case 'soulEater':{
           const sb2=c.effect.soulEaterBonus||0;
@@ -9026,18 +9049,26 @@ function renderHand(){
           if(c.type==='attack'&&c.effect&&c.effect.atk){
             const t=c.effect.times||1;
             const hpScaleExtra=c.effect.hpScaleUnit?Math.floor(G.playerMaxHp/c.effect.hpScaleUnit)*c.effect.hpScaleBonus:0;
-            const atkExtra=_atk+soulAtkB+hpScaleExtra;
+            // 「最初の一撃」系の上昇値（攻撃力強化2のソウル・次攻撃+X）は、このカードが
+            // 実際にプレイされた場合の1ヒット目に乗る実処理と同じ条件で加算する
+            const firstAtkBonus=(G.permAtkBuff2&&!G.usedFirstAtkBuff2)?G.permAtkBuff2:0;
+            const nextAtkBonus=(G.nextAtkBuffVal||0);
+            const firstHitExtra=firstAtkBonus+nextAtkBonus;
+            const atkExtra=_atk+soulAtkB+hpScaleExtra+firstHitExtra;
             const base=c.effect.atk;
             const dmg=_d(base+atkExtra);
             const total=dmg*t;
             const hpTag=hpScaleExtra>0?'<span style="color:#4ecdc4;font-size:8px;">(HP+'+hpScaleExtra+')</span>':'';
             if(t>1){
-              // 弱点付与ダメージは1ヒット目にのみ乗る一時的な追加分のため、合計には含めず別枠で示す
+              // 弱点付与・最初の一撃ボーナスは1ヒット目にのみ乗る一時的な追加分のため、
+              // per-hitの数値・合計には含めず別枠で示す（1ヒット目の実際の値と食い違うのを防ぐ）
               const wkExtra=G.enemyWeaknessCount||0;
+              const firstHitTag=firstHitExtra>0?'<span style="color:#f39c12;font-size:9px;">(1発目+'+firstHitExtra+')</span>':'';
               const wkTag=wkExtra>0?'<span style="color:#ff6060;font-size:9px;">(1発目+'+wkExtra+')</span>':'';
-              return '攻'+fmtStatArrow(base,dmg)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(total)+'</span>'+wkTag+hpTag;
+              const dmgNoFirst=_d(base+_atk+soulAtkB+hpScaleExtra);
+              return '攻'+fmtStatArrow(base,dmgNoFirst)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(dmgNoFirst*t)+'</span>'+firstHitTag+wkTag+hpTag;
             }
-            // 単発攻撃は、弱点付与分も含めた「実際に与えるダメージ」を現在値として表示する
+            // 単発攻撃は、弱点付与・最初の一撃ボーナス分も含めた「実際に与えるダメージ」を現在値として表示する
             const wkExtra=G.enemyWeaknessCount||0;
             return '攻'+fmtStatArrow(base,dmg+wkExtra)+hpTag;
           }
@@ -9242,7 +9273,10 @@ function getCardStatBreakdown(c){
   if(c.type==='attack' && c.effect.atk){
     const times=c.effect.times||1;
     const hpScaleExtra=(inBattle&&c.effect.hpScaleUnit)?Math.floor(G.playerMaxHp/c.effect.hpScaleUnit)*c.effect.hpScaleBonus:0;
-    const flatBonus=(inBattle?((G.atkBuff||0)+(G.stageAtkBonus||0)):0)+soulAtkB+hpScaleExtra;
+    // 最初の一撃ボーナス（攻撃力強化2のソウル・次攻撃+X）も、1ヒット目に乗る実処理と同じ条件で加算する
+    const firstAtkBonus=(inBattle&&G.permAtkBuff2&&!G.usedFirstAtkBuff2)?G.permAtkBuff2:0;
+    const nextAtkBonus=inBattle?(G.nextAtkBuffVal||0):0;
+    const flatBonus=(inBattle?((G.atkBuff||0)+(G.stageAtkBonus||0)):0)+soulAtkB+hpScaleExtra+firstAtkBonus+nextAtkBonus;
     const mult=(inBattle&&G.doubleNext)?(G.doubleMultiplier||2):1;
     const wkExtra=(inBattle&&times===1)?(G.enemyWeaknessCount||0):0; // 弱点付与は1ヒット目のみ・乗算後に加算（実処理と同じ順序）
     const base=c.effect.atk;
