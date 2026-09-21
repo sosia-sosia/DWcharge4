@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver418</title>
+<title>DUNGEON WALKER DWCver419</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v418</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v419</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver418</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver419</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -999,10 +999,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span class="menu-btn-fallback">🗑️ データ削除</span>
     </div>
     <div id="menu-btn-theme" class="ov-btn menu-img-btn" data-bg="menu_song.png" style="height:70px;overflow:hidden;">
-      <span class="menu-btn-fallback">🎵 メインテーマ曲「迷宮の衝動」</span>
-      <span id="menu-theme-playicon" style="position:absolute;top:50%;left:14px;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.6);">▶</span>
+      <span class="menu-btn-fallback">🎵 ミュージック</span>
     </div>
   </div>
+</div>
+
+<!-- ミュージック画面（聴いたことのある曲だけが並ぶプレイリスト） -->
+<div class="overlay" id="ov-music" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(menu_song.png);background-size:cover;background-position:center;">
+  <div class="nav-back-row">
+    <div class="nav-back-btn" id="btn-music-back">← 戻る</div>
+    <div class="nav-back-title">🎵 ミュージック</div>
+  </div>
+  <div style="width:100%;font-size:10px;color:#c9a84c;font-family:sans-serif;background:rgba(0,0,0,.5);border-radius:8px;padding:6px 10px;">ゲーム内で一度でも流れた曲だけが、ここに追加されていきます。</div>
+  <div id="music-track-list" style="width:100%;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
 </div>
 
 <!-- ショップ画面（#appの外側に配置） -->
@@ -10673,8 +10682,19 @@ function getAudioCtx(){
 // BGMシステム
 // 音声ミュート設定（SAVEに永続化。設定変更のたびに再生中の音声へも即反映）
 function isMuted(){ return !!(SAVE&&SAVE.muted); }
+// ミュート中は「音は出さないが裏で再生され続ける（曲が進む・終了イベントが発火する等）」状態を避けるため、
+// muted属性だけでなく実際にpause()する。ミュート解除時は、ミュートで止めた分だけ再開する。
 function _applyMuteToActiveAudio(){
-  [_opAudio,_bgmAudio,_eventAudio].forEach(a=>{ if(a) a.muted=isMuted(); });
+  const m=isMuted();
+  [_opAudio,_bgmAudio,_eventAudio].forEach(a=>{
+    if(!a) return;
+    a.muted=m; // 保険として引き続き設定（pause漏れがあっても無音は保証する）
+    if(m){
+      if(!a.paused) a.pause();
+    } else if(a.paused){
+      a.play().catch(()=>{});
+    }
+  });
 }
 function setMuted(v){
   SAVE.muted=!!v;
@@ -10753,7 +10773,7 @@ function playOpBgm(){
     _opAudio.loop=true;
     _opAudio.volume=0.85;
     _opAudio.muted=isMuted();
-    _opAudio.play().catch(()=>{});
+    if(!isMuted()) _opAudio.play().catch(()=>{});
   }catch(e){}
 }
 function stopOpBgm(){
@@ -10768,12 +10788,13 @@ function playEventBgm(){
   if(_eventAudio) return; // すでに再生中なら継続
   stopOpBgm();
   if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;_currentBgm=null;}
+  _unlockMusicTrack('event.mp3');
   try{
     _eventAudio=new Audio('event.mp3');
     _eventAudio.loop=true;
     _eventAudio.volume=0.85;
     _eventAudio.muted=isMuted();
-    _eventAudio.play().catch(()=>{});
+    if(!isMuted()) _eventAudio.play().catch(()=>{});
   }catch(e){}
 }
 function stopEventBgm(){
@@ -10789,12 +10810,13 @@ function playBgm(file){
   stopEventBgm(); // イベントBGMも止める
   if(_bgmAudio){_bgmAudio.pause();_bgmAudio.currentTime=0;_bgmAudio=null;}
   _currentBgm=file;
+  if(file!=='op.mp3') _unlockMusicTrack(file); // メニュー曲(op.mp3)自体はプレイリスト対象外
   try{
     _bgmAudio=new Audio(file);
     _bgmAudio.loop=true;
     _bgmAudio.volume=0.85;
     _bgmAudio.muted=isMuted();
-    _bgmAudio.play().catch(()=>{});
+    if(!isMuted()) _bgmAudio.play().catch(()=>{});
   }catch(e){}
 }
 // ループさせず一度だけ再生し、終わったらonEndedを呼ぶ（メインテーマ曲プレビュー用）
@@ -10815,7 +10837,7 @@ function playBgmOnce(file, onEnded){
         if(onEnded) onEnded();
       }
     });
-    _bgmAudio.play().catch(()=>{});
+    if(!isMuted()) _bgmAudio.play().catch(()=>{});
   }catch(e){}
 }
 function stopBgm(){
@@ -12240,36 +12262,85 @@ function _initMenuImgFallbacks(){
     img.src=src;
   });
 }
-// メインテーマ曲プレビュー再生中は、再生停止ボタン以外のメニュー操作をできないようにする
-function _setMenuLocked(locked){
-  const menu=document.getElementById('ov-main-menu');
-  if(!menu) return;
-  const btns=menu.querySelectorAll('.ov-btn');
-  btns.forEach(b=>{
-    if(b.id==='menu-btn-theme') return;
-    b.style.pointerEvents=locked?'none':'';
-    b.style.opacity=locked?'0.4':'';
-  });
-}
-function _updateThemeBtnLabel(){
-  const icon=document.getElementById('menu-theme-playicon');
-  if(!icon) return;
-  const playing=(_currentBgm==='song_meikyu.mp3');
-  icon.textContent=playing?'⏸':'▶';
-  icon.style.background=playing?'rgba(200,60,120,.75)':'rgba(0,0,0,.55)';
-  icon.style.borderColor=playing?'rgba(255,180,220,.9)':'rgba(255,255,255,.8)';
-  _setMenuLocked(playing);
-}
-// 万が一、再生中に画面が切り替わってしまった場合の保険。ov-main-menuが非表示になったタイミングで停止する
-function _stopThemeIfMenuHidden(){
-  const menu=document.getElementById('ov-main-menu');
-  const isMenuVisible=menu && menu.classList.contains('show');
-  if(!isMenuVisible && _currentBgm==='song_meikyu.mp3'){
-    playBgm('op.mp3');
-    _setMenuLocked(false);
+// ===== ミュージック（ゲーム内で流れた曲だけが並ぶプレイリスト） =====
+// fileはplayBgm/playEventBgm等に渡す実際のファイル名と一致させる。
+// always:trueの曲は最初から解放済み（隠しメインテーマ扱い）。
+const MUSIC_TRACKS=[
+  {id:'song_meikyu', file:'song_meikyu.mp3', name:'迷宮の衝動（メインテーマ）', desc:'隠しメインテーマ曲', always:true},
+  {id:'stage1_8',    file:'stage1-8.mp3',    name:'ステージ曲・序盤',   desc:'始まりの洞窟〜序盤の各エリア'},
+  {id:'stage9',      file:'stage9.mp3',      name:'ステージ曲・中盤',   desc:'中盤エリア／始まりの洞窟ステージ4以降'},
+  {id:'stage10_14',  file:'stage10-14.mp3',  name:'ステージ曲・終盤',   desc:'終盤エリア'},
+  {id:'stage15',     file:'stage15.mp3',     name:'ステージ曲・最終決戦', desc:'各エリア最終ステージ（ボスモンスター）'},
+  {id:'event',       file:'event.mp3',       name:'報酬演出曲',        desc:'ステージクリア報酬画面'},
+];
+function _unlockMusicTrack(file){
+  const t=MUSIC_TRACKS.find(t=>t.file===file);
+  if(!t) return;
+  SAVE.musicUnlocked=SAVE.musicUnlocked||{};
+  if(!SAVE.musicUnlocked[t.id]){
+    SAVE.musicUnlocked[t.id]=true;
+    writeSaveData();
   }
 }
-setInterval(_stopThemeIfMenuHidden, 500);
+function _isMusicTrackUnlocked(t){
+  return !!t.always || !!(SAVE.musicUnlocked && SAVE.musicUnlocked[t.id]);
+}
+// ミュージック画面でのプレビュー再生中かどうか（画面を閉じたら止めるため）
+let _musicPreviewPlaying=null; // 再生中トラックのid、またはnull
+function renderMusicTrackList(){
+  const list=document.getElementById('music-track-list');
+  if(!list) return;
+  list.innerHTML='';
+  const unlocked=MUSIC_TRACKS.filter(_isMusicTrackUnlocked);
+  if(unlocked.length===0){
+    list.innerHTML='<div style="text-align:center;color:#888;font-size:11px;font-family:sans-serif;padding:24px 0;">まだ聴いた曲がありません。<br>ダンジョンを進めると、ここに曲が追加されていきます。</div>';
+    return;
+  }
+  unlocked.forEach(t=>{
+    const playing=(_currentBgm===t.file && _musicPreviewPlaying===t.id);
+    const row=document.createElement('div');
+    row.className='shop-item-card';
+    row.innerHTML=
+      '<div class="shop-item-head">'
+        +'<span class="shop-item-icon">'+(playing?'⏸':'🎵')+'</span>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div class="shop-item-name">'+t.name+'</div>'
+          +'<div class="shop-item-desc" style="margin-top:2px;">'+t.desc+'</div>'
+        +'</div>'
+      +'</div>';
+    row.style.cursor='pointer';
+    row.style.touchAction='manipulation';
+    const tap=()=>{
+      sfxSelect();
+      if(playing){
+        _stopMusicPreview();
+      } else {
+        _musicPreviewPlaying=t.id;
+        playBgmOnce(t.file, ()=>{ _musicPreviewPlaying=null; renderMusicTrackList(); playBgm('op.mp3'); });
+      }
+      renderMusicTrackList();
+    };
+    bindTapSwipe(row, tap);
+    list.appendChild(row);
+  });
+}
+function _stopMusicPreview(){
+  if(_musicPreviewPlaying){
+    _musicPreviewPlaying=null;
+    playBgm('op.mp3');
+  }
+}
+function showMusicScreen(){
+  renderMusicTrackList();
+  showOv('ov-music');
+}
+// 万が一、プレビュー再生中に画面が切り替わってしまった場合の保険。ov-musicが非表示になったタイミングで停止する
+function _stopMusicPreviewIfScreenHidden(){
+  const ov=document.getElementById('ov-music');
+  const visible=ov && ov.classList.contains('show');
+  if(!visible && _musicPreviewPlaying) _stopMusicPreview();
+}
+setInterval(_stopMusicPreviewIfScreenHidden, 500);
 
 // ==================== ショップ（プレビュー版・形だけ用意） ====================
 // 販売品リスト。unlockArea: nullなら常時販売、エリア名を指定すると該当エリアを初クリアした時点で追加販売される
@@ -12810,16 +12881,12 @@ function _bindTitleExtraButtons(){
   bind('menu-btn-savedelete',()=>{ sfxSelect(); showOv('ov-save-delete-confirm'); _startSaveDeleteCountdown(); });
   bind('menu-btn-theme',()=>{
     sfxSelect();
-    if(_currentBgm==='song_meikyu.mp3'){
-      playBgm('op.mp3'); // 手動で停止 → 通常のメニューBGMに戻す
-      _updateThemeBtnLabel();
-    } else {
-      playBgmOnce('song_meikyu.mp3', ()=>{
-        playBgm('op.mp3'); // 再生し終わったら通常のメニューBGMに自動で戻す
-        _updateThemeBtnLabel();
-      });
-      _updateThemeBtnLabel();
-    }
+    showMusicScreen();
+  });
+  bind('btn-music-back',()=>{
+    sfxBack();
+    _stopMusicPreview();
+    hideOv('ov-music');
   });
   bind('sdc-cancel',()=>{ sfxCancel(); hideOv('ov-save-delete-confirm'); });
   bind('sdc-ok',()=>{
@@ -12852,7 +12919,6 @@ function _bindTitleExtraButtons(){
   });
   _updateMuteBtnLabel();
   _updateShopNewBadge();
-  _updateThemeBtnLabel();
   _initMenuImgFallbacks();
 }
 _bindTitleExtraButtons();
@@ -12860,7 +12926,6 @@ _bindTitleExtraButtons();
 function showMainMenu(){
   showOv('ov-main-menu');
   _updateShopNewBadge();
-  _updateThemeBtnLabel();
 }
 
 // ===== ゲームデータ画面（モンスター図鑑・カード図鑑） =====
