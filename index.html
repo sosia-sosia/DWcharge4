@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver416</title>
+<title>DUNGEON WALKER DWCver418</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -811,7 +811,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v416</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v418</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +845,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver416</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver418</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -7166,6 +7166,7 @@ function showAreaSelect(){
     const badge=document.getElementById('area-clear-badge-'+idx);
     const cleared=!!(SAVE.clearedAreas&&SAVE.clearedAreas[idx]);
     const noContinueDone=!!(SAVE.noContinueCleared&&SAVE.noContinueCleared[idx]);
+    const allChargeDone=cleared&&isAllChargeCleared(idx);
     if(badge){
       if(locked){
         badge.style.display='block';
@@ -7173,7 +7174,7 @@ function showAreaSelect(){
         badge.style.color='#e07070';
       } else {
         badge.style.display=cleared?'block':'none';
-        badge.textContent=noContinueDone?'🏆 クリア済み（ノーコン済✨）':'🏆 クリア済み';
+        badge.textContent=(noContinueDone?'🏆 クリア済み（ノーコン済✨）':'🏆 クリア済み')+(allChargeDone?'（全チャージ制覇✨）':'');
         badge.style.color='#ffd700';
       }
     }
@@ -8728,6 +8729,12 @@ function renderHand(){
     const isNewCard=!G._skipDrawAnim&&(G._lastDrawnIndices||[]).includes(i);
     const isTutorialTarget = G.areaId===7 && tutorialCurrentAction()==='card' && i===G.tutorialTargetHandIdx;
     d.className='card '+c.rarity+' '+(canUse?'playable':'unplayable')+(isSelected?' selected-card':'')+(isNewCard?' card-slide-in':'')+(isTutorialTarget?' tutorial-target-card':'');
+    if(isNewCard){
+      // 【バグ対策】card-slide-inはanimation-fill-mode:forwardsで終端のopacity:1を固定してしまうため、
+      // マナ不足等で本来暗く(unplayable)表示すべきカードでも、ドロー直後は明るいまま見えてしまっていた。
+      // アニメーション終了後にクラスを外し、通常のCSSクラス(.unplayable)による不透明度に戻す。
+      d.addEventListener('animationend',()=>{ d.classList.remove('card-slide-in'); }, {once:true});
+    }
     if(isPoisonKillLocked||isLastStandLocked||isSwiftLocked||isEchoLocked||isFreePassLocked||isFreePassCostLocked||isChainNoSkillLocked||isAfterForceLocked||isSealLocked||isQuakeLocked||isMechSignalLocked||isBougaiLocked||isExorciseLocked||isHalfHpLocked||isTutorialCardLocked) d.style.filter='grayscale(100%)';
     else d.style.filter='';
     // 麻痺中：次に使うカードが無効化されることが分かるよう、手札全体を黄色く色付けする
@@ -8817,7 +8824,8 @@ function renderHand(){
         case 'reflect':{
           const sv=Math.floor(G.shield/2);
           const dmg=_d(sv+_atk);
-          return G.shield>0?'盾-'+sv+' 攻'+_hi(dmg)+'（盾'+G.shield+'÷2）':'<span style="color:#888;">盾なし</span>';
+          // カード幅が狭いと1行に収まらず不自然に折り返すため、<br>で2行に固定して見やすくする
+          return G.shield>0?'盾-'+sv+'<br>攻'+_hi(dmg)+'<span style="font-size:8px;color:#aaa;">(盾÷2)</span>':'<span style="color:#888;">盾なし</span>';
         }
         case 'curseBurst':{
           let cnt=0;
@@ -11198,8 +11206,11 @@ function executeChargeEffect(){
         '<div class="card-corner tl">'+corner+'</div>'+
         '<div class="card-corner br">'+corner+'</div>';
       // タップ：コストなしで使用（レベル3のみさらに山札から手札にも加える）
+      let _doUseFired=false; // タッチ端末でtouchendとclickが両方発火し、2回実行されてしまう事故の防止
       const doUse=(e)=>{
         if(e.type==='touchend') e.preventDefault();
+        if(_doUseFired) return;
+        _doUseFired=true;
         (function(){var _el=ov;if(_el&&_el.parentNode)_el.parentNode.removeChild(_el);})();
         const _repeat=ct.repeatCount>1?ct.repeatCount:1;
         const _savedBattleExile=c.effect.battleExile;
