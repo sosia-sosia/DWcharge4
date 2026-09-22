@@ -10866,19 +10866,21 @@ function stopBgm(){
   _currentBgm=null;
 }
 function updateBgm(){
-  if(G.areaId===0){
-    // 始まりの洞窟
-    playBgm(G.stage>=4?'stage9.mp3':'stage1-8.mp3');
+  const stageNum=G.stage+1; // 1始まりのステージ番号
+  const e=getAreaEnemies()[G.stage];
+  if(e && e.boss){
+    // ボス曲を優先（10・15階のボスは stageBOSS_2、それ以外（5・7・9階等）は stageBOSS_1）
+    playBgm((stageNum===10||stageNum===15)?'stageBOSS_2.mp3':'stageBOSS_1.mp3');
     return;
   }
-  if(G.stage>=14){
-    playBgm('stage15.mp3');
-  } else if(G.stage>=9){
-    playBgm('stage10-14.mp3');
-  } else if(G.stage>=8){
-    playBgm('stage9.mp3');
+  if(stageNum<=4){
+    playBgm('stage1-4.mp3');
+  } else if(stageNum<=8){
+    playBgm('stage5-8.mp3');
+  } else if(stageNum<=12){
+    playBgm('stage9-12.mp3');
   } else {
-    playBgm('stage1-8.mp3');
+    playBgm('stage13-14.mp3');
   }
 }
 function playBeep(freq=440,type='square',dur=0.08,vol=0.12,delay=0){
@@ -12277,12 +12279,18 @@ function _initMenuImgFallbacks(){
 // fileはplayBgm/playEventBgm等に渡す実際のファイル名と一致させる。
 // always:trueの曲は最初から解放済み（隠しメインテーマ扱い）。
 const MUSIC_TRACKS=[
-  {id:'song_meikyu', file:'song_meikyu.mp3', name:'迷宮の衝動（メインテーマ）', desc:'隠しメインテーマ曲', always:true},
-  {id:'stage1_8',    file:'stage1-8.mp3',    name:'ステージ曲・序盤',   desc:'始まりの洞窟〜序盤の各エリア'},
-  {id:'stage9',      file:'stage9.mp3',      name:'ステージ曲・中盤',   desc:'中盤エリア／始まりの洞窟ステージ4以降'},
-  {id:'stage10_14',  file:'stage10-14.mp3',  name:'ステージ曲・終盤',   desc:'終盤エリア'},
-  {id:'stage15',     file:'stage15.mp3',     name:'ステージ曲・最終決戦', desc:'各エリア最終ステージ（ボスモンスター）'},
-  {id:'event',       file:'event.mp3',       name:'報酬演出曲',        desc:'ステージクリア報酬画面'},
+  // 初めから出すもの
+  {id:'song_meikyu', file:'song_meikyu.mp3', name:'旧メインテーマ',     desc:'隠しメインテーマ曲', always:true},
+  {id:'op',          file:'op.mp3',          name:'メインテーマ',       desc:'タイトル・メニュー画面', always:true},
+  {id:'op_old',      file:'op_old.mp3',      name:'旧オープニング',     desc:'過去のオープニング曲', always:true},
+  // 聞いた後に出すもの
+  {id:'event',       file:'event.mp3',       name:'イベント',          desc:'ステージクリア報酬画面'},
+  {id:'stage1_4',    file:'stage1-4.mp3',    name:'ステージ曲１',       desc:'ステージ1〜4'},
+  {id:'stage5_8',    file:'stage5-8.mp3',    name:'ステージ曲２',       desc:'ステージ5〜8'},
+  {id:'stage9_12',   file:'stage9-12.mp3',   name:'ステージ曲３',       desc:'ステージ9〜12'},
+  {id:'stage13_14',  file:'stage13-14.mp3',  name:'ステージ曲４',       desc:'ステージ13〜14'},
+  {id:'stageBOSS_1', file:'stageBOSS_1.mp3', name:'境界を越える意志',   desc:'ボス戦（5・7・9階等）'},
+  {id:'stageBOSS_2', file:'stageBOSS_2.mp3', name:'鮮やかな幻影',       desc:'ボス戦（10・15階）'},
 ];
 function _unlockMusicTrack(file){
   const t=MUSIC_TRACKS.find(t=>t.file===file);
