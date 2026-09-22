@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver419</title>
+<title>DUNGEON WALKER DWCver421</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -510,6 +510,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* カード獲得スライドイン */
 @keyframes card-slide-in{from{transform:translateX(130%);opacity:0}to{transform:translateX(0);opacity:1}}
 .card-slide-in{animation:card-slide-in .5s cubic-bezier(.2,.8,.3,1) forwards;}
+/* レア度ごとの常時グロー演出(.card.rare等)も"animation"プロパティを使っているため、
+   両方を同じ要素に付けた場合、詳細度の高い方（クラス2つ分の.card.rare）だけが適用され、
+   スライドイン演出(.card-slide-in、クラス1つ分)が発火しない不具合があった。
+   （手札一括ドロー時、rare/epic/legendaryのカードだけ動きが無く見えた原因）
+   詳細度の高い専用ルールを用意し、複数アニメーションをカンマ区切りで両方適用する。 */
+.card.rare.card-slide-in{animation:card-slide-in .5s cubic-bezier(.2,.8,.3,1) forwards, card-glow-rare 2.6s ease-in-out infinite;}
+.card.epic.card-slide-in{animation:card-slide-in .5s cubic-bezier(.2,.8,.3,1) forwards, card-glow-epic 2.2s ease-in-out infinite;}
+.card.legendary.card-slide-in{animation:card-slide-in .5s cubic-bezier(.2,.8,.3,1) forwards, card-glow-legendary 1.8s ease-in-out infinite;}
 
 /* 敵揺れは attack時のみ（classで制御） */
 #enemy-area.attack-hit{animation:enemy-hit .35s ease-out;}
@@ -811,7 +819,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v419</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v421</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -845,7 +853,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver419</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver421</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -1005,7 +1013,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 </div>
 
 <!-- ミュージック画面（聴いたことのある曲だけが並ぶプレイリスト） -->
-<div class="overlay" id="ov-music" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(menu_song.png);background-size:cover;background-position:center;">
+<div class="overlay" id="ov-music" style="gap:8px;padding:14px 12px;position:fixed;z-index:2000;background-image:url(title.png);background-size:cover;background-position:center;">
   <div class="nav-back-row">
     <div class="nav-back-btn" id="btn-music-back">← 戻る</div>
     <div class="nav-back-title">🎵 ミュージック</div>
@@ -1722,7 +1730,7 @@ const CHARGE_TYPES = {
          effectType:'nextTurnHeal', effectVal:12, draw:0},
       3:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+12回復 + ドロー1',
          effectType:'nextTurnHeal', effectVal:12, draw:1},
-      4:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：HP+20回復し、最大HPを超えた分は最大HPに加算する（このステージ中のみ／加算分は回復扱いで神聖なる拳のカウントに加算される）',
+      4:{maxCount:3, desc:'回復カード使用で1溜まる。3溜まったらゲージをタップして手動発動：先に最大HP+20してから、HP+20回復する（このステージ中のみ／回復扱いで神聖なる拳のカウントにも加算される）',
          effectType:'nextTurnHeal', effectVal:20, draw:0, overflowToMax:true},
     },
   },
@@ -3141,9 +3149,9 @@ const SOULS={
   taidoku: {id:'taidoku', name:'耐毒のソウルⅠ', category:2, cost:1, icon:'☠️', desc:'敵から受ける毒付与量-8（0未満にはならない）'},
   taidoku2:{id:'taidoku2', name:'耐毒のソウルⅡ', category:2, cost:2, icon:'☠️', desc:'敵から受ける毒付与量-16（0未満にはならない）'},
   taidoku3:{id:'taidoku3', name:'耐毒のソウルⅢ', category:2, cost:3, icon:'☠️', desc:'敵から受ける毒付与量-24（0未満にはならない）'},
-  fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-5（0未満にはならない）'},
-  fukutsu2:{id:'fukutsu2', name:'不屈のソウルⅡ', category:2, cost:2, icon:'💢', desc:'敵の呪いダメージ-10（0未満にはならない）'},
-  fukutsu3:{id:'fukutsu3', name:'不屈のソウルⅢ', category:2, cost:3, icon:'💢', desc:'敵の呪いダメージ-15（0未満にはならない）'},
+  fukutsu: {id:'fukutsu', name:'不屈のソウルⅠ', category:2, cost:1, icon:'💢', desc:'敵の呪いダメージ-3（0未満にはならない）'},
+  fukutsu2:{id:'fukutsu2', name:'不屈のソウルⅡ', category:2, cost:2, icon:'💢', desc:'敵の呪いダメージ-6（0未満にはならない）'},
+  fukutsu3:{id:'fukutsu3', name:'不屈のソウルⅢ', category:2, cost:3, icon:'💢', desc:'敵の呪いダメージ-9（0未満にはならない）'},
   jakutenKoku: {id:'jakutenKoku', name:'弱点克服のソウルⅠ', category:2, cost:1, icon:'🎯', desc:'弱点付与量-6（0未満にはならない）'},
   jakutenKoku2:{id:'jakutenKoku2', name:'弱点克服のソウルⅡ', category:2, cost:2, icon:'🎯', desc:'弱点付与量-12（0未満にはならない）'},
   taika:   {id:'taika',   name:'耐炎のソウルⅠ', category:2, cost:2, icon:'🔥', desc:'炎上・大炎上・超炎上の増加コストを-1する（0未満にはならない）'},
@@ -3366,7 +3374,7 @@ function initGame(){
   const _soulHpBonus=(_equippedSouls.includes('seimei')?10:0)+(_equippedSouls.includes('seimei2')?20:0)+(_equippedSouls.includes('seimei3')?40:0);
   const _soulShieldBonus=(_equippedSouls.includes('teppeki')?5:0)+(_equippedSouls.includes('teppeki2')?10:0);
   const _soulPoisonReduce=(_equippedSouls.includes('taidoku')?8:0)+(_equippedSouls.includes('taidoku2')?16:0)+(_equippedSouls.includes('taidoku3')?24:0);
-  const _soulCurseReduce=(_equippedSouls.includes('fukutsu')?5:0)+(_equippedSouls.includes('fukutsu2')?10:0)+(_equippedSouls.includes('fukutsu3')?15:0);
+  const _soulCurseReduce=(_equippedSouls.includes('fukutsu')?3:0)+(_equippedSouls.includes('fukutsu2')?6:0)+(_equippedSouls.includes('fukutsu3')?9:0);
   const _soulManaBonus=_equippedSouls.includes('manaAmp')?1:0;
   // 初マナのソウル／初札のソウル：通常のステータス強化で獲得した時と同じ処理（firstTurnManaBonus/initHandBonusとフラグを同時にセット）
   const _soulFirstMana=_equippedSouls.includes('hatsuMana')?1:0;
@@ -3807,7 +3815,9 @@ function playCard(idx, _isChain){
     // 氷雪弾：このターンに使用できるカード枚数の上限に達している場合は使用不可
     if(G.cardPlayLimitThisTurn!=null && (G.turnCardsUsed||0)>=G.cardPlayLimitThisTurn && !isHakiZeroPlay && !isFreePass){
       dwRejectFeedback(document.getElementById('hand-cards'));
-      addLog('❄️ 氷雪弾の効果でこのカードは使用できません（残り使用可能枚数: 0）','sys'); return;
+      addLog('❄️ 氷雪弾の効果でこのカードは使用できません（残り使用可能枚数: 0）','sys');
+      showTurnSlide('❄️ 氷雪弾の効果でこのカードは使用できません','#5dade2');
+      return;
     }
     if(isFreePass){
       // 踏み倒し：使用時のマナ以下のコストのカードは使用不可
@@ -7310,7 +7320,7 @@ function showChargeSelect(){
           const _soulHpBonus2=(_equippedSoulsNow2.includes('seimei')?10:0)+(_equippedSoulsNow2.includes('seimei2')?20:0)+(_equippedSoulsNow2.includes('seimei3')?40:0);
           const _soulShieldBonus2=(_equippedSoulsNow2.includes('teppeki')?5:0)+(_equippedSoulsNow2.includes('teppeki2')?10:0);
           const _soulPoisonReduce2=(_equippedSoulsNow2.includes('taidoku')?8:0)+(_equippedSoulsNow2.includes('taidoku2')?16:0)+(_equippedSoulsNow2.includes('taidoku3')?24:0);
-          const _soulCurseReduce2=(_equippedSoulsNow2.includes('fukutsu')?5:0)+(_equippedSoulsNow2.includes('fukutsu2')?10:0)+(_equippedSoulsNow2.includes('fukutsu3')?15:0);
+          const _soulCurseReduce2=(_equippedSoulsNow2.includes('fukutsu')?3:0)+(_equippedSoulsNow2.includes('fukutsu2')?6:0)+(_equippedSoulsNow2.includes('fukutsu3')?9:0);
           const _soulManaBonus2=_equippedSoulsNow2.includes('manaAmp')?1:0;
           const _soulFirstMana2=_equippedSoulsNow2.includes('hatsuMana')?1:0;
           const _soulInitHand2=_equippedSoulsNow2.includes('hatsuFuda')?1:0;
@@ -8885,7 +8895,8 @@ function renderHand(){
           // 実際に与えるダメージ（敵シールド軽減後）を基準に回復量を計算する（実処理と一致させる）
           const lsRealDmg=Math.max(0,dmg-(G.enemyShield||0));
           const hv=lsRealDmg+(G.healBuff||0);
-          return '攻'+_hi(dmg)+'+HP+'+_hi(hv)+'回復'+(lsRealDmg<dmg?'<span style="color:#5dade2;font-size:9px;">（盾軽減後）</span>':'');
+          // カード幅が狭いと1行に収まらず不自然に折り返すため、<br>で2行に固定して見やすくする
+          return '攻'+_hi(dmg)+'<br>HP+'+_hi(hv)+'回復'+(lsRealDmg<dmg?'<span style="font-size:8px;color:#aaa;">(軽減後)</span>':'');
         }
         case 'strikeBack':{
           const prevLoss=G.prevTurnHpLoss||0;
@@ -9055,11 +9066,13 @@ function renderHand(){
           // 回復カード（表示ルール統一：基本値→現在値）
           if(c.type==='heal'&&c.effect){
             const healExtra=hb+soulHealB;
+            // 息吹等、回復と同時にシールドも付与するカードは、シールド分も併記する
+            const shieldPart=c.effect.shield?('盾'+fmtStatArrow(c.effect.shield,c.effect.shield+sb+soulShieldB)+' + '):'';
             if(c.effect.heal){
-              return 'HP+'+fmtStatArrow(c.effect.heal,c.effect.heal+healExtra);
+              return shieldPart+'HP+'+fmtStatArrow(c.effect.heal,c.effect.heal+healExtra);
             }
             if(c.effect.regenVal){
-              return '毎T HP+'+fmtStatArrow(c.effect.regenVal,c.effect.regenVal+healExtra);
+              return shieldPart+'毎T HP+'+fmtStatArrow(c.effect.regenVal,c.effect.regenVal+healExtra);
             }
           }
           // 攻撃カード（表示ルール統一：基本値→現在値）
@@ -9076,6 +9089,8 @@ function renderHand(){
             const dmg=_d(base+atkExtra);
             const total=dmg*t;
             const hpTag=hpScaleExtra>0?'<span style="color:#4ecdc4;font-size:8px;">(HP+'+hpScaleExtra+')</span>':'';
+            // 血の契約・魂の契約等、自分のHPを消費して攻撃するカードは、その分も併記する
+            const selfDmgPart=c.effect.selfDmg?('HP-'+c.effect.selfDmg+' + '):'';
             if(t>1){
               // 弱点付与・最初の一撃ボーナスは1ヒット目にのみ乗る一時的な追加分のため、
               // per-hitの数値・合計には含めず別枠で示す（1ヒット目の実際の値と食い違うのを防ぐ）
@@ -9083,11 +9098,11 @@ function renderHand(){
               const firstHitTag=firstHitExtra>0?'<span style="color:#f39c12;font-size:9px;">(1発目+'+firstHitExtra+')</span>':'';
               const wkTag=wkExtra>0?'<span style="color:#ff6060;font-size:9px;">(1発目+'+wkExtra+')</span>':'';
               const dmgNoFirst=_d(base+_atk+soulAtkB+hpScaleExtra);
-              return '攻'+fmtStatArrow(base,dmgNoFirst)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(dmgNoFirst*t)+'</span>'+firstHitTag+wkTag+hpTag;
+              return selfDmgPart+'攻'+fmtStatArrow(base,dmgNoFirst)+'×'+t+'<br><span style="font-size:8px;color:#aaa;">合計'+_hi(dmgNoFirst*t)+'</span>'+firstHitTag+wkTag+hpTag;
             }
             // 単発攻撃は、弱点付与・最初の一撃ボーナス分も含めた「実際に与えるダメージ」を現在値として表示する
             const wkExtra=G.enemyWeaknessCount||0;
-            return '攻'+fmtStatArrow(base,dmg+wkExtra)+hpTag;
+            return selfDmgPart+'攻'+fmtStatArrow(base,dmg+wkExtra)+hpTag;
           }
           return c.shortDesc||c.desc.slice(0,18)+(c.desc.length>18?'…':'');
         }
@@ -11163,21 +11178,17 @@ function executeChargeEffect(){
     const hv=ct.effectVal||9;
     let _mha;
     if(ct.overflowToMax){
-      // レベル4僧侶：最大HPを超えた分は最大HPそのものに加算する（このステージ中のみ／回復扱いで神聖なる拳のカウントにも加算）
-      const before=G.playerHp;
-      G.playerHp=G.playerHp+hv;
-      if(G.playerHp>G.playerMaxHp){
-        const over=G.playerHp-G.playerMaxHp;
-        G.playerMaxHp+=over;
-        G.jikoSaiseiOverflowHp=(G.jikoSaiseiOverflowHp||0)+over; // 次ステージ開始時に取り消す
-      }
-      _mha=G.playerHp-before;
-      if(_mha>0) G.stageHealSum=(G.stageHealSum||0)+_mha;
+      // レベル4僧侶：以前は「回復量のうち最大HPを超えた分だけ」最大HPに加算していたが、
+      // 仕様変更により「先に最大HP+20」してから通常通り回復する（このステージ中のみ有効／次ステージ開始時に+20分を取り消す）
+      const maxHpGain=20;
+      G.playerMaxHp+=maxHpGain;
+      G.jikoSaiseiOverflowHp=(G.jikoSaiseiOverflowHp||0)+maxHpGain;
+      _mha=healPlayer(hv);
     } else {
       _mha=healPlayer(hv);
     }
     const _drawTxt=ct.draw>0?(' + ドロー'+ct.draw):'';
-    addLog('💚 HP+'+_mha+_drawTxt+(ct.overflowToMax?'（最大HPを超えた分は最大HPに加算）':'')+'！','sys');
+    addLog('💚 HP+'+_mha+_drawTxt+(ct.overflowToMax?'（最大HP+20してから回復）':'')+'！','sys');
     queueEffect(()=>{sfxHeal();spawnDmgNum('+'+_mha,'heal');flashHealEffect(_mha);}, 800);
     if(ct.draw>0) queueEffect(()=>{flashDrawCard(ct.draw);setTimeout(()=>{drawCards(ct.draw);renderHand();},500);}, 800);
     G.chargeEffectActive=false;
@@ -12350,9 +12361,9 @@ const SHOP_ITEMS=[
   {id:'buy_kekkai',   cat:'soul', icon:'🔷', name:'障壁のソウルⅠ', desc:'①ステータスアップ系 コスト3・シールドの最低値が0ではなく5になり、5以下に減少しなくなる', price:50, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kekkai'},
   {id:'buy_kinkyu',   cat:'soul', icon:'🚨', name:'緊急防壁のソウルⅠ', desc:'①ステータスアップ系 コスト1・シールド無しでターンを終了した場合、シールド+3する', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'kinkyu'},
   {id:'buy_taidoku',  cat:'soul', icon:'☠️', name:'耐毒のソウルⅠ', desc:'②状態異常軽減系 コスト1・毒付与-8', price:20, currency:'crystal', unlockArea:null, oneTime:true, soulId:'taidoku'},
-  {id:'buy_fukutsu',  cat:'soul', icon:'💢', name:'不屈のソウルⅠ',  desc:'②状態異常軽減系 コスト1・呪いダメージ-5', price:30, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu'},
-  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈のソウルⅡ', desc:'②状態異常軽減系 コスト2・呪いダメージ-10', price:30, currency:'crystal', unlockArea:null, requireSouls:['fukutsu'], oneTime:true, soulId:'fukutsu2'},
-  {id:'buy_fukutsu3', cat:'soul', icon:'💢', name:'不屈のソウルⅢ', desc:'②状態異常軽減系 コスト3・呪いダメージ-15', price:40, currency:'crystal', unlockArea:null, requireSouls:['fukutsu2'], oneTime:true, soulId:'fukutsu3'},
+  {id:'buy_fukutsu',  cat:'soul', icon:'💢', name:'不屈のソウルⅠ',  desc:'②状態異常軽減系 コスト1・呪いダメージ-3', price:30, currency:'crystal', unlockArea:null, oneTime:true, soulId:'fukutsu'},
+  {id:'buy_fukutsu2', cat:'soul', icon:'💢', name:'不屈のソウルⅡ', desc:'②状態異常軽減系 コスト2・呪いダメージ-6', price:30, currency:'crystal', unlockArea:null, requireSouls:['fukutsu'], oneTime:true, soulId:'fukutsu2'},
+  {id:'buy_fukutsu3', cat:'soul', icon:'💢', name:'不屈のソウルⅢ', desc:'②状態異常軽減系 コスト3・呪いダメージ-9', price:40, currency:'crystal', unlockArea:null, requireSouls:['fukutsu2'], oneTime:true, soulId:'fukutsu3'},
   {id:'buy_taika',  cat:'soul', icon:'🔥', name:'耐炎のソウルⅠ', desc:'②状態異常軽減系 コスト2・炎上系の増加コストを-1', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taika'},
   {id:'buy_taiden', cat:'soul', icon:'⚡', name:'耐電のソウルⅠ', desc:'②状態異常軽減系 コスト2・麻痺で無効化されたカードのコストが消費されない', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taiden'},
   {id:'buy_taihyou',cat:'soul', icon:'❄️', name:'耐氷のソウルⅠ', desc:'②状態異常軽減系 コスト2・氷雪弾の使用制限を2枚→3枚に緩和', price:40, currency:'crystal', unlockArea:'毒の沼地', oneTime:true, soulId:'taihyou'},
