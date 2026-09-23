@@ -104,8 +104,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #enemy-area.area-iron #area-particles span{background:radial-gradient(circle,#dce4f0,transparent);box-shadow:0 0 5px #8a9cb4;width:5px;height:5px;}
 #enemy-area.area-ice{border-color:rgba(120,200,240,.8);}
 #enemy-area.area-ice #area-particles span{background:radial-gradient(circle,#e0f6ff,transparent);box-shadow:0 0 6px #78c8f0;width:4px;height:4px;}
-/* 氷壁の迷宮：背景・敵が白っぽく輪郭が見えにくいため、黒色オーバーレイでコントラストを確保する */
-#enemy-area.area-ice::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.42);z-index:2;pointer-events:none;}
+/* 氷壁の迷宮：敵が白っぽく輪郭が見えにくいため、敵の輪郭に黒縁を付けてコントラストを確保する（背景は変更しない） */
+#enemy-area.area-ice #enemy-sprite img.enemy-img{filter:drop-shadow(0 0 2px #000) drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000) drop-shadow(0 0 4px rgba(0,0,0,.9));}
 #enemy-area.area-noroi{border-color:rgba(176,136,216,.75);}
 #enemy-area.area-noroi #area-particles span{background:radial-gradient(circle,#dcc0f0,transparent);box-shadow:0 0 5px #8a5ab0;width:4px;height:4px;}
 #enemy-area.area-mori{border-color:rgba(74,140,90,.8);}
