@@ -9178,7 +9178,7 @@ function renderHand(){
         cardIconHtml(c)+
         '<div class="card-name" style="font-size:'+_cardNameSize(c.name)+'px;">'+c.name+'</div>'+
         '<div class="card-divider"></div>'+
-        '<div class="card-desc" style="font-size:'+_handCardDescSize(displayDesc)+'px;">'+displayDesc+'</div>'+
+        '<div class="card-desc" style="font-size:'+_handCardDescSize(displayDesc)+'px;"><span style="display:block;width:100%;">'+displayDesc+'</span></div>'+
         '<div class="rarity-dot '+c.rarity+'">'+RL[c.rarity]+'</div>'+
       '</div>'+
       '<div class="card-corner tl">'+corner+'</div>'+
@@ -9271,13 +9271,14 @@ function showCardUsePopup(c,idx,canUse){
   // 拡大カード（showCardDetailと同じ描画）
   const fImg=FRAME_IMGS[c.rarity]||'';
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',D:'☠️'}[c.rarity]||'◆';
+  const _bdp=getDetailDescParts(c);
   const cardDiv=document.createElement('div');
   cardDiv.className='card '+c.rarity;
   cardDiv.style.cssText='position:relative;width:180px;pointer-events:none;';
   if(fImg){cardDiv.style.backgroundImage='url('+fImg+')';cardDiv.style.backgroundSize='100% 100%';}
   const _imgId1=c._baseId||c.id;
   const _imgSrc1=CARD_ICON_OVERRIDE[_imgId1]||('card_'+_imgId1+'.png');
-  const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:18px auto 4px;">'
+  const iconHtml='<div class="card-icon-wrap" style="width:48px;height:48px;margin:34px auto 4px;">'
     +'<img src="'+_imgSrc1+'" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" '
     +'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\';" '
     +'onload="this.nextSibling.style.display=\'none\';">'
@@ -9291,8 +9292,8 @@ function showCardUsePopup(c,idx,canUse){
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
       '<div class="card-divider"></div>'+
-      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 26px;white-space:normal;word-break:break-all;">'+getDisplayCardDesc(c)+'</div>'+
-      '<div style="padding:0 20px;">'+fmtStatDetailBlock(getCardStatBreakdown(c))+'</div>'+
+      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 26px;white-space:normal;word-break:break-all;">'+_bdp.desc+'</div>'+
+      '<div style="padding:0 20px;">'+_bdp.block+'</div>'+
       '<div style="margin:5px auto 3px;width:fit-content;background:#000;border:1.5px solid #fff;border-radius:5px;padding:2px 8px;"><span class="rarity-dot '+c.rarity+'" style="display:inline;font-size:8px;">'+(RL[c.rarity]||c.rarity)+'</span></div>'+
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
@@ -9416,11 +9417,41 @@ function fmtStatDetailBlock(bd){
     +row
     +'</div>';
 }
+// 詳細表示用：ステージ中は、説明文中の元の数値を「現在値（補正込み）」に置き換えて表示し、
+// 別枠の内訳ブロックは出さない（元データは変更しない）。置き換えできない複雑な説明文の場合は従来どおり別枠で表示する。
+function getDetailDescParts(c){
+  const desc=getDisplayCardDesc(c);
+  const bd=getCardStatBreakdown(c);
+  const fallback={desc:desc, block:fmtStatDetailBlock(bd)};
+  if(!_inBattle) return fallback;
+  if(!bd) return {desc:desc, block:''};
+  if(String(desc).indexOf('<')>=0) return fallback;
+  const baseId=c._baseId||c.id;
+  let soulB=0;
+  if(bd.label==='攻撃力') soulB=getSoulCardAtkBonus(baseId);
+  else if(bd.label==='シールド') soulB=getSoulCardShieldBonus(baseId);
+  else if(bd.label==='回復量'||bd.label==='毎ターン回復') soulB=getSoulCardHealBonus(baseId);
+  const shownBase=bd.base+soulB;
+  const times=bd.times||1;
+  const nums=[...String(desc).matchAll(/\d+/g)];
+  const hit=nums.find(m=>parseInt(m[0],10)===shownBase);
+  if(!hit) return fallback;
+  const reps=[{idx:hit.index,len:hit[0].length,html:fmtStatArrow(bd.base,bd.cur,!!bd.invert)}];
+  if(times>1){
+    const tot=nums.find(m=>m.index>hit.index&&parseInt(m[0],10)===shownBase*times);
+    if(tot) reps.push({idx:tot.index,len:tot[0].length,html:fmtStatArrow(bd.base*times,bd.total,!!bd.invert)});
+  }
+  let out='',pos=0;
+  reps.sort((a,b)=>a.idx-b.idx).forEach(r=>{out+=desc.slice(pos,r.idx)+r.html;pos=r.idx+r.len;});
+  out+=desc.slice(pos);
+  return {desc:out, block:''};
+}
 function showCardDetail(c){
   const popup=document.getElementById('card-detail-popup');
   const inner=document.getElementById('card-detail-inner');
   const fImg=FRAME_IMGS[c.rarity]||'';
   const corner={common:'◆',uncommon:'◆',rare:'◆',epic:'◈',legendary:'★',gauge:'⚡',bougai:'☠️',D:'☠️'}[c.rarity]||'◆';
+  const _bdp=getDetailDescParts(c);
   inner.className='card '+c.rarity;
   inner.style.cssText='position:relative;width:180px;';
   if(fImg){inner.style.backgroundImage='url('+fImg+')';inner.style.backgroundSize='100% 100%';}
@@ -9442,8 +9473,8 @@ function showCardDetail(c){
       iconHtml+
       '<div class="card-name" style="font-size:16.5px;margin-top:4px;">'+c.name+'</div>'+
       '<div class="card-divider"></div>'+
-      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 26px;white-space:normal;word-break:break-all;">'+getDisplayCardDesc(c)+'</div>'+
-      '<div style="padding:0 20px;">'+fmtStatDetailBlock(getCardStatBreakdown(c))+'</div>'+
+      '<div class="card-desc" style="font-size:12px;line-height:1.6;padding:0 26px;white-space:normal;word-break:break-all;">'+_bdp.desc+'</div>'+
+      '<div style="padding:0 20px;">'+_bdp.block+'</div>'+
       '<div style="margin:5px auto 3px;width:fit-content;background:#000;border:1.5px solid #fff;border-radius:5px;padding:2px 8px;"><span class="rarity-dot '+c.rarity+'" style="display:inline;font-size:8px;">'+(RL[c.rarity]||c.rarity)+'</span></div>'+
     '</div>'+
     '<div class="card-corner tl">'+corner+'</div>'+
