@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver424</title>
+<title>DUNGEON WALKER DWCver425</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -821,7 +821,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v424</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v425</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -855,7 +855,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver424</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver425</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -886,17 +886,35 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
 
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">⬆️ ステータス強化（ボタンで何度でも追加）</div>
-      <div id="admin-statup-list" style="display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;"></div>
+      <div id="admin-hdr-stat" style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:space-between;">
+        <span>⬆️ ステータス強化（ボタンで何度でも追加）</span><span id="admin-chev-stat" style="color:#888;">▼</span>
+      </div>
+      <div id="admin-body-stat">
+        <div id="admin-statup-list" style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto;"></div>
+      </div>
     </div>
 
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;">🃏 カード追加（デッキ: <span id="admin-deck-count">0</span>枚）<span id="btn-admin-refresh" style="margin-left:8px;background:rgba(80,120,200,.2);border:1px solid rgba(80,120,200,.5);border-radius:4px;padding:2px 8px;color:#7db8f7;cursor:pointer;font-size:9px;touch-action:manipulation;">🔄 更新</span></div>
-      <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <select id="admin-card-select" style="flex:1;background:rgba(0,0,0,.7);border:1px solid rgba(201,168,76,.4);border-radius:6px;color:#c9a84c;font-size:11px;padding:4px 6px;min-width:0;font-family:sans-serif;"></select>
-        <div id="btn-admin-add-card" style="background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.6);border-radius:6px;padding:6px 12px;color:#c9a84c;cursor:pointer;font-size:11px;font-family:'Cinzel',serif;white-space:nowrap;touch-action:manipulation;">+追加</div>
+      <div id="admin-hdr-soul" style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:space-between;">
+        <span>🔮 ソウル所持＆装着（現在のチャージ用）</span><span id="admin-chev-soul" style="color:#888;">▼</span>
       </div>
-      <div id="admin-deck-list" style="display:flex;flex-wrap:wrap;gap:3px;max-height:110px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:4px;padding:4px;min-height:28px;"></div>
+      <div id="admin-body-soul">
+        <div style="font-size:9px;color:#888;margin-bottom:4px;font-family:sans-serif;">金色＝装着中。専用チャージのソウルは、選択中のチャージに合うものだけ表示します。</div>
+        <div id="admin-soul-list" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
+      <div id="admin-hdr-card" style="font-family:'Cinzel',serif;font-size:10px;color:#c9a84c;margin-bottom:6px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:space-between;">
+        <span>🃏 カード追加（デッキ: <span id="admin-deck-count">0</span>枚）<span id="btn-admin-refresh" style="margin-left:8px;background:rgba(80,120,200,.2);border:1px solid rgba(80,120,200,.5);border-radius:4px;padding:2px 8px;color:#7db8f7;cursor:pointer;font-size:9px;touch-action:manipulation;">🔄 更新</span></span><span id="admin-chev-card" style="color:#888;">▼</span>
+      </div>
+      <div id="admin-body-card">
+        <div style="display:flex;gap:6px;margin-bottom:6px;">
+          <select id="admin-card-select" style="flex:1;background:rgba(0,0,0,.7);border:1px solid rgba(201,168,76,.4);border-radius:6px;color:#c9a84c;font-size:11px;padding:4px 6px;min-width:0;font-family:sans-serif;"></select>
+          <div id="btn-admin-add-card" style="background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.6);border-radius:6px;padding:6px 12px;color:#c9a84c;cursor:pointer;font-size:11px;font-family:'Cinzel',serif;white-space:nowrap;touch-action:manipulation;">+追加</div>
+        </div>
+        <div id="admin-deck-list" style="display:flex;flex-wrap:wrap;gap:3px;max-height:110px;overflow-y:auto;background:rgba(0,0,0,.3);border-radius:4px;padding:4px;min-height:28px;"></div>
+      </div>
     </div>
 
     <div style="background:rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:8px;">
@@ -11559,6 +11577,71 @@ function adminRefreshDeck(){
   });
 }
 
+// 管理者パネル：ソウルの所持＋装着をテスト用に一括操作する。
+// タップで「未所持→所持＆装着」「装着中→未装着（所持は残す）」を切り替える。コスト上限は無視する（テスト用のため）。
+function adminRefreshSoulList(){
+  const list=document.getElementById('admin-soul-list');
+  if(!list) return;
+  list.innerHTML='';
+  SAVE.soulsOwned=SAVE.soulsOwned||{};
+  SAVE.soulEquippedByCharge=SAVE.soulEquippedByCharge||{};
+  _migrateSoulEquipToPerCharge();
+  const cid=adminChargeType||'renGeki';
+  const equippedArr=(SAVE.soulEquippedByCharge[cid]=SAVE.soulEquippedByCharge[cid]||[]);
+  const byCat={1:[],2:[],3:[],4:[]};
+  Object.values(SOULS).forEach(s=>{
+    if(s.exclusiveCharge && s.exclusiveCharge!==cid) return;
+    (byCat[s.category]=byCat[s.category]||[]).push(s);
+  });
+  [1,2,3,4].forEach(cat=>{
+    const souls=byCat[cat];
+    if(!souls || !souls.length) return;
+    const catHead=document.createElement('div');
+    catHead.style.cssText='font-size:9px;color:#888;font-family:sans-serif;margin-top:2px;';
+    catHead.textContent=SOUL_CATEGORY_NAMES[cat]||'';
+    list.appendChild(catHead);
+    const grid=document.createElement('div');
+    grid.style.cssText='display:flex;flex-wrap:wrap;gap:4px;';
+    souls.forEach(s=>{
+      const on=equippedArr.includes(s.id);
+      const btn=document.createElement('div');
+      btn.style.cssText='font-size:10px;font-family:sans-serif;border-radius:6px;padding:5px 7px;cursor:pointer;touch-action:manipulation;user-select:none;border:1px solid '+(on?'rgba(201,168,76,.8)':'rgba(255,255,255,.15)')+';background:'+(on?'rgba(201,168,76,.25)':'rgba(0,0,0,.35)')+';color:'+(on?'#f0d878':'#999')+';white-space:nowrap;';
+      btn.textContent=s.icon+' '+s.name;
+      const toggle=(e)=>{
+        e.stopPropagation();
+        SAVE.soulsOwned[s.id]=true;
+        const i=equippedArr.indexOf(s.id);
+        if(i>=0) equippedArr.splice(i,1); else equippedArr.push(s.id);
+        adminRefreshSoulList();
+      };
+      btn.addEventListener('click',toggle);
+      btn.addEventListener('touchend',(e)=>{e.preventDefault();toggle(e);});
+      grid.appendChild(btn);
+    });
+    list.appendChild(grid);
+  });
+}
+
+// 管理者パネル内の各セクションを開閉できるようにする（項目が多く一覧しづらいため）。
+function adminInitCollapsibles(){
+  [['admin-hdr-stat','admin-body-stat','admin-chev-stat',true],
+   ['admin-hdr-soul','admin-body-soul','admin-chev-soul',false],
+   ['admin-hdr-card','admin-body-card','admin-chev-card',false]].forEach(([hid,bid,cid2,openDefault])=>{
+    const h=document.getElementById(hid), b=document.getElementById(bid), c=document.getElementById(cid2);
+    if(!h||!b||!c||h._admWired) return;
+    h._admWired=true;
+    const setOpen=(v)=>{b.style.display=v?'':'none';c.textContent=v?'▼':'▶';};
+    setOpen(openDefault);
+    const tgl=(e)=>{
+      if(e.target&&e.target.id==='btn-admin-refresh') return; // 更新ボタンはヘッダ内だがトグルさせない
+      e.stopPropagation();
+      setOpen(b.style.display==='none');
+    };
+    h.addEventListener('click',tgl);
+    h.addEventListener('touchend',(e)=>{e.preventDefault();tgl(e);});
+  });
+}
+
 function openAdminMode(){
   const inGame=(G.stage>0&&G.phase&&G.phase!=='title');
   if(!inGame){
@@ -11636,6 +11719,7 @@ function openAdminMode(){
         chargeBtns2.querySelectorAll('div').forEach((x,xi)=>{const c2=chargeList[xi];x.style.background='rgba(0,0,0,.6)';x.style.borderColor=c2?c2.color+'66':'#555';x.style.color=c2?c2.color:'#aaa';});
         b.style.background='rgba(231,76,60,.2)';b.style.borderColor='#e74c3c';b.style.color='#fff';
         adminRefreshDeck();
+        adminRefreshSoulList();
       };
       btn.addEventListener('click',pickC(ct.id,btn));
       btn.addEventListener('touchend',(e)=>{e.preventDefault();pickC(ct.id,btn)(e);});
@@ -11668,6 +11752,11 @@ function openAdminMode(){
     {label:'⚡ フルチャージ',       max:1,  apply:()=>{G.fullChargeStart=true;G.gotChargeHelper=true;G.gotFullCharge=true;},undo:()=>{G.fullChargeStart=false;G.gotFullCharge=false;}},
     {label:'💗 回復強化+1',        max:10, apply:(d)=>{G.healBuff=(G.healBuff||0)+d;G.healBuffCount=(G.healBuffCount||0)+d;},undo:(d)=>{G.healBuff=Math.max(0,(G.healBuff||0)-d);G.healBuffCount=Math.max(0,(G.healBuffCount||0)-d);}},
     {label:'🛡️ 盾強化+1',         max:10, apply:(d)=>{G.shieldBuff=(G.shieldBuff||0)+d;G.shieldBuffCount=(G.shieldBuffCount||0)+d;},undo:(d)=>{G.shieldBuff=Math.max(0,(G.shieldBuff||0)-d);G.shieldBuffCount=Math.max(0,(G.shieldBuffCount||0)-d);}},
+    {label:'💥 マナストライク（一度のみ）', max:1, apply:()=>{G.gotManaStrike=true;},undo:()=>{G.gotManaStrike=false;}},
+    {label:'🛡️ カードバリア（一度のみ）', max:1, apply:()=>{G.gotCardBarrier=true;},undo:()=>{G.gotCardBarrier=false;}},
+    {label:'❤️ ハンドレス（一度のみ）', max:1, apply:()=>{G.gotHandless=true;},undo:()=>{G.gotHandless=false;}},
+    {label:'🃏 ワンハンド（一度のみ）', max:1, apply:()=>{G.gotOnehand=true;},undo:()=>{G.gotOnehand=false;}},
+    {label:'🧘 不動の構え（一度のみ）', max:1, apply:()=>{G.gotFudouKamae=true;},undo:()=>{G.gotFudouKamae=false;}},
   ];
   statOptions.forEach(opt=>{
     const row=document.createElement('div');
@@ -11720,6 +11809,9 @@ function openAdminMode(){
     addBtn.onclick=(e)=>{e.stopPropagation();const s=document.getElementById('admin-card-select');if(s&&s.value){G.deck.push(s.value);adminRefreshDeck();}};
     addBtn.ontouchend=(e)=>{e.stopPropagation();e.preventDefault();const s=document.getElementById('admin-card-select');if(s&&s.value){G.deck.push(s.value);adminRefreshDeck();}};
   }
+
+  adminRefreshSoulList();
+  adminInitCollapsibles();
 
   // タブ・ステージ・チャージを現在エリアで初期化
   setTab(adminAreaId);
