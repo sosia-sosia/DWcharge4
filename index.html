@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DUNGEON WALKER">
-<title>DUNGEON WALKER DWCver430</title>
+<title>DUNGEON WALKER DWCver431</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 :root{--bg:#07050e;--panel:#110d1a;--panel2:#180f28;--border:#2a1e42;--gold:#c9a84c;--text:#e8dcc8;--dim:#5a4a3a;--common:#8a9aaa;--uncommon:#50b450;--rare:#4a8aff;--epic:#d040ff;--legendary:#ff9500;}
@@ -821,7 +821,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <div id="tap-to-start-screen" style="display:none;position:fixed;inset:0;background:#07050e;z-index:1100;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;touch-action:manipulation;transition:opacity .3s;opacity:1;">
   <div style="font-family:'Cinzel',serif;font-size:22px;color:#c9a84c;letter-spacing:6px;text-shadow:0 0 24px rgba(201,168,76,.8);animation:logo-pulse 1.5s ease-in-out infinite;">DUNGEON WALKER</div>
-  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v430</div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;color:rgba(201,168,76,.45);letter-spacing:2px;">v431</div>
   <div style="font-family:'Cinzel',serif;font-size:13px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;">▶ TAP TO START</div>
 </div>
 <div id="op-screen" style="display:none;position:fixed;inset:0;background:#000;z-index:1003;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:all;touch-action:none;">
@@ -855,7 +855,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#b8d4ff;letter-spacing:8px;text-shadow:0 0 20px rgba(100,160,255,.8),0 0 40px rgba(100,160,255,.3),1px 1px 0 #0a2060;text-align:center;">CHARGE</div>
     <div style="height:2px;width:220px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin-top:6px;"></div>
     <div style="font-family:'Cinzel',serif;font-size:10px;color:rgba(201,168,76,.5);letter-spacing:3px;">CARD BATTLE RPG</div>
-    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver430</div>
+    <div style="font-family:sans-serif;font-size:9px;color:rgba(201,168,76,.35);letter-spacing:1px;margin-top:2px;">ver431</div>
     <div style="font-family:'Cinzel',serif;font-size:12px;color:rgba(201,168,76,.7);letter-spacing:4px;animation:logo-pulse 1.5s ease-in-out infinite;margin-top:10px;">▶ TAP TO START</div>
   </div>
 
@@ -2855,6 +2855,7 @@ function _doResumeRun(){
     return;
   }
   G=st;
+  G._bypassPhaseGuard=false; // 極めて短い一瞬（自動発動カードの処理中）に保存された場合への保険。復帰後は必ず解除する。
   _reconstructSmithKaiCards(G);
   // 演出専用の一時フラグ（多段ヒット演出中フラグ等）は、保存前に演出が完了しないまま
   // 中断された場合に「立ったまま」保存されてしまうことがある。そのまま復元すると、
@@ -3812,8 +3813,7 @@ function playCard(idx, _isChain){
   const c = (typeof idx==='object') ? idx : DB[G.hand[idx]];
   const cid = c ? c.id : null;
   if(!c||!cid)return;
-  if(G.phase!=='player')return;
-  // 連鎖起動後：スキルカードは実行そのものをブロックする（UI層のグレーアウトだけに依存しない保険）
+  if(G.phase!=='player' && !G._bypassPhaseGuard)return;
   if(!_isChain && G.chainNoSkill && c.type==='skill'){ dwRejectFeedback(document.getElementById('hand-cards')); return; }
   // チュートリアル：UI層（canUse）の判定を経由しない呼び出しに対する保険。対象外の操作は実行しない。
   if(!_isChain && G.areaId===7){
@@ -9468,25 +9468,26 @@ function showHandAutoEffectPopup(kind, idx, onResolved){
       if(popup.parentNode) popup.parentNode.removeChild(popup);
       addLog((kind==='randomhand'?'🎲 ランダムハンド発動！「':'🃏 ワンハンド発動！「')+c.name+'」を使用','sys');
       // ターン終了処理中はG.phase='enemy'になっており、playCard()は
-      // G.phase!=='player'だと即座に何もせず終了してしまうため、使用する間だけplayer扱いに戻す。
-      const _prevPhase=G.phase;
-      G.phase='player';
+      // G.phase!=='player'だと即座に何もせず終了してしまう。ここでG.phaseを直接'player'に書き換える
+      // と、その間に強制終了された場合、復帰処理が「もう自分のターン開始処理は完了済み」と誤判定して
+      // ターン開始時の手札入れ替え・マナ回復・ターン加算を省いてしまい、カードだけ無料で使い得になる
+      // 抜け道になる（実際に報告された不具合）。そのため実際のフェーズには触れず、
+      // playCard側だけを一時的にバイパスする専用フラグを使う。
+      G._bypassPhaseGuard=true;
       G.freeNextCard=true; G.freePassUsedThisTurn=true; G.freePassManaAtUse=-1;
       playCard(idx);
+      G._bypassPhaseGuard=false;
       G.freeNextCard=false; // 万一カード側の処理で消費されなかった場合の保険（次のターンへ持ち越さない）
       // ダメージ処理はqueueEffectで非同期に実行される場合があるため、効果キューが
       // 完全に片付くまで待ってから、敵を倒したかどうかを判定する。
-      // ここで敵を倒していた場合：checkEnemyDeath()がG.phase='block'にして勝利演出（victory()）を
-      // 予約するので、その状態を維持したまま（元のphaseに戻さず）このターン終了処理の残りを打ち切る。
-      // 生きている場合のみ、元のphase（'enemy'）に戻してターン終了処理を続行させる。
+      // 敵を倒していた場合：checkEnemyDeath()がG.phase='block'にして勝利演出（victory()）を
+      // 予約するので、その状態のままこのターン終了処理の残りを打ち切る。
       const _finish=()=>{
         if((typeof effectQueue!=='undefined'&&effectQueue.length>0)||effectRunning){ setTimeout(_finish,80); return; }
         let died=false;
         if(G.enemy && G.enemy.curHp<=0){
           checkEnemyDeath(); // G._victoryPendingで二重発火は防止されるので、念のため呼んでおく
           died=true;
-        } else {
-          G.phase=_prevPhase;
         }
         onResolved(true, died);
       };
